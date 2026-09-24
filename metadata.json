@@ -1,0 +1,6 @@
+{
+  "name": "Olimpiade Siswa Nasional",
+  "description": "Platform Olimpiade Online Nasional bergengsi di seluruh Indonesia dengan slogan Berani Mencoba Untuk Masa Depan Gemilang.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "OSN-2026-5640",
+    "fullName": "Budi Pratama",
+    "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
+    "schoolName": "SD Harapan Bangsa",
+    "cityProvince": "Bandung, Jawa Barat",
+    "whatsapp": "081298765432",
+    "email": "-",
+    "subjects": [
+      "Matematika",
+      "Bahasa Indonesia"
+    ],
+    "registeredAt": "2026-09-24T03:03:13.455Z",
+    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)"
+  },
+  {
+    "id": "OSN-2026-B-89102",
+    "fullName": "Dzaliqa Assyafa N",
+    "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
+    "schoolName": "SDN Teladan Bangsa (Kelas 5)",
+    "cityProvince": "DKI Jakarta",
+    "whatsapp": "08123456781",
+    "email": "dzaliqa.assyafa@gmail.com",
+    "subjects": [
+      "Matematika",
+      "IPA / Sains"
+    ],
+    "registeredAt": "2026-09-20T08:30:00.000Z",
+    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)"
+  },
+  {
+    "id": "OSN-2026-C-99214",
+    "fullName": "Annora Geraldqueen S.R",
+    "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
+    "schoolName": "SMP Negeri 1 Nusantara",
+    "cityProvince": "Jawa Timur",
+    "whatsapp": "08123456782",
+    "email": "annora.gerald@gmail.com",
+    "subjects": [
+      "Bahasa Indonesia",
+      "Bahasa Inggris"
+    ],
+    "registeredAt": "2026-09-21T10:15:00.000Z",
+    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)"
+  }
+]
