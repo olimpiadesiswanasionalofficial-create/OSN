@@ -21,6 +21,10 @@ export function exportParticipantsToExcel(participants: ParticipantRecord[], tit
     'Status Penyisihan/Simulasi',
     'Skor Penyisihan',
     'Tanggal Selesai Penyisihan',
+    'Status Kelulusan Final',
+    'Status Closing Tiket Final',
+    'Nominal Closing (Rp)',
+    'Status Juara / Peringkat',
     'Status Babak Final',
     'Skor Babak Final',
     'Tanggal Selesai Final'
@@ -43,6 +47,10 @@ export function exportParticipantsToExcel(participants: ParticipantRecord[], tit
     `"${p.simulatedExam ? p.simulatedExam.status : 'Belum Mengerjakan'}"`,
     p.simulatedExam ? p.simulatedExam.score : '-',
     `"${p.simulatedExam ? new Date(p.simulatedExam.completedAt).toLocaleString('id-ID') : '-'}"`,
+    `"${p.qualificationStatus === 'lolos' ? 'LOLOS FINAL' : p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'PENDING'}"`,
+    `"${p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS (CLOSING)' : 'BELUM BAYAR'}"`,
+    p.finalTicketPaymentStatus === 'paid_closing' ? (p.finalTicketAmount || 99000) : 0,
+    `"${p.championRank || 'Belum Dinilai'}"`,
     `"${p.finalExam ? p.finalExam.status : 'Menunggu Jadwal'}"`,
     p.finalExam ? p.finalExam.score : '-',
     `"${p.finalExam ? new Date(p.finalExam.completedAt).toLocaleString('id-ID') : '-'}"`
@@ -259,5 +267,43 @@ export function exportParticipantsToVcf(participants: ParticipantRecord[], custo
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// 4. Export Single Participant Contact as VCF
+export function exportSingleParticipantVcf(p: ParticipantRecord, customGroup: string = 'OSN 2026'): void {
+  let cleanPhone = p.whatsapp.replace(/[^0-9]/g, '');
+  if (cleanPhone.startsWith('0')) {
+    cleanPhone = '62' + cleanPhone.substring(1);
+  }
+  if (!cleanPhone.startsWith('+')) {
+    cleanPhone = '+' + cleanPhone;
+  }
+
+  const note = `Peserta OSN 2026 - ID: ${p.id} | Sekolah: ${p.schoolName} | Jenjang: ${p.level} | Mapel: ${(p.subjects || []).join(', ')}`;
+
+  const vcard = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${p.fullName} - ${customGroup}`,
+    `N:${p.fullName};;;;`,
+    `ORG:OSN 2026;${p.schoolName || 'Peserta'}`,
+    `TITLE:Peserta ${p.level}`,
+    `TEL;TYPE=CELL,VOICE,PREF:${cleanPhone}`,
+    p.email && p.email !== '-' ? `EMAIL;TYPE=INTERNET:${p.email}` : '',
+    `NOTE:${note}`,
+    `CATEGORIES:${customGroup},Olimpiade Siswa Nasional`,
+    'END:VCARD'
+  ].filter(Boolean).join('\r\n');
+
+  const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const vcfLink = document.createElement('a');
+  const safeName = p.fullName.replace(/[^a-zA-Z0-9]/g, '_');
+  vcfLink.href = url;
+  vcfLink.setAttribute('download', `Kontak_${safeName}_OSN2026.vcf`);
+  document.body.appendChild(vcfLink);
+  vcfLink.click();
+  document.body.removeChild(vcfLink);
   URL.revokeObjectURL(url);
 }

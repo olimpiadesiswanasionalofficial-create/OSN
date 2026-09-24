@@ -41,6 +41,8 @@ import { APP_CONFIG } from '../appConfig.js';
 import { LogoOSN, LogoLKP, StempelLKP } from './components/BrandLogos';
 import { AuthModal } from './components/AuthModal';
 import { saveParticipant, saveMultipleParticipants, ParticipantRecord } from './services/participantDb';
+import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
+import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
 
 export interface ChildParticipantForm {
   fullName: string;
@@ -173,11 +175,56 @@ export default function App() {
   const [registeredRecords, setRegisteredRecords] = useState<ParticipantRecord[]>([]);
   const [authStudentInitialData, setAuthStudentInitialData] = useState<{ fullName?: string; whatsapp?: string; autoLogin?: boolean } | null>(null);
 
+  // Dynamic Event Schedule state
+  const [liveSchedule, setLiveSchedule] = useState<EventScheduleConfig>(DEFAULT_EVENT_SCHEDULE);
+
+  useEffect(() => {
+    // Secret URL parameter ?admin=true or ?panel=admin
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true' || urlParams.get('panel') === 'admin' || window.location.hash === '#admin-panitia') {
+      openLogin('admin');
+    }
+
+    // Secret Keyboard Shortcut: Ctrl + Shift + A to open Admin Login safely
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        openLogin('admin');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    setLiveSchedule(getEventSchedule());
+    const onScheduleChange = (e: any) => {
+      if (e.detail) {
+        setLiveSchedule(e.detail);
+      }
+    };
+    window.addEventListener('osn_schedule_updated', onScheduleChange);
+
+    // Initialize Meta Pixel from admin config
+    const pixelCfg = getMetaPixelConfig();
+    applyMetaPixel(pixelCfg);
+    const onPixelChange = (e: any) => {
+      if (e.detail) {
+        applyMetaPixel(e.detail);
+      }
+    };
+    window.addEventListener('osn_pixel_updated', onPixelChange);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('osn_schedule_updated', onScheduleChange);
+      window.removeEventListener('osn_pixel_updated', onPixelChange);
+    };
+  }, []);
+
   useEffect(() => {
     if (chatBottomRef.current) {
       chatBottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [aiMessages, aiLoading]);
+
 
   const openLogin = (role: 'user' | 'admin') => {
     setAuthModalDefaultRole(role);
@@ -359,6 +406,18 @@ export default function App() {
       // Automatically record all children registration into database and system
       const records = await saveMultipleParticipants(childrenForms);
       setRegisteredRecords(records);
+
+      // Track Meta Pixel Conversion Events
+      trackPixelEvent('Lead', {
+        content_name: 'Pendaftaran OSN 2026',
+        num_children: childrenForms.length,
+        status: 'registered'
+      });
+      trackPixelEvent('CompleteRegistration', {
+        content_name: 'OSN 2026 Online Registration',
+        value: 0.00,
+        currency: 'IDR'
+      });
     } catch (err) {
       console.error('Error saving participants to database:', err);
     }
@@ -505,33 +564,23 @@ export default function App() {
             <a href="#faq" className="hover:text-[#1A1615] transition-colors">FAQ</a>
           </nav>
 
-          {/* Action Buttons: LOGIN USER, LOGIN ADMIN & DAFTAR */}
+          {/* Action Buttons: LOGIN PESERTA & DAFTAR */}
           <div className="hidden sm:flex items-center gap-2.5">
             
             {/* Tombol Akses Login User */}
             <button
               onClick={() => openLogin('user')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all shadow-sm cursor-pointer"
               title="Akses Ujian CBT & Kartu Peserta"
             >
               <User className="w-3.5 h-3.5 text-[#9E7D15]" />
               <span>Login Peserta</span>
             </button>
 
-            {/* Tombol Akses Login Admin */}
-            <button
-              onClick={() => openLogin('admin')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#0B132B] text-white hover:bg-[#172554] transition-all shadow-sm border border-[#D4AF37]/50"
-              title="Akses Panitia LKP Prestasi Nusantara"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Login Admin</span>
-            </button>
-
             {/* Tombol Daftar Sekarang */}
             <button
               onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/60 hover:bg-[#2A2321] transition-all shadow-[0_4px_15px_rgba(212,175,55,0.2)]"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/60 hover:bg-[#2A2321] transition-all shadow-[0_4px_15px_rgba(212,175,55,0.2)] cursor-pointer"
             >
               <span>Daftar Gratis</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -553,20 +602,13 @@ export default function App() {
           <div className="lg:hidden bg-[#FAF8F5] border-b border-[#E8E2D9] px-4 pt-3 pb-6 space-y-3">
             
             {/* Mobile Login Access Direct Row */}
-            <div className="grid grid-cols-2 gap-2 pb-2 border-b border-[#E8E2D9]">
+            <div className="pb-2 border-b border-[#E8E2D9]">
               <button
                 onClick={() => openLogin('user')}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37]"
+                className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm"
               >
-                <User className="w-4 h-4 text-[#9E7D15]" />
-                <span>Login Peserta</span>
-              </button>
-              <button
-                onClick={() => openLogin('admin')}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-[#0B132B] text-white border border-[#D4AF37]/40"
-              >
-                <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
-                <span>Login Admin</span>
+                <User className="w-4 h-4 text-[#D4AF37]" />
+                <span>Masuk Ruang Ujian CBT Peserta</span>
               </button>
             </div>
 
@@ -1073,40 +1115,98 @@ export default function App() {
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {APP_CONFIG.timeline.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-[#FAF8F5] p-7 rounded-3xl border border-[#E8E2D9] space-y-4 relative shadow-sm hover:border-[#D4AF37] transition-all"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl font-black text-[#D4AF37]">
-                    {item.step}
-                  </span>
-                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#1A1615] text-[#D4AF37]">
-                    {item.badge}
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h3 className="text-lg font-extrabold text-[#1A1615]">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs font-bold text-[#9E7D15]">
-                    📅 {item.date}
-                  </p>
-                </div>
-
-                <p className="text-xs text-[#66615B] leading-relaxed">
-                  {item.desc}
-                </p>
-
-                <div className="pt-2 text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{item.status}</span>
-                </div>
+          <div className="mt-14 grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            {/* Step 1: Pendaftaran */}
+            <div className="bg-[#FAF8F5] p-6 rounded-3xl border border-[#E8E2D9] space-y-4 relative shadow-sm hover:border-[#D4AF37] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-black text-[#D4AF37]">01</span>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#1A1615] text-[#D4AF37]">
+                  Pendaftaran Online
+                </span>
               </div>
-            ))}
+              <div className="space-y-1">
+                <h3 className="text-base font-extrabold text-[#1A1615]">Pendaftaran Dibuka</h3>
+                <p className="text-xs font-bold text-[#9E7D15]">
+                  📅 {liveSchedule.registrationOpenDate || "25 Agustus – 11 September 2026"}
+                </p>
+              </div>
+              <p className="text-xs text-[#66615B] leading-relaxed">
+                {liveSchedule.registrationDesc || "Pendaftaran online mudah & praktis. Terbuka untuk seluruh siswa di Indonesia tanpa kuota zonasi."}
+              </p>
+              <div className="pt-2 text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Pendaftaran Dibuka</span>
+              </div>
+            </div>
+
+            {/* Step 2: Babak Penyisihan */}
+            <div className="bg-[#FAF8F5] p-6 rounded-3xl border border-[#E8E2D9] space-y-4 relative shadow-sm hover:border-[#D4AF37] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-black text-[#D4AF37]">02</span>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-700 text-white">
+                  Penyisihan Gratis
+                </span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-extrabold text-[#1A1615]">Babak Penyisihan (CBT)</h3>
+                <p className="text-xs font-bold text-[#9E7D15]">
+                  📅 {liveSchedule.penyisihanDate || "12 September 2026"}
+                </p>
+              </div>
+              <p className="text-xs text-[#66615B] leading-relaxed">
+                {liveSchedule.penyisihanDesc || "Ujian online aman dari rumah via sistem CBT mutakhir anti-kecurangan. Penyisihan GRATIS untuk semua peserta."}
+              </p>
+              <div className="pt-2 text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>CBT Terjadwal Online</span>
+              </div>
+            </div>
+
+            {/* Step 3: Babak Final */}
+            <div className="bg-[#FAF8F5] p-6 rounded-3xl border border-[#E8E2D9] space-y-4 relative shadow-sm hover:border-[#D4AF37] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-black text-[#D4AF37]">03</span>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#1A1615] text-[#D4AF37]">
+                  Babak Puncak
+                </span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-extrabold text-[#1A1615]">Babak Final Nasional</h3>
+                <p className="text-xs font-bold text-[#9E7D15]">
+                  📅 {liveSchedule.finalDate || "19 September 2026"}
+                </p>
+              </div>
+              <p className="text-xs text-[#66615B] leading-relaxed">
+                {liveSchedule.finalDesc || "Babak penentuan medalis nasional dan perebutan gelar Juara Umum OSN tingkat nasional."}
+              </p>
+              <div className="pt-2 text-[11px] font-semibold text-amber-700 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Tahap Penjurian</span>
+              </div>
+            </div>
+
+            {/* Step 4: Pengumuman Juara */}
+            <div className="bg-[#FAF8F5] p-6 rounded-3xl border border-[#E8E2D9] space-y-4 relative shadow-sm hover:border-[#D4AF37] transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-black text-[#D4AF37]">04</span>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#D4AF37] text-[#1A1615]">
+                  Sertifikat & Medali
+                </span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-extrabold text-[#1A1615]">Pengumuman Juara</h3>
+                <p className="text-xs font-bold text-[#9E7D15]">
+                  📅 {liveSchedule.announcementDate || "20 September 2026"}
+                </p>
+              </div>
+              <p className="text-xs text-[#66615B] leading-relaxed">
+                {liveSchedule.announcementDesc || "Pengumuman resmi juara, penerbitan sertifikat QR-Code & pengiriman paket piala/medali fisik ke alamat pemenang."}
+              </p>
+              <div className="pt-2 text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                <Trophy className="w-3.5 h-3.5" />
+                <span>Penyerahan Penghargaan</span>
+              </div>
+            </div>
           </div>
 
           <div className="mt-10 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -1456,19 +1556,19 @@ export default function App() {
               <p className="text-xs font-bold uppercase tracking-wider text-white">Akses Portal</p>
               <ul className="space-y-2 text-[11px]">
                 <li>
-                  <button onClick={() => openLogin('user')} className="text-[#D4AF37] hover:underline font-bold text-left">
-                    ● Login Peserta / Siswa
+                  <button onClick={() => openLogin('user')} className="text-[#D4AF37] hover:underline font-bold text-left cursor-pointer">
+                    ● Ruang Ujian CBT Siswa
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => openLogin('admin')} className="text-neutral-300 hover:text-white text-left">
-                    ● Login Admin Panitia
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => setAiDrawerOpen(true)} className="text-neutral-300 hover:text-white text-left">
+                  <button onClick={() => setAiDrawerOpen(true)} className="text-neutral-300 hover:text-white text-left cursor-pointer">
                     ● Konsultan Akademik AI
                   </button>
+                </li>
+                <li>
+                  <a href="#faq" className="text-neutral-300 hover:text-white text-left">
+                    ● Panduan & Syarat Ketentuan
+                  </a>
                 </li>
               </ul>
             </div>
@@ -1982,8 +2082,31 @@ export default function App() {
                     ))}
                   </div>
 
-                  {/* Actions: Direct CBT Portal Login & WhatsApp Notification */}
+                  {/* Wajib Konfirmasi WhatsApp & Follow Sosmed Banner */}
+                  <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-left space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-amber-600 text-white font-bold text-xs flex items-center justify-center">!</span>
+                      <h4 className="text-xs font-bold text-amber-900">Alur Wajib Setelah Mendaftar:</h4>
+                    </div>
+                    <ol className="text-xs text-amber-950 space-y-1 pl-4 list-decimal">
+                      <li><strong>Klik tombol WhatsApp di bawah</strong> untuk konfirmasi data ke panitia.</li>
+                      <li><strong>Wajib Follow Akun Instagram/TikTok resmi OSN</strong> untuk membuka akses pengerjaan simulasi ujian.</li>
+                      <li>Setelah follow, masuk ke <strong>Ruang Ujian Siswa</strong> untuk mengerjakan simulasi dan unduh kartu ujian.</li>
+                    </ol>
+                  </div>
+
+                  {/* Actions: WhatsApp Notification & Direct CBT Portal Login */}
                   <div className="space-y-2 pt-2">
+                    <a
+                      href={generateWhatsAppUrlMulti(childrenForms)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-3.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>1. Konfirmasi Sekarang ke WhatsApp Admin & Ambil Link Sosmed</span>
+                    </a>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -1994,21 +2117,11 @@ export default function App() {
                           openLogin('user');
                         }
                       }}
-                      className="w-full py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-2 shadow-lg border border-[#D4AF37]/60 cursor-pointer"
+                      className="w-full py-3 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-2 shadow-md border border-[#D4AF37]/60 cursor-pointer"
                     >
                       <LogIn className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Masuk ke Portal Ujian CBT Siswa Sekarang</span>
+                      <span>2. Masuk ke Ruang Ujian CBT Siswa (Simulasi & Kartu)</span>
                     </button>
-
-                    <a
-                      href={generateWhatsAppUrlMulti(childrenForms)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full py-3 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Kirim Konfirmasi ({childrenForms.length} Anak) ke WhatsApp Panitia</span>
-                    </a>
                     
                     <button
                       onClick={() => setRegistrationModalOpen(false)}

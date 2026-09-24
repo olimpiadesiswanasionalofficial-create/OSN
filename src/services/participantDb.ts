@@ -4,6 +4,8 @@ export interface ExamResultInfo {
   totalQuestions: number;
   completedAt: string;
   status: string;
+  violationReason?: string;
+  attemptsCount?: number;
 }
 
 export interface ParticipantRecord {
@@ -21,6 +23,24 @@ export interface ParticipantRecord {
   cbtStatus: string;
   simulatedExam?: ExamResultInfo;
   finalExam?: ExamResultInfo;
+  // Attempt counters (Max 2x access per exam stage)
+  simulatedAttempts?: number;
+  finalAttempts?: number;
+  // Anti-Cheat Violation Reason
+  violationReason?: string;
+  // Social Media Following Confirmation
+  hasFollowedSocial?: boolean;
+  socialFollowedAt?: string;
+  // Babak Penyisihan Qualification Status (Ditentukan Admin)
+  qualificationStatus?: 'pending' | 'lolos' | 'tidak_lolos';
+  qualificationNote?: string;
+  // Tiket Final Payment Closing Status
+  finalTicketPaymentStatus?: 'unpaid' | 'pending_verification' | 'paid_closing';
+  finalTicketPaidAt?: string;
+  finalTicketAmount?: number;
+  // Final Award / Certificate Champion Title
+  championRank?: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' | 'Belum Dinilai';
+  certificateIssuedDate?: string;
 }
 
 const STORAGE_KEY = 'osn_participants_database_2026';
@@ -39,7 +59,14 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     fullAddress: "Jl. Tebet Barat Dalam No. 14, Tebet, Jakarta Selatan",
     subjects: ["Matematika", "IPA / Sains"],
     registeredAt: "2026-09-20T08:30:00.000Z",
-    cbtStatus: "Selesai Mengerjakan Babak Final (Skor: 95/100)",
+    cbtStatus: "Tiket Final Lunas (Closing BCA Rp 99.000)",
+    qualificationStatus: 'lolos',
+    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
+    finalTicketPaymentStatus: 'paid_closing',
+    finalTicketPaidAt: "2026-09-22T13:10:00.000Z",
+    finalTicketAmount: 99000,
+    championRank: 'Juara 2',
+    certificateIssuedDate: "2026-09-23T16:00:00.000Z",
     simulatedExam: {
       subject: "Matematika",
       score: 90,
@@ -67,7 +94,11 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     fullAddress: "Jl. Pemuda No. 45, Gubeng, Surabaya",
     subjects: ["Bahasa Indonesia", "Bahasa Inggris"],
     registeredAt: "2026-09-21T10:15:00.000Z",
-    cbtStatus: "Selesai Simulasi CBT (Skor: 85/100)",
+    cbtStatus: "Selesai Simulasi CBT (Lolos Penyisihan)",
+    qualificationStatus: 'lolos',
+    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
+    finalTicketPaymentStatus: 'unpaid',
+    championRank: 'Belum Dinilai',
     simulatedExam: {
       subject: "Bahasa Inggris",
       score: 85,
@@ -86,6 +117,8 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     email: "aqilla.mikayla@gmail.com",
     subjects: ["Bahasa Indonesia"],
     registeredAt: "2026-09-22T14:20:00.000Z",
+    qualificationStatus: 'pending',
+    finalTicketPaymentStatus: 'unpaid',
     cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)"
   },
   {
@@ -98,7 +131,14 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     email: "rizky.pratama@gmail.com",
     subjects: ["Matematika", "IPA / Sains", "Bahasa Inggris"],
     registeredAt: "2026-09-23T09:45:00.000Z",
-    cbtStatus: "Selesai Mengerjakan Babak Final (Skor: 100/100)",
+    cbtStatus: "Tiket Final Lunas (Closing BCA Rp 99.000)",
+    qualificationStatus: 'lolos',
+    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
+    finalTicketPaymentStatus: 'paid_closing',
+    finalTicketPaidAt: "2026-09-23T11:00:00.000Z",
+    finalTicketAmount: 99000,
+    championRank: 'Juara 1',
+    certificateIssuedDate: "2026-09-23T16:00:00.000Z",
     simulatedExam: {
       subject: "IPA / Sains",
       score: 95,
@@ -279,6 +319,7 @@ export async function updateParticipantExamResult(
     subject: string;
     score: number;
     totalQuestions: number;
+    violationReason?: string;
   }
 ): Promise<ParticipantRecord | null> {
   const all = getAllParticipants();
@@ -286,20 +327,42 @@ export async function updateParticipantExamResult(
   if (idx === -1) return null;
 
   const p = all[idx];
+
+  // Increment attempts count
+  if (result.examType === 'final') {
+    p.finalAttempts = (p.finalAttempts || 0) + 1;
+  } else {
+    p.simulatedAttempts = (p.simulatedAttempts || 0) + 1;
+  }
+
+  const currentAttempts = result.examType === 'final' ? p.finalAttempts : p.simulatedAttempts;
+
+  let statusText = result.examType === 'final' ? 'Selesai Mengerjakan Babak Final' : 'Selesai Simulasi CBT';
+  if (result.violationReason) {
+    statusText = `Diskualifikasi: ${result.violationReason}`;
+  }
+
   const examInfo: ExamResultInfo = {
     subject: result.subject,
     score: result.score,
     totalQuestions: result.totalQuestions,
     completedAt: new Date().toISOString(),
-    status: result.examType === 'final' ? 'Selesai Mengerjakan Babak Final' : 'Selesai Simulasi CBT'
+    status: statusText,
+    violationReason: result.violationReason,
+    attemptsCount: currentAttempts
   };
 
   if (result.examType === 'final') {
     p.finalExam = examInfo;
-    p.cbtStatus = `Selesai Babak Final (Skor: ${result.score}/100)`;
+    if (result.violationReason) {
+      p.violationReason = result.violationReason;
+    }
+    p.cbtStatus = result.violationReason
+      ? `Final Terhenti (Pelanggaran Anti-Contek)`
+      : `Selesai Babak Final (Skor: ${result.score}/100, Percobaan ke-${currentAttempts}/2)`;
   } else {
     p.simulatedExam = examInfo;
-    p.cbtStatus = `Selesai Simulasi CBT (Skor: ${result.score}/100)`;
+    p.cbtStatus = `Selesai Simulasi CBT (Skor: ${result.score}/100, Percobaan ke-${currentAttempts}/2)`;
   }
 
   all[idx] = p;
@@ -320,10 +383,172 @@ export async function updateParticipantExamResult(
         subject: result.subject,
         score: result.score,
         totalQuestions: result.totalQuestions,
-        completedAt: examInfo.completedAt
+        completedAt: examInfo.completedAt,
+        violationReason: result.violationReason,
+        attemptsCount: currentAttempts
       })
     }).catch(() => {});
   } catch {}
 
   return p;
 }
+
+export function deleteParticipant(participantId: string): boolean {
+  const all = getAllParticipants();
+  const filtered = all.filter(p => p.id !== participantId);
+  if (filtered.length === all.length) return false;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  } catch (err) {
+    console.error('Failed to delete participant:', err);
+  }
+
+  try {
+    fetch(`/api/participants/${participantId}`, { method: 'DELETE' }).catch(() => {});
+  } catch {}
+
+  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  return true;
+}
+
+export function updateParticipantField(participantId: string, fields: Partial<ParticipantRecord>): ParticipantRecord | null {
+  const all = getAllParticipants();
+  const idx = all.findIndex(p => p.id === participantId);
+  if (idx === -1) return null;
+
+  all[idx] = { ...all[idx], ...fields };
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch (err) {
+    console.error('Failed to update participant:', err);
+  }
+
+  try {
+    fetch(`/api/participants/${participantId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields)
+    }).catch(() => {});
+  } catch {}
+
+  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  return all[idx];
+}
+
+export function confirmFinalTicketPayment(participantId: string, amount: number = 99000): ParticipantRecord | null {
+  return updateParticipantField(participantId, {
+    finalTicketPaymentStatus: 'paid_closing',
+    finalTicketPaidAt: new Date().toISOString(),
+    finalTicketAmount: amount,
+    cbtStatus: 'Tiket Final Lunas (Siap Ujian Final)'
+  });
+}
+
+export function resetParticipantAttempts(
+  participantId: string,
+  examType: 'simulasi' | 'final' | 'all' = 'all',
+  clearHistory: boolean = false
+): ParticipantRecord | null {
+  const all = getAllParticipants();
+  const idx = all.findIndex(p => p.id === participantId);
+  if (idx === -1) return null;
+
+  const p = { ...all[idx] };
+  p.violationReason = undefined;
+  if (!examType || examType === 'all') {
+    p.simulatedAttempts = 0;
+    p.finalAttempts = 0;
+    p.cbtStatus = 'Aktif (Kuota Ujian Direset 0/2)';
+    if (clearHistory) {
+      delete p.simulatedExam;
+      delete p.finalExam;
+      p.qualificationStatus = 'pending';
+    }
+  } else if (examType === 'simulasi') {
+    p.simulatedAttempts = 0;
+    p.cbtStatus = 'Aktif (Kuota Penyisihan Direset 0/2)';
+    if (clearHistory) {
+      delete p.simulatedExam;
+      p.qualificationStatus = 'pending';
+    }
+  } else if (examType === 'final') {
+    p.finalAttempts = 0;
+    p.cbtStatus = 'Aktif (Kuota Final Direset 0/2)';
+    if (clearHistory) {
+      delete p.finalExam;
+    }
+  }
+
+  all[idx] = p;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch (err) {
+    console.error('Failed to reset attempts:', err);
+  }
+
+  // Sync to server in background
+  try {
+    fetch(`/api/participants/${participantId}/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ examType, clearHistory })
+    }).catch(() => {});
+  } catch {}
+
+  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  return p;
+}
+
+export function grantExtraAttempt(
+  participantId: string,
+  examType: 'simulasi' | 'final' = 'simulasi'
+): ParticipantRecord | null {
+  const all = getAllParticipants();
+  const idx = all.findIndex(p => p.id === participantId);
+  if (idx === -1) return null;
+
+  const p = { ...all[idx] };
+  p.violationReason = undefined;
+  if (examType === 'final') {
+    p.finalAttempts = Math.max(0, (p.finalAttempts || 2) - 1);
+    p.cbtStatus = `Aktif (+1 Kuota Tambahan Final, Terpakai: ${p.finalAttempts}/2)`;
+  } else {
+    p.simulatedAttempts = Math.max(0, (p.simulatedAttempts || 2) - 1);
+    p.cbtStatus = `Aktif (+1 Kuota Tambahan Penyisihan, Terpakai: ${p.simulatedAttempts}/2)`;
+  }
+
+  all[idx] = p;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch (err) {
+    console.error('Failed to grant extra attempt:', err);
+  }
+
+  try {
+    fetch(`/api/participants/${participantId}/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ examType, extraAttempt: true })
+    }).catch(() => {});
+  } catch {}
+
+  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  return p;
+}
+
+export function bulkResetParticipantAttempts(
+  participantIds: string[],
+  examType: 'simulasi' | 'final' | 'all' = 'all',
+  clearHistory: boolean = false
+): number {
+  let count = 0;
+  for (const id of participantIds) {
+    const res = resetParticipantAttempts(id, examType, clearHistory);
+    if (res) count++;
+  }
+  return count;
+}
+
+

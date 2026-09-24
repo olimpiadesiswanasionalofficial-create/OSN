@@ -305,6 +305,102 @@ app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
   }
 });
 
+// Reset participant attempts / quota
+app.post('/api/participants/:id/reset', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { examType, clearHistory, extraAttempt } = req.body;
+    const currentList = getStoredParticipants();
+    const idx = currentList.findIndex((p: any) => p.id === id);
+
+    if (idx === -1) {
+      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
+    }
+
+    const p = currentList[idx];
+    delete p.violationReason;
+
+    if (extraAttempt) {
+      if (examType === 'final') {
+        p.finalAttempts = Math.max(0, (p.finalAttempts || 2) - 1);
+        p.cbtStatus = `Aktif (+1 Kuota Tambahan Final, Terpakai: ${p.finalAttempts}/2)`;
+      } else {
+        p.simulatedAttempts = Math.max(0, (p.simulatedAttempts || 2) - 1);
+        p.cbtStatus = `Aktif (+1 Kuota Tambahan Penyisihan, Terpakai: ${p.simulatedAttempts}/2)`;
+      }
+    } else if (!examType || examType === 'all') {
+      p.simulatedAttempts = 0;
+      p.finalAttempts = 0;
+      p.cbtStatus = 'Aktif (Kuota Ujian Direset 0/2)';
+      if (clearHistory) {
+        delete p.simulatedExam;
+        delete p.finalExam;
+        p.qualificationStatus = 'pending';
+      }
+    } else if (examType === 'simulasi') {
+      p.simulatedAttempts = 0;
+      p.cbtStatus = 'Aktif (Kuota Penyisihan Direset 0/2)';
+      if (clearHistory) {
+        delete p.simulatedExam;
+        p.qualificationStatus = 'pending';
+      }
+    } else if (examType === 'final') {
+      p.finalAttempts = 0;
+      p.cbtStatus = 'Aktif (Kuota Final Direset 0/2)';
+      if (clearHistory) {
+        delete p.finalExam;
+      }
+    }
+
+    currentList[idx] = p;
+    saveStoredParticipants(currentList);
+    return res.json({ success: true, message: 'Kuota berhasil di-reset.', data: p });
+  } catch (error: any) {
+    console.error('Error in POST /api/participants/:id/reset:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal reset kuota peserta.' });
+  }
+});
+
+// Update specific fields of participant
+app.patch('/api/participants/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const currentList = getStoredParticipants();
+    const idx = currentList.findIndex((p: any) => p.id === id);
+
+    if (idx === -1) {
+      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
+    }
+
+    currentList[idx] = { ...currentList[idx], ...req.body };
+    saveStoredParticipants(currentList);
+    return res.json({ success: true, data: currentList[idx] });
+  } catch (error: any) {
+    console.error('Error in PATCH /api/participants/:id:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal memperbarui data peserta.' });
+  }
+});
+
+// Delete participant
+app.delete('/api/participants/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    let currentList = getStoredParticipants();
+    const beforeLen = currentList.length;
+    currentList = currentList.filter((p: any) => p.id !== id);
+
+    if (currentList.length === beforeLen) {
+      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
+    }
+
+    saveStoredParticipants(currentList);
+    return res.json({ success: true, message: 'Peserta berhasil dihapus dari database.' });
+  } catch (error: any) {
+    console.error('Error in DELETE /api/participants/:id:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal menghapus peserta.' });
+  }
+});
+
 // Questions API
 const questionsFile = path.join(dataDir, 'cbt_questions.json');
 app.get('/api/questions', (_req: Request, res: Response) => {
