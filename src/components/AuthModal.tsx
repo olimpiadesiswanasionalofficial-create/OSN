@@ -36,8 +36,6 @@ import {
   Contact,
   CalendarDays,
   RefreshCw,
-  Calendar,
-  Clock,
   Settings
 } from 'lucide-react';
 import { LogoOSN, LogoLKP, StempelLKP } from './BrandLogos';
