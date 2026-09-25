@@ -225,22 +225,35 @@ app.post('/api/participants', (req: Request, res: Response) => {
     // Check if already registered
     const existingIndex = currentList.findIndex((p: any) => {
       const pPhone = String(p.whatsapp).replace(/[^0-9]/g, '').replace(/^62/, '0');
-      return pPhone === cleanPhone && p.fullName.toLowerCase() === String(fullName).trim().toLowerCase();
+      return (id && p.id === id) || (pPhone === cleanPhone && p.fullName.toLowerCase() === String(fullName).trim().toLowerCase());
     });
 
+    const existingP = existingIndex >= 0 ? currentList[existingIndex] : null;
     const newRecord = {
-      id: id || (existingIndex >= 0 ? currentList[existingIndex].id : `OSN-2026-${Math.floor(1000 + Math.random() * 9000)}`),
+      ...(existingP || {}),
+      ...(req.body || {}),
+      id: id || existingP?.id || `OSN-2026-${Math.floor(1000 + Math.random() * 9000)}`,
       fullName: String(fullName).trim(),
-      level: level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-      schoolName: schoolName || '-',
-      cityProvince: cityProvince || '-',
+      level: level || existingP?.level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
+      schoolName: schoolName || existingP?.schoolName || '-',
+      cityProvince: cityProvince || existingP?.cityProvince || '-',
       whatsapp: String(whatsapp).trim(),
-      email: email || '-',
-      parentName: parentName || '-',
-      fullAddress: fullAddress || '-',
-      subjects: Array.isArray(subjects) && subjects.length > 0 ? subjects : ['Matematika'],
-      registeredAt: new Date().toISOString(),
-      cbtStatus: 'Aktif & Siap Ujian (Tercatat di Database)'
+      email: email || existingP?.email || '-',
+      parentName: parentName || existingP?.parentName || '-',
+      fullAddress: fullAddress || existingP?.fullAddress || '-',
+      subjects: Array.isArray(subjects) && subjects.length > 0 ? subjects : (existingP?.subjects || ['Matematika']),
+      registeredAt: existingP?.registeredAt || new Date().toISOString(),
+      cbtStatus: req.body.cbtStatus || existingP?.cbtStatus || 'Aktif & Siap Ujian (Tercatat di Database)',
+      // PRESERVE ALL EXAM RESULTS & ATTEMPTS
+      simulatedExam: req.body.simulatedExam || existingP?.simulatedExam,
+      penyisihanExam: req.body.penyisihanExam || existingP?.penyisihanExam,
+      finalExam: req.body.finalExam || existingP?.finalExam,
+      simulatedAttempts: req.body.simulatedAttempts ?? existingP?.simulatedAttempts ?? 0,
+      penyisihanAttempts: req.body.penyisihanAttempts ?? existingP?.penyisihanAttempts ?? 0,
+      finalAttempts: req.body.finalAttempts ?? existingP?.finalAttempts ?? 0,
+      qualificationStatus: req.body.qualificationStatus || existingP?.qualificationStatus || 'pending',
+      finalTicketPaymentStatus: req.body.finalTicketPaymentStatus || existingP?.finalTicketPaymentStatus || 'unpaid',
+      championRank: req.body.championRank || existingP?.championRank
     };
 
     if (existingIndex >= 0) {
@@ -262,37 +275,115 @@ app.post('/api/participants', (req: Request, res: Response) => {
   }
 });
 
-// Update participant exam results / progress (Simulasi or Final)
+// Update participant exam results / progress (Simulasi, Penyisihan, or Final)
 app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { examType, subject, score, totalQuestions, completedAt } = req.body;
+    const { examType, subject, score, totalQuestions, completedAt, violationReason, whatsapp, fullName, level, schoolName } = req.body;
     const currentList = getStoredParticipants();
-    const idx = currentList.findIndex((p: any) => p.id === id);
+    
+    // Robust participant lookup (Exact ID, case-insensitive, trimmed, or by phone/name)
+    const cleanId = String(id || '').trim();
+    let idx = currentList.findIndex((p: any) => p.id === cleanId);
+    if (idx === -1) {
+      idx = currentList.findIndex((p: any) => p.id?.trim().toLowerCase() === cleanId.toLowerCase());
+    }
+    if (idx === -1 && whatsapp) {
+      const cleanPhone = String(whatsapp).replace(/\D/g, '').replace(/^62/, '0');
+      if (cleanPhone) {
+        idx = currentList.findIndex((p: any) => String(p.whatsapp || '').replace(/\D/g, '').replace(/^62/, '0') === cleanPhone);
+      }
+    }
+    if (idx === -1 && fullName) {
+      idx = currentList.findIndex((p: any) => p.fullName?.trim().toLowerCase() === String(fullName).trim().toLowerCase());
+    }
+
+    const numericScore = typeof score === 'number' ? score : parseInt(score, 10) || 0;
+
+    const examInfo = {
+      subject: subject || 'Matematika',
+      score: numericScore,
+      totalQuestions: totalQuestions || 20,
+      completedAt: completedAt || new Date().toISOString(),
+      status: violationReason
+        ? `Pelanggaran: ${violationReason}`
+        : examType === 'final'
+        ? `Selesai Ujian Final (${numericScore}/100)`
+        : examType === 'penyisihan'
+        ? `Selesai Babak Penyisihan (${numericScore}/100)`
+        : `Selesai Simulasi CBT (${numericScore}/100)`,
+      violationReason
+    };
 
     if (idx === -1) {
-      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
+      // Create record if not found so score is never lost
+      const newP: any = {
+        id: cleanId,
+        fullName: fullName || 'Peserta CBT',
+        level: level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
+        schoolName: schoolName || '-',
+        cityProvince: '-',
+        whatsapp: whatsapp || '-',
+        email: '-',
+        subjects: [subject || 'Matematika'],
+        registeredAt: new Date().toISOString(),
+        cbtStatus: examInfo.status
+      };
+      if (examType === 'final') {
+        newP.finalExam = examInfo;
+        newP.finalAttempts = 1;
+        newP.championRank = numericScore >= 90 ? 'Juara 1' : numericScore >= 80 ? 'Juara 2' : numericScore >= 70 ? 'Juara 3' : 'Peserta Final';
+      } else if (examType === 'penyisihan') {
+        newP.penyisihanExam = examInfo;
+        newP.penyisihanAttempts = 1;
+        newP.qualificationStatus = numericScore >= 70 ? 'lolos' : 'tidak_lolos';
+      } else {
+        newP.simulatedExam = examInfo;
+        newP.simulatedAttempts = 1;
+      }
+      currentList.unshift(newP);
+      saveStoredParticipants(currentList);
+      return res.json({ success: true, data: newP });
     }
 
     const p = currentList[idx];
+
     if (examType === 'final') {
-      p.finalExam = {
-        subject,
-        score,
-        totalQuestions,
-        completedAt: completedAt || new Date().toISOString(),
-        status: 'Selesai Mengerjakan Babak Final'
-      };
-      p.cbtStatus = 'Selesai Ujian Final (Lulus Evaluasi)';
+      p.finalExam = examInfo;
+      p.finalAttempts = (p.finalAttempts || 0) + 1;
+      p.cbtStatus = violationReason
+        ? `Pelanggaran Final: ${violationReason}`
+        : `Selesai Ujian Final (${score}/100)`;
+      if (score >= 90) p.championRank = 'Juara 1';
+      else if (score >= 80) p.championRank = 'Juara 2';
+      else if (score >= 70) p.championRank = 'Juara 3';
+      else p.championRank = 'Peserta Final';
+    } else if (examType === 'penyisihan') {
+      p.penyisihanExam = examInfo;
+      p.penyisihanAttempts = (p.penyisihanAttempts || 0) + 1;
+      p.cbtStatus = violationReason
+        ? `Pelanggaran Penyisihan: ${violationReason}`
+        : `Selesai Babak Penyisihan (${score}/100)`;
+      if (score >= 70) {
+        p.qualificationStatus = 'lolos';
+        p.qualificationNote = 'Lolos Otomatis Berdasarkan Nilai Babak Penyisihan (≥70)';
+      } else {
+        p.qualificationStatus = 'tidak_lolos';
+        p.qualificationNote = 'Belum Memenuhi Passing Grade Babak Penyisihan (≥70)';
+      }
     } else {
-      p.simulatedExam = {
-        subject,
-        score,
-        totalQuestions,
-        completedAt: completedAt || new Date().toISOString(),
-        status: 'Selesai Mengerjakan Simulasi CBT'
-      };
-      p.cbtStatus = 'Selesai Simulasi CBT';
+      p.simulatedExam = examInfo;
+      p.simulatedAttempts = (p.simulatedAttempts || 0) + 1;
+      p.cbtStatus = violationReason
+        ? `Pelanggaran Simulasi: ${violationReason}`
+        : `Selesai Simulasi CBT (${score}/100)`;
+      if (!p.penyisihanExam && score >= 70) {
+        p.qualificationStatus = 'lolos';
+      }
+    }
+
+    if (violationReason) {
+      p.violationReason = violationReason;
     }
 
     currentList[idx] = p;
@@ -324,24 +415,35 @@ app.post('/api/participants/:id/reset', (req: Request, res: Response) => {
       if (examType === 'final') {
         p.finalAttempts = Math.max(0, (p.finalAttempts || 2) - 1);
         p.cbtStatus = `Aktif (+1 Kuota Tambahan Final, Terpakai: ${p.finalAttempts}/2)`;
+      } else if (examType === 'penyisihan') {
+        p.penyisihanAttempts = Math.max(0, (p.penyisihanAttempts || 2) - 1);
+        p.cbtStatus = `Aktif (+1 Kuota Tambahan Penyisihan, Terpakai: ${p.penyisihanAttempts}/2)`;
       } else {
         p.simulatedAttempts = Math.max(0, (p.simulatedAttempts || 2) - 1);
-        p.cbtStatus = `Aktif (+1 Kuota Tambahan Penyisihan, Terpakai: ${p.simulatedAttempts}/2)`;
+        p.cbtStatus = `Aktif (+1 Kuota Tambahan Simulasi, Terpakai: ${p.simulatedAttempts}/2)`;
       }
     } else if (!examType || examType === 'all') {
       p.simulatedAttempts = 0;
+      p.penyisihanAttempts = 0;
       p.finalAttempts = 0;
-      p.cbtStatus = 'Aktif (Kuota Ujian Direset 0/2)';
+      p.cbtStatus = 'Aktif (Seluruh Kuota Ujian Direset 0/2)';
       if (clearHistory) {
         delete p.simulatedExam;
+        delete p.penyisihanExam;
         delete p.finalExam;
         p.qualificationStatus = 'pending';
       }
     } else if (examType === 'simulasi') {
       p.simulatedAttempts = 0;
-      p.cbtStatus = 'Aktif (Kuota Penyisihan Direset 0/2)';
+      p.cbtStatus = 'Aktif (Kuota Simulasi Direset 0/2)';
       if (clearHistory) {
         delete p.simulatedExam;
+      }
+    } else if (examType === 'penyisihan') {
+      p.penyisihanAttempts = 0;
+      p.cbtStatus = 'Aktif (Kuota Babak Penyisihan Direset 0/2)';
+      if (clearHistory) {
+        delete p.penyisihanExam;
         p.qualificationStatus = 'pending';
       }
     } else if (examType === 'final') {

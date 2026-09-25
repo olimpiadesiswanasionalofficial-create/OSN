@@ -564,23 +564,33 @@ export default function App() {
             <a href="#faq" className="hover:text-[#1A1615] transition-colors">FAQ</a>
           </nav>
 
-          {/* Action Buttons: LOGIN PESERTA & DAFTAR */}
-          <div className="hidden sm:flex items-center gap-2.5">
+          {/* Action Buttons: LOGIN PESERTA, LOGIN ADMIN & DAFTAR */}
+          <div className="hidden sm:flex items-center gap-2">
             
             {/* Tombol Akses Login User */}
             <button
               onClick={() => openLogin('user')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all shadow-xs cursor-pointer"
               title="Akses Ujian CBT & Kartu Peserta"
             >
               <User className="w-3.5 h-3.5 text-[#9E7D15]" />
               <span>Login Peserta</span>
             </button>
 
+            {/* Tombol Akses Login Admin Panitia */}
+            <button
+              onClick={() => openLogin('admin')}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/60 hover:bg-[#2A2321] transition-all shadow-xs cursor-pointer"
+              title="Akses Dashboard Admin & Panitia Pusat"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Login Admin</span>
+            </button>
+
             {/* Tombol Daftar Sekarang */}
             <button
               onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/60 hover:bg-[#2A2321] transition-all shadow-[0_4px_15px_rgba(212,175,55,0.2)] cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white transition-all shadow-sm cursor-pointer"
             >
               <span>Daftar Gratis</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -602,13 +612,20 @@ export default function App() {
           <div className="lg:hidden bg-[#FAF8F5] border-b border-[#E8E2D9] px-4 pt-3 pb-6 space-y-3">
             
             {/* Mobile Login Access Direct Row */}
-            <div className="pb-2 border-b border-[#E8E2D9]">
+            <div className="pb-2 border-b border-[#E8E2D9] space-y-2">
               <button
                 onClick={() => openLogin('user')}
-                className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm"
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] shadow-sm"
               >
-                <User className="w-4 h-4 text-[#D4AF37]" />
+                <User className="w-4 h-4 text-[#9E7D15]" />
                 <span>Masuk Ruang Ujian CBT Peserta</span>
+              </button>
+              <button
+                onClick={() => openLogin('admin')}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm"
+              >
+                <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                <span>Masuk Dashboard Admin Panitia</span>
               </button>
             </div>
 
@@ -1556,8 +1573,15 @@ export default function App() {
               <p className="text-xs font-bold uppercase tracking-wider text-white">Akses Portal</p>
               <ul className="space-y-2 text-[11px]">
                 <li>
-                  <button onClick={() => openLogin('user')} className="text-[#D4AF37] hover:underline font-bold text-left cursor-pointer">
-                    ● Ruang Ujian CBT Siswa
+                  <button onClick={() => openLogin('user')} className="text-[#D4AF37] hover:underline font-bold text-left cursor-pointer flex items-center gap-1.5">
+                    <User className="w-3 h-3 text-[#D4AF37]" />
+                    <span>Ruang Ujian CBT Siswa</span>
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => openLogin('admin')} className="text-purple-300 hover:text-white font-bold text-left cursor-pointer flex items-center gap-1.5">
+                    <ShieldCheck className="w-3 h-3 text-[#D4AF37]" />
+                    <span>Dashboard Admin Panitia</span>
                   </button>
                 </li>
                 <li>
@@ -1635,17 +1659,6 @@ export default function App() {
           </span>
         </button>
       </div>
-
-      {/* 15. AUTH MODAL (LOGIN USER & ADMIN) */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => {
-          setAuthModalOpen(false);
-          setAuthStudentInitialData(null);
-        }}
-        defaultRole={authModalDefaultRole}
-        initialStudentData={authStudentInitialData}
-      />
 
       {/* 16. REGISTRATION MODAL (TANPA HARGA - PENYISIHAN GRATIS) */}
       {registrationModalOpen && (
