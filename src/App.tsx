@@ -39,12 +39,15 @@ import {
   UserPlus
 } from 'lucide-react';
 import { APP_CONFIG } from '../appConfig.js';
+import confetti from 'canvas-confetti';
 import { LogoOSN, LogoLKP, StempelLKP } from './components/BrandLogos';
 import { AuthModal } from './components/AuthModal';
 import { StatsCounterBar } from './components/StatsCounterBar';
 import { RecentWinnersMarquee } from './components/RecentWinnersMarquee';
 import { GalleryOSN } from './components/GalleryOSN';
-import { saveParticipant, saveMultipleParticipants, ParticipantRecord } from './services/participantDb';
+import { CompetitionCountdown } from './components/CompetitionCountdown';
+import { PublicAnnouncementTable } from './components/PublicAnnouncementTable';
+import { saveParticipant, saveMultipleParticipants, getAllParticipants, ParticipantRecord } from './services/participantDb';
 import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
 import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
 
@@ -198,6 +201,7 @@ export default function App() {
 
   // Dynamic Event Schedule state
   const [liveSchedule, setLiveSchedule] = useState<EventScheduleConfig>(DEFAULT_EVENT_SCHEDULE);
+  const [publicParticipants, setPublicParticipants] = useState<ParticipantRecord[]>(() => getAllParticipants());
 
   useEffect(() => {
     // Secret URL parameter ?admin=true or ?panel=admin
@@ -222,6 +226,11 @@ export default function App() {
       }
     };
     window.addEventListener('osn_schedule_updated', onScheduleChange);
+
+    const onParticipantsChange = () => {
+      setPublicParticipants(getAllParticipants());
+    };
+    window.addEventListener('osn_participants_updated', onParticipantsChange);
 
     // Initialize Meta Pixel from admin config
     const pixelCfg = getMetaPixelConfig();
@@ -444,6 +453,30 @@ export default function App() {
       console.error('Error saving participants to database:', err);
     }
     setRegistrationSuccess(true);
+    try {
+      confetti({
+        particleCount: 120,
+        spread: 75,
+        origin: { y: 0.6 },
+        colors: ['#D4AF37', '#1A1615', '#10B981', '#3B82F6', '#F59E0B']
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 60,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        confetti({
+          particleCount: 60,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
+      }, 300);
+    } catch (confettiErr) {
+      console.warn('Confetti animation error:', confettiErr);
+    }
   };
 
   const generateWhatsAppUrlMulti = (children: ChildParticipantForm[]) => {
@@ -577,7 +610,7 @@ export default function App() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs xl:text-sm font-semibold text-[#4A453E]">
+          <nav className="hidden lg:flex items-center gap-4 text-xs xl:text-sm font-semibold text-[#4A453E]">
             <a href="#keunggulan" className="text-amber-800 hover:text-[#1A1615] font-extrabold transition-colors flex items-center gap-1">
               <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Keunggulan</span>
@@ -585,6 +618,10 @@ export default function App() {
             <a href="#jenjang" className="hover:text-[#1A1615] transition-colors">Jenjang Lomba</a>
             <a href="#mapel" className="hover:text-[#1A1615] transition-colors">Mata Pelajaran</a>
             <a href="#jadwal" className="hover:text-[#1A1615] transition-colors">Jadwal & Alur</a>
+            <a href="#pengumuman-hasil" className="text-emerald-700 hover:text-emerald-900 font-extrabold transition-colors flex items-center gap-1">
+              <Trophy className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Pengumuman Lolos</span>
+            </a>
             <a href="#galeri" className="hover:text-[#1A1615] transition-colors">Galeri Juara</a>
             <a href="#penyelenggara" className="hover:text-[#1A1615] transition-colors">Penyelenggara</a>
             <a href="#faq" className="hover:text-[#1A1615] transition-colors">FAQ</a>
@@ -781,6 +818,11 @@ export default function App() {
               <p className="text-xs sm:text-sm text-[#554E46] max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 {APP_CONFIG.description}
               </p>
+
+              {/* Real-Time Competition Countdown Timer */}
+              <div className="w-full pt-1">
+                <CompetitionCountdown schedule={liveSchedule} className="w-full shadow-md" />
+              </div>
 
               {/* Main Action Buttons */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
@@ -1590,6 +1632,12 @@ export default function App() {
 
       {/* 8.5 DYNAMIC 'RECENT WINNERS' MARQUEE SECTION */}
       <RecentWinnersMarquee />
+
+      {/* 8.8 TABEL PENGUMUMAN HASIL KELULUSAN RESMI & FINALIS (2.000+ PESERTA TERCATAT) */}
+      <PublicAnnouncementTable
+        participants={publicParticipants}
+        onOpenLogin={() => openLogin('user')}
+      />
 
       {/* 9. OFFICIAL ORGANIZER PROFILE (LKP PRESTASI NUSANTARA) */}
       <section id="penyelenggara" className="py-20 bg-white border-b border-[#E8E2D9]">

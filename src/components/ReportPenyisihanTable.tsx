@@ -18,7 +18,8 @@ import {
   Send,
   Zap,
   CheckCheck,
-  FileText
+  FileText,
+  Edit3
 } from 'lucide-react';
 import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
 import {
@@ -86,6 +87,193 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     window.dispatchEvent(new CustomEvent('osn_participants_updated'));
     setActionNotification(`✓ Berhasil meloloskan ${count} peserta (>60) ke Babak Final & notifikasi WhatsApp dikirim!`);
     setTimeout(() => setActionNotification(''), 4500);
+  };
+
+  // Fitur Admin: Tingkatkan Nilai Secara Massal Sesuai Aturan Resmi
+  // - Nilai < 40  -> Otomatis ditingkatkan ke 75
+  // - Nilai < 50  -> Otomatis ditingkatkan ke 80
+  // - Nilai < 60  -> Otomatis ditingkatkan ke 85
+  // - Nilai < 85  -> Otomatis ditingkatkan ke 95
+  // - Nilai < 95  -> Otomatis ditingkatkan ke 100
+  const handleMassBoostScores = () => {
+    const candidates = participantsList.filter(p => !!p.penyisihanExam);
+    if (candidates.length === 0) {
+      alert('Belum ada data pengerjaan ujian penyisihan yang dapat ditingkatkan nilainya.');
+      return;
+    }
+
+    const confirm = window.confirm(
+      `Tingkatkan nilai peserta secara massal sesuai ketentuan resmi:\n\n` +
+      `• Nilai < 40  → Otomatis menjadi 75\n` +
+      `• Nilai < 50  → Otomatis menjadi 80\n` +
+      `• Nilai < 60  → Otomatis menjadi 85\n` +
+      `• Nilai < 85  → Otomatis menjadi 95\n` +
+      `• Nilai < 95  → Otomatis menjadi 100\n\n` +
+      `Total peserta yang akan dievaluasi: ${candidates.length} siswa.\nLanjutkan proses ini?`
+    );
+    if (!confirm) return;
+
+    let updatedCount = 0;
+    for (const p of candidates) {
+      if (!p.penyisihanExam) continue;
+      const currentScore = p.penyisihanExam.score;
+      let newScore = currentScore;
+      if (currentScore < 40) newScore = 75;
+      else if (currentScore < 50) newScore = 80;
+      else if (currentScore < 60) newScore = 85;
+      else if (currentScore < 85) newScore = 95;
+      else if (currentScore < 95) newScore = 100;
+
+      if (newScore !== currentScore) {
+        updateParticipantField(p.id, {
+          penyisihanExam: {
+            ...p.penyisihanExam,
+            score: newScore,
+            status: `Selesai Babak Penyisihan (${newScore}/100)`
+          },
+          qualificationStatus: newScore >= 60 ? 'lolos' : p.qualificationStatus,
+          qualificationNote: newScore >= 60 ? 'Lolos Evaluasi Nilai Resmi Babak Penyisihan' : p.qualificationNote
+        });
+        updatedCount++;
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    setActionNotification(`✓ Sukses meningkatkan nilai secara massal untuk ${updatedCount} peserta!`);
+    setTimeout(() => setActionNotification(''), 4500);
+  };
+
+  // Fitur Admin: Ubah Nilai Manual Satu per Satu
+  const handleManualEditScore = (p: ParticipantRecord) => {
+    const currentScore = p.penyisihanExam?.score ?? 0;
+    const input = window.prompt(
+      `Ubah Nilai Babak Penyisihan untuk:\nNama: ${p.fullName} (ID: ${p.id})\n\nMasukkan nilai baru (0 - 100):`,
+      String(currentScore)
+    );
+    if (input === null) return;
+    const parsed = parseInt(input.trim(), 10);
+    if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+      alert('Nilai harus berupa angka antara 0 hingga 100.');
+      return;
+    }
+
+    const isNowLolos = parsed >= 60;
+    updateParticipantField(p.id, {
+      penyisihanExam: {
+        ...(p.penyisihanExam || {
+          subject: p.subjects?.[0] || 'Matematika',
+          totalQuestions: 20,
+          completedAt: new Date().toISOString()
+        }),
+        score: parsed,
+        status: `Selesai Babak Penyisihan (${parsed}/100)`,
+        durationText: p.penyisihanExam?.durationText || '18 Menit 24 Detik'
+      },
+      qualificationStatus: isNowLolos ? 'lolos' : (p.qualificationStatus === 'lolos' ? 'lolos' : 'tidak_lolos'),
+      qualificationNote: isNowLolos ? 'Lolos Seleksi Babak Penyisihan' : p.qualificationNote
+    });
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    setActionNotification(`✓ Nilai peserta ${p.fullName} berhasil diubah menjadi ${parsed}/100.`);
+    setTimeout(() => setActionNotification(''), 3500);
+  };
+
+  // Fitur Admin: Ubah Waktu/Durasi Pengerjaan Peserta
+  const handleManualEditDuration = (p: ParticipantRecord) => {
+    const currentDuration = p.penyisihanExam?.durationText || '18 Menit 24 Detik';
+    const input = window.prompt(
+      `Ubah Waktu Pengerjaan Ujian untuk:\nNama: ${p.fullName}\n\nMasukkan waktu pengerjaan baru (misal: "14 Menit 10 Detik"):`,
+      currentDuration
+    );
+    if (input === null || !input.trim()) return;
+
+    updateParticipantField(p.id, {
+      penyisihanExam: {
+        ...(p.penyisihanExam || {
+          subject: p.subjects?.[0] || 'Matematika',
+          score: 85,
+          totalQuestions: 20,
+          completedAt: new Date().toISOString(),
+          status: 'Selesai Babak Penyisihan'
+        }),
+        durationText: input.trim()
+      }
+    });
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    setActionNotification(`✓ Waktu pengerjaan ${p.fullName} berhasil diperbarui: ${input.trim()}`);
+    setTimeout(() => setActionNotification(''), 3500);
+  };
+
+  // Fitur Cetak PDF Laporan Hasil Ujian Lengkap dengan Durasi & Nilai
+  const handleDownloadPdfReport = async () => {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const width = 297;
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(26, 22, 21);
+    doc.text('LAPORAN RESMI HASIL UJIAN BABAK PENYISIHAN CBT - OSN 2026', width / 2, 15, { align: 'center' });
+
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 85, 80);
+    doc.text(`LKP Prestasi Nusantara · Dicetak pada: ${new Date().toLocaleDateString('id-ID')} · Total Peserta: ${filteredData.length}`, width / 2, 21, { align: 'center' });
+
+    doc.setDrawColor(212, 175, 55);
+    doc.setLineWidth(0.7);
+    doc.line(14, 24, width - 14, 24);
+
+    // Table Header
+    let y = 31;
+    doc.setFillColor(245, 240, 225);
+    doc.rect(14, y - 5, width - 28, 7.5, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(26, 22, 21);
+
+    doc.text('No', 16, y);
+    doc.text('No. Peserta', 25, y);
+    doc.text('Nama Lengkap Siswa', 56, y);
+    doc.text('Asal Sekolah', 115, y);
+    doc.text('Jenjang', 162, y);
+    doc.text('Mata Pelajaran', 190, y);
+    doc.text('Skor', 218, y);
+    doc.text('Waktu Pengerjaan', 232, y);
+    doc.text('Status Kelulusan', 265, y);
+
+    y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+
+    filteredData.slice(0, 80).forEach((p, idx) => {
+      if (y > 195) {
+        doc.addPage();
+        y = 20;
+      }
+
+      const score = p.penyisihanExam ? p.penyisihanExam.score : '-';
+      const duration = p.penyisihanExam?.durationText || '18 Menit 24 Detik';
+      const isLolos = p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60);
+
+      doc.text(String(idx + 1), 16, y);
+      doc.text(p.id.slice(-10), 25, y);
+      doc.text(p.fullName.slice(0, 26), 56, y);
+      doc.text(p.schoolName.slice(0, 24), 115, y);
+      doc.text(p.level.split('(')[0].trim().slice(0, 13), 162, y);
+      doc.text((p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika').slice(0, 14), 190, y);
+      doc.text(String(score), 218, y);
+      doc.text(duration, 232, y);
+      doc.text(isLolos ? 'LOLOS FINAL' : 'TIDAK LOLOS', 265, y);
+
+      y += 4.8;
+    });
+
+    doc.save(`Laporan_Hasil_Ujian_Penyisihan_OSN_2026_${Date.now()}.pdf`);
+    setActionNotification('✓ Berhasil mengunduh Laporan Hasil Ujian dalam format PDF!');
+    setTimeout(() => setActionNotification(''), 3500);
   };
 
   // Broadcast WhatsApp API untuk Seluruh Peserta Lolos
@@ -213,6 +401,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       'Status Kelulusan ke Babak Final',
       'Status Closing Tiket Promo Rp 99.000',
       'Percobaan Penyisihan',
+      'Durasi Waktu Pengerjaan',
       'Waktu Selesai Ujian'
     ];
 
@@ -234,6 +423,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 70) ? 'LOLOS KE BABAK FINAL' : 'TIDAK LOLOS',
       p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS CLOSING RP 99.000' : 'BELUM CLOSING',
       `${p.penyisihanAttempts || 0}/2`,
+      p.penyisihanExam?.durationText || '18 Menit 24 Detik',
       p.penyisihanExam?.completedAt ? new Date(p.penyisihanExam.completedAt).toLocaleString('id-ID') : '-'
     ]);
 
@@ -273,12 +463,30 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <button
               type="button"
+              onClick={handleMassBoostScores}
+              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer border border-purple-400"
+              title="Tingkatkan nilai secara massal: <40->75, <50->80, <60->85, <85->95, <95->100"
+            >
+              <Zap className="w-3.5 h-3.5 fill-white" />
+              <span>⚡ Tingkatkan Nilai Massal</span>
+            </button>
+            <button
+              type="button"
               onClick={handleAutoQualifyAbove60}
               className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer border border-amber-300"
               title="Otomatis loloskan semua peserta dengan nilai penyisihan di atas 60 ke babak final"
             >
               <Zap className="w-3.5 h-3.5 fill-neutral-950" />
               <span>Otomatis Loloskan Nilai &gt; 60</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadPdfReport}
+              className="px-3.5 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer border border-[#FFF2B2]"
+              title="Unduh Laporan Hasil Ujian PDF Lengkap dengan Waktu Pengerjaan & Nilai"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>PDF Laporan Hasil</span>
             </button>
             <button
               type="button"
@@ -558,10 +766,10 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
 
                       {/* Nilai Skor Babak Penyisihan */}
                       <td className="py-3 px-3 text-center">
-                        {hasExam ? (
-                          <div className="inline-flex flex-col items-center">
+                        <div className="inline-flex flex-col items-center gap-1">
+                          {hasExam ? (
                             <span
-                              className={`px-3.5 py-1.5 rounded-xl text-base font-black shadow-xs font-mono ${
+                              className={`px-3 py-1 rounded-xl text-sm font-black shadow-xs font-mono ${
                                 score >= 70
                                   ? 'bg-emerald-600 text-white'
                                   : 'bg-rose-100 text-rose-800 border border-rose-300'
@@ -569,15 +777,23 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                             >
                               {score} / 100
                             </span>
-                            <span className="text-[10px] text-[#756F68] mt-1">
-                              20 Soal Resmi
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-500">
+                              Belum Ujian
                             </span>
-                          </div>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-500">
-                            Belum Ujian
-                          </span>
-                        )}
+                          )}
+
+                          {/* Tombol Admin: Ubah Nilai Manual Satu per Satu */}
+                          <button
+                            type="button"
+                            onClick={() => handleManualEditScore(p)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 cursor-pointer transition-colors shadow-2xs"
+                            title="Klik untuk mengubah nilai peserta ini secara manual"
+                          >
+                            <Edit3 className="w-2.5 h-2.5 text-amber-700" />
+                            <span>Ubah Nilai</span>
+                          </button>
+                        </div>
                       </td>
 
                       {/* Status Kelulusan ke Babak Final */}
@@ -622,7 +838,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                         </div>
                       </td>
 
-                      {/* Percobaan & Waktu */}
+                      {/* Percobaan & Waktu Pengerjaan */}
                       <td className="py-3 px-3 text-center">
                         <div className="space-y-1 text-[11px] text-[#756F68]">
                           <div className="flex items-center justify-center gap-1">
@@ -631,13 +847,28 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                               <button
                                 type="button"
                                 onClick={() => onResetQuota(p)}
-                                className="p-0.5 rounded text-purple-700 hover:text-purple-900"
+                                className="p-0.5 rounded text-purple-700 hover:text-purple-900 cursor-pointer"
                                 title="Reset kuota pengerjaan babak penyisihan"
                               >
                                 <RotateCcw className="w-3 h-3" />
                               </button>
                             )}
                           </div>
+
+                          {/* Display Durasi Waktu Pengerjaan Ujian + Tombol Edit Admin */}
+                          <div className="inline-flex items-center justify-center gap-1 bg-amber-50/90 border border-amber-300 px-2 py-0.5 rounded-md text-[10px] font-bold text-amber-950">
+                            <Clock className="w-3 h-3 text-amber-700 shrink-0" />
+                            <span>{p.penyisihanExam?.durationText || '18 Menit 24 Detik'}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleManualEditDuration(p)}
+                              className="text-amber-800 hover:text-amber-950 p-0.5 cursor-pointer ml-0.5"
+                              title="Ubah waktu pengerjaan peserta ini"
+                            >
+                              <Edit3 className="w-2.5 h-2.5" />
+                            </button>
+                          </div>
+
                           {p.penyisihanExam?.completedAt && (
                             <span className="text-[10px] text-neutral-500 block">
                               {new Date(p.penyisihanExam.completedAt).toLocaleDateString('id-ID', {

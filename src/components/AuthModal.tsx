@@ -4001,13 +4001,13 @@ export const AuthModal = ({
                                       </a>
                                     )}
 
-                                    {isLolos && !p.finalExam && (
+                                    {isLolos && (
                                       <a
                                         href={generateFollowUpWhatsAppUrl(p, 'final')}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="px-2 py-0.5 rounded-md bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center"
-                                        title="Follow up via WA: Peserta lolos tapi belum mengerjakan babak final"
+                                        className="px-2 py-0.5 rounded-md bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center shadow-2xs"
+                                        title="Follow up via WA: Peserta lolos babak final OSN"
                                       >
                                         <MessageCircle className="w-2.5 h-2.5 text-purple-700" />
                                         <span>Follow-Up Final</span>

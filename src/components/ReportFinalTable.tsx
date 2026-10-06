@@ -15,9 +15,10 @@ import {
   School,
   Eye,
   ShieldCheck,
-  ShieldAlert
+  ShieldAlert,
+  Edit3
 } from 'lucide-react';
-import { ParticipantRecord } from '../services/participantDb';
+import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
 
 interface ReportFinalTableProps {
   participantsList: ParticipantRecord[];
@@ -39,6 +40,65 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
   const [filterSubject, setFilterSubject] = useState('Semua');
   const [filterRank, setFilterRank] = useState('Semua');
   const [sortOption, setSortOption] = useState<'highest' | 'lowest' | 'latest' | 'name'>('highest');
+
+  const handleManualEditScoreFinal = (p: ParticipantRecord) => {
+    const currentScore = p.finalExam?.score ?? 0;
+    const input = window.prompt(
+      `Ubah Nilai Babak Final untuk:\nNama: ${p.fullName} (ID: ${p.id})\n\nMasukkan nilai baru (0 - 100):`,
+      String(currentScore)
+    );
+    if (input === null) return;
+    const parsed = parseInt(input.trim(), 10);
+    if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+      alert('Nilai harus berupa angka antara 0 hingga 100.');
+      return;
+    }
+
+    let championRank: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' = 'Peserta Final';
+    if (parsed >= 90) championRank = 'Juara 1';
+    else if (parsed >= 80) championRank = 'Juara 2';
+    else if (parsed >= 70) championRank = 'Juara 3';
+
+    updateParticipantField(p.id, {
+      finalExam: {
+        ...(p.finalExam || {
+          subject: p.subjects?.[0] || 'Matematika',
+          totalQuestions: 20,
+          completedAt: new Date().toISOString()
+        }),
+        score: parsed,
+        status: `Selesai Ujian Final (${parsed}/100)`,
+        durationText: p.finalExam?.durationText || '19 Menit 10 Detik'
+      },
+      championRank
+    });
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  };
+
+  const handleManualEditDurationFinal = (p: ParticipantRecord) => {
+    const currentDuration = p.finalExam?.durationText || '19 Menit 10 Detik';
+    const input = window.prompt(
+      `Ubah Waktu/Durasi Pengerjaan Babak Final:\nNama: ${p.fullName}\n\nMasukkan durasi pengerjaan baru (misal: "17 Menit 30 Detik"):`,
+      currentDuration
+    );
+    if (input === null || !input.trim()) return;
+
+    updateParticipantField(p.id, {
+      finalExam: {
+        ...(p.finalExam || {
+          subject: p.subjects?.[0] || 'Matematika',
+          score: 85,
+          totalQuestions: 20,
+          completedAt: new Date().toISOString(),
+          status: 'Selesai Ujian Final'
+        }),
+        durationText: input.trim()
+      }
+    });
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  };
 
   // Stats calculation
   const completedFinalList = participantsList.filter(p => !!p.finalExam);
@@ -457,22 +517,44 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                         </span>
                       </td>
 
-                      {/* Nilai Skor Final */}
+                      {/* Nilai Skor Final & Durasi */}
                       <td className="py-3 px-3 text-center">
-                        {hasFinal ? (
-                          <div className="inline-flex flex-col items-center">
-                            <span className="px-3.5 py-1.5 rounded-xl text-base font-black shadow-xs font-mono bg-purple-700 text-white">
+                        <div className="inline-flex flex-col items-center gap-1">
+                          {hasFinal ? (
+                            <span className="px-3 py-1 rounded-xl text-sm font-black shadow-xs font-mono bg-purple-700 text-white">
                               {score} / 100
                             </span>
-                            <span className="text-[10px] text-neutral-500 mt-1">
-                              Percobaan: {attempts}/2
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-500">
+                              Belum Ujian
                             </span>
+                          )}
+
+                          {/* Tombol Ubah Nilai Manual */}
+                          <button
+                            type="button"
+                            onClick={() => handleManualEditScoreFinal(p)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 cursor-pointer shadow-2xs"
+                            title="Ubah nilai babak final secara manual"
+                          >
+                            <Edit3 className="w-2.5 h-2.5 text-purple-700" />
+                            <span>Ubah Nilai</span>
+                          </button>
+
+                          {/* Waktu Pengerjaan Final */}
+                          <div className="inline-flex items-center justify-center gap-1 bg-neutral-50 border border-neutral-200 px-2 py-0.5 rounded text-[10px] font-bold text-neutral-800 mt-0.5">
+                            <Clock className="w-2.5 h-2.5 text-neutral-500" />
+                            <span>{p.finalExam?.durationText || '19 Menit 10 Detik'}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleManualEditDurationFinal(p)}
+                              className="text-neutral-600 hover:text-black p-0.5 cursor-pointer"
+                              title="Ubah durasi pengerjaan final"
+                            >
+                              <Edit3 className="w-2.5 h-2.5" />
+                            </button>
                           </div>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-500">
-                            Belum Ujian
-                          </span>
-                        )}
+                        </div>
                       </td>
 
                       {/* Status Anti-Cheat */}
