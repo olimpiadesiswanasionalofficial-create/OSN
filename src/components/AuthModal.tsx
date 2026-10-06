@@ -10,6 +10,7 @@ import {
   Calendar,
   Clock,
   Award,
+  ChevronLeft,
   ChevronRight,
   LogOut,
   AlertCircle,
@@ -213,6 +214,11 @@ export const AuthModal = ({
   const [adminStartDate, setAdminStartDate] = useState('');
   const [adminEndDate, setAdminEndDate] = useState('');
   const [participantsList, setParticipantsList] = useState<ParticipantRecord[]>([]);
+
+  // Mode Akses Cepat & Ringan: Batasi tabel peserta hanya 10 baris per halaman, diurutkan mulai dari yang terbaru
+  const [adminParticipantsPage, setAdminParticipantsPage] = useState(1);
+  const [adminAnnouncePage, setAdminAnnouncePage] = useState(1);
+  const ADMIN_PAGE_SIZE = 10;
 
   // States for 3 Exam Report Tables (Laporan Simulasi, Penyisihan, Final)
   const [reportSimulasiSearch, setReportSimulasiSearch] = useState('');
@@ -911,6 +917,39 @@ export const AuthModal = ({
 
     return matchesSearch && matchesCategory && matchesStatus && matchesWinner && matchesDate;
   });
+
+  // Diurutkan mulai dari yang terbaru (newest registeredAt first) sesuai permintaan
+  const sortedParticipants = useMemo(() => {
+    return [...filteredParticipants].sort((a, b) => {
+      const timeA = a.registeredAt ? new Date(a.registeredAt).getTime() : 0;
+      const timeB = b.registeredAt ? new Date(b.registeredAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return (b.id || '').localeCompare(a.id || '');
+    });
+  }, [filteredParticipants]);
+
+  const totalAdminPages = Math.max(1, Math.ceil(sortedParticipants.length / ADMIN_PAGE_SIZE));
+  const validAdminPage = Math.min(Math.max(1, adminParticipantsPage), totalAdminPages);
+
+  // Hanya 10 baris data peserta yang dirender ke DOM untuk menjamin akses dashboard super cepat, hemat memori, dan tidak lambat
+  const displayedParticipants = useMemo(() => {
+    const start = (validAdminPage - 1) * ADMIN_PAGE_SIZE;
+    return sortedParticipants.slice(start, start + ADMIN_PAGE_SIZE);
+  }, [sortedParticipants, validAdminPage]);
+
+  // Pagination untuk Tab Pengumuman Kelulusan & Juara (10 baris per halaman)
+  const totalAnnouncePages = Math.max(1, Math.ceil(sortedParticipants.length / ADMIN_PAGE_SIZE));
+  const validAnnouncePage = Math.min(Math.max(1, adminAnnouncePage), totalAnnouncePages);
+  const displayedAnnounceParticipants = useMemo(() => {
+    const start = (validAnnouncePage - 1) * ADMIN_PAGE_SIZE;
+    return sortedParticipants.slice(start, start + ADMIN_PAGE_SIZE);
+  }, [sortedParticipants, validAnnouncePage]);
+
+  // Reset pagination ke halaman 1 saat pencarian atau filter berubah
+  useEffect(() => {
+    setAdminParticipantsPage(1);
+    setAdminAnnouncePage(1);
+  }, [adminSearch, adminFilterCategory, adminFilterExamStatus, adminFilterWinner, adminStartDate, adminEndDate]);
 
   // Calculate statistics based on current date filter or total
   const dateFilteredParticipants = participantsList.filter(p => {
@@ -1815,62 +1854,7 @@ export const AuthModal = ({
                 ) : (
                   /* STANDARD LOGIN FORM */
                   <>
-                    <div className="text-center space-y-1">
-                      <h3 className="text-base font-extrabold text-[#1A1615]">
-                        {role === 'user' ? 'Masuk ke Ruang Ujian CBT Siswa' : 'Masuk Dashboard Admin Pusat'}
-                      </h3>
-                      <p className="text-xs text-[#756F68]">
-                        {role === 'user'
-                          ? 'Cukup masukkan Nomor WhatsApp yang didaftarkan. 1 nomor dapat menaungi beberapa siswa/anak sekaligus.'
-                          : 'Masukkan Username dan Password Panitia resmi untuk mengakses seluruh panel admin.'}
-                      </p>
-                    </div>
-
-                    {role === 'admin' && (
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1A1615] to-[#2E2724] border border-[#D4AF37]/50 text-white space-y-3 shadow-md">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37]">
-                              <ShieldCheck className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <h4 className="text-xs font-bold text-white">Akses Masuk Dashboard Panitia & Admin</h4>
-                              <p className="text-[10px] text-neutral-300">Kelola bank soal, nilai peserta, auto-lolos final & broadcast WhatsApp</p>
-                            </div>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#D4AF37] text-[#1A1615]">
-                            Resmi
-                          </span>
-                        </div>
-
-                        {/* Tombol 1-Klik Masuk Admin Tanpa Ribet */}
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdminLogin('admin', 'ADMIN123')}
-                          className="w-full py-2.5 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border border-[#FFF2B2]"
-                        >
-                          <Zap className="w-3.5 h-3.5 fill-[#1A1615]" />
-                          <span>⚡ Masuk Cepat Panitia (1-Klik Masuk Langsung)</span>
-                        </button>
-
-                        <div className="pt-1 border-t border-white/10 flex items-center justify-between text-[11px] text-neutral-300">
-                          <span>Akun Default: <strong>admin</strong> / <strong>ADMIN123</strong></span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminUser('admin');
-                              setAdminPassword('ADMIN123');
-                              setLoginError('');
-                            }}
-                            className="text-[#D4AF37] hover:underline font-bold cursor-pointer"
-                          >
-                            Isi Form Otomatis
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                       {role === 'user' ? (
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
@@ -3597,9 +3581,14 @@ export const AuthModal = ({
 
                     {/* Export Action Buttons Toolbar (Excel, PDF, VCF) */}
                     <div className="pt-2 border-t border-[#E8E2D9]/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-                      <div className="text-[11px] text-[#756F68]">
-                        Menampilkan <strong className="text-[#1A1615]">{filteredParticipants.length}</strong> dari{' '}
-                        <strong className="text-[#1A1615]">{participantsList.length}</strong> peserta terdaftar
+                      <div className="text-[11px] text-[#756F68] flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
+                          <Zap className="w-3 h-3 text-emerald-600" />
+                          Akses Cepat Ringan
+                        </span>
+                        <span>
+                          Menampilkan <strong>{displayedParticipants.length} data terbaru</strong> (Halaman <strong>{validAdminPage}</strong> dari <strong>{totalAdminPages}</strong>) • Total terdata: <strong className="text-[#1A1615]">{sortedParticipants.length}</strong> peserta
+                        </span>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -3658,13 +3647,16 @@ export const AuthModal = ({
                   {/* Detailed Table */}
                   <div className="bg-white rounded-2xl border border-[#E8E2D9] overflow-hidden shadow-sm">
                     <div className="p-4 border-b border-[#E8E2D9] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-xs font-black text-[#1A1615] uppercase tracking-wider flex items-center gap-1.5">
                           <Database className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Database Peserta & Riwayat Ujian Lengkap ({filteredParticipants.length})</span>
+                          <span>Database Peserta ({sortedParticipants.length})</span>
                         </h4>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
+                          10 Baris per Halaman
+                        </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-                          Real-Time Sync
+                          Urut Paling Baru
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -3733,7 +3725,18 @@ export const AuthModal = ({
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#E8E2D9]">
-                          {filteredParticipants.map((p) => {
+                          {displayedParticipants.length === 0 ? (
+                            <tr>
+                              <td colSpan={11} className="py-12 text-center text-neutral-500">
+                                <div className="flex flex-col items-center justify-center">
+                                  <Database className="w-8 h-8 text-neutral-300 mb-2" />
+                                  <p className="font-bold text-sm text-[#1A1615]">Tidak ada data peserta ditemukan</p>
+                                  <p className="text-xs text-[#756F68] mt-1">Coba sesuaikan kata kunci pencarian atau filter yang dipilih.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          ) : (
+                            displayedParticipants.map((p) => {
                             const isPaidClosing = p.finalTicketPaymentStatus === 'paid_closing';
                             const isLolos = p.qualificationStatus === 'lolos';
 
@@ -4115,10 +4118,90 @@ export const AuthModal = ({
                                 </td>
                               </tr>
                             );
-                          })}
+                          })
+                        )}
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Pagination Controls - Menampilkan hanya 10 baris data peserta per halaman agar akses dashboard super cepat dan hemat resources */}
+                    {sortedParticipants.length > 0 && (
+                      <div className="p-3.5 bg-[#FAF8F5] border-t border-[#E8E2D9] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2 text-neutral-600 font-medium text-[11px]">
+                          <span>
+                            Menampilkan baris ke-<strong>{(validAdminPage - 1) * ADMIN_PAGE_SIZE + 1}</strong> s/d <strong>{(validAdminPage - 1) * ADMIN_PAGE_SIZE + displayedParticipants.length}</strong> dari <strong>{sortedParticipants.length}</strong> peserta (Urutan Paling Baru)
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setAdminParticipantsPage(1)}
+                            disabled={validAdminPage <= 1}
+                            className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors text-xs"
+                            title="Halaman Pertama (Paling Baru)"
+                          >
+                            « Pertama
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setAdminParticipantsPage(prev => Math.max(1, prev - 1))}
+                            disabled={validAdminPage <= 1}
+                            className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors text-xs flex items-center gap-1"
+                          >
+                            <ChevronLeft className="w-3.5 h-3.5" />
+                            <span>Sebelumnya</span>
+                          </button>
+
+                          {/* Quick Page Jump Buttons */}
+                          <div className="flex items-center gap-1 px-1">
+                            {Array.from({ length: totalAdminPages }, (_, i) => i + 1)
+                              .filter(page => page === 1 || page === totalAdminPages || Math.abs(page - validAdminPage) <= 1)
+                              .map((page, idx, arr) => {
+                                const prev = arr[idx - 1];
+                                const hasGap = prev && page - prev > 1;
+                                return (
+                                  <React.Fragment key={page}>
+                                    {hasGap && <span className="px-1 text-neutral-400">...</span>}
+                                    <button
+                                      type="button"
+                                      onClick={() => setAdminParticipantsPage(page)}
+                                      className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                        validAdminPage === page
+                                          ? 'bg-[#1A1615] text-[#D4AF37] font-black'
+                                          : 'bg-white border border-[#E8E2D9] text-neutral-700 hover:bg-neutral-100'
+                                      }`}
+                                    >
+                                      {page}
+                                    </button>
+                                  </React.Fragment>
+                                );
+                              })}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setAdminParticipantsPage(prev => Math.min(totalAdminPages, prev + 1))}
+                            disabled={validAdminPage >= totalAdminPages}
+                            className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors text-xs flex items-center gap-1"
+                          >
+                            <span>Selanjutnya</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setAdminParticipantsPage(totalAdminPages)}
+                            disabled={validAdminPage >= totalAdminPages}
+                            className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors text-xs"
+                            title="Halaman Terakhir"
+                          >
+                            Terakhir »
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -4996,14 +5079,23 @@ export const AuthModal = ({
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[#E8E2D9]">
-                            {filteredParticipants.map((p, idx) => {
+                            {displayedAnnounceParticipants.length === 0 ? (
+                              <tr>
+                                <td colSpan={7} className="py-12 text-center text-neutral-500">
+                                  <AlertCircle className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                                  <p className="font-bold text-sm text-[#1A1615]">Tidak ada data peserta ditemukan</p>
+                                  <p className="text-xs text-[#756F68] mt-1">Coba sesuaikan kata kunci pencarian atau filter yang dipilih.</p>
+                                </td>
+                              </tr>
+                            ) : (
+                              displayedAnnounceParticipants.map((p, idx) => {
                               const isLolos = p.qualificationStatus === 'lolos';
                               const isPaid = p.finalTicketPaymentStatus === 'paid_closing';
 
                               return (
                                 <tr key={p.id} className="hover:bg-amber-50/30">
                                   <td className="py-3 px-4 font-mono">
-                                    <div className="font-bold text-[#1A1615]">{idx + 1}. {p.id}</div>
+                                    <div className="font-bold text-[#1A1615]">{(validAnnouncePage - 1) * ADMIN_PAGE_SIZE + idx + 1}. {p.id}</div>
                                   </td>
                                   <td className="py-3 px-4">
                                     <div className="font-bold text-[#1A1615]">{p.fullName}</div>
@@ -5075,10 +5167,43 @@ export const AuthModal = ({
                                   </td>
                                 </tr>
                               );
-                            })}
+                            })
+                          )}
                           </tbody>
                         </table>
                       </div>
+
+                      {/* Pagination Controls untuk Tab Pengumuman */}
+                      {sortedParticipants.length > 0 && (
+                        <div className="p-3 bg-[#FAF8F5] border-t border-[#E8E2D9] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                          <div className="text-[11px] text-neutral-600 font-medium">
+                            Menampilkan data ke-<strong>{(validAnnouncePage - 1) * ADMIN_PAGE_SIZE + 1}</strong> s/d <strong>{(validAnnouncePage - 1) * ADMIN_PAGE_SIZE + displayedAnnounceParticipants.length}</strong> dari <strong>{sortedParticipants.length}</strong> peserta
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                            <button
+                              type="button"
+                              onClick={() => setAdminAnnouncePage(prev => Math.max(1, prev - 1))}
+                              disabled={validAnnouncePage <= 1}
+                              className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs flex items-center gap-1"
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                              <span>Sebelumnya</span>
+                            </button>
+                            <span className="font-extrabold text-[#1A1615] px-2 text-xs">
+                              Hal {validAnnouncePage} / {totalAnnouncePages}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setAdminAnnouncePage(prev => Math.min(totalAnnouncePages, prev + 1))}
+                              disabled={validAnnouncePage >= totalAnnouncePages}
+                              className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs flex items-center gap-1"
+                            >
+                              <span>Selanjutnya</span>
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

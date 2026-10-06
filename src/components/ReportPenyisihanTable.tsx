@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   Filter,
@@ -19,7 +19,9 @@ import {
   Zap,
   CheckCheck,
   FileText,
-  Edit3
+  Edit3,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
 import {
@@ -384,6 +386,21 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       });
   }, [participantsList, searchTerm, filterLevel, filterSubject, filterQualification, filterClosing, sortOption]);
 
+  // Mode Akses Cepat Ringan: Batasi tampil hanya 10 baris data per halaman
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
+  const validPage = Math.min(Math.max(1, currentPage), totalPages);
+
+  const displayedData = useMemo(() => {
+    const start = (validPage - 1) * PAGE_SIZE;
+    return filteredData.slice(start, start + PAGE_SIZE);
+  }, [filteredData, validPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterLevel, filterSubject, filterQualification, filterClosing, sortOption]);
+
   const handleExportCsv = () => {
     const headers = [
       'Peringkat',
@@ -700,7 +717,8 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                   </td>
                 </tr>
               ) : (
-                filteredData.map((p, idx) => {
+                displayedData.map((p, idx) => {
+                  const globalIdx = (validPage - 1) * PAGE_SIZE + idx + 1;
                   const hasExam = !!p.penyisihanExam;
                   const score = p.penyisihanExam?.score ?? 0;
                   const isLolos = p.qualificationStatus === 'lolos' || (hasExam && score >= 70);
@@ -710,7 +728,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                   return (
                     <tr key={p.id} className="hover:bg-emerald-50/40 transition-colors">
                       <td className="py-3 px-3 text-center font-bold text-neutral-500 font-mono">
-                        {idx + 1}
+                        {globalIdx}
                       </td>
 
                       {/* Identitas Siswa */}
@@ -951,6 +969,65 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar - 10 baris per halaman */}
+        {filteredData.length > 0 && (
+          <div className="p-3.5 bg-[#FAF8F5] border-t border-[#E8E2D9] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-neutral-600 font-medium text-[11px]">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center gap-1">
+                <Zap className="w-3 h-3 text-emerald-600" />
+                Mode Ringan
+              </span>
+              <span>
+                Menampilkan baris ke-<strong>{(validPage - 1) * PAGE_SIZE + 1}</strong> s/d <strong>{(validPage - 1) * PAGE_SIZE + displayedData.length}</strong> dari <strong>{filteredData.length}</strong> peserta babak penyisihan
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap justify-center">
+              <button
+                type="button"
+                onClick={() => setCurrentPage(1)}
+                disabled={validPage <= 1}
+                className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs"
+              >
+                « Awal
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={validPage <= 1}
+                className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs flex items-center gap-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Sebelumnya</span>
+              </button>
+
+              <span className="font-extrabold text-[#1A1615] px-2 text-xs">
+                Hal {validPage} / {totalPages}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={validPage >= totalPages}
+                className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs flex items-center gap-1"
+              >
+                <span>Selanjutnya</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={validPage >= totalPages}
+                className="px-2.5 py-1 rounded-lg border border-[#E8E2D9] bg-white text-neutral-700 font-bold hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-xs"
+              >
+                Akhir »
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
