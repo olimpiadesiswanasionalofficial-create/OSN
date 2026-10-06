@@ -3,6 +3,7 @@ import {
   Award,
   BookOpen,
   CheckCircle2,
+  Check,
   ChevronDown,
   ChevronRight,
   GraduationCap,
@@ -40,6 +41,9 @@ import {
 import { APP_CONFIG } from '../appConfig.js';
 import { LogoOSN, LogoLKP, StempelLKP } from './components/BrandLogos';
 import { AuthModal } from './components/AuthModal';
+import { StatsCounterBar } from './components/StatsCounterBar';
+import { RecentWinnersMarquee } from './components/RecentWinnersMarquee';
+import { GalleryOSN } from './components/GalleryOSN';
 import { saveParticipant, saveMultipleParticipants, ParticipantRecord } from './services/participantDb';
 import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
 import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
@@ -88,8 +92,8 @@ export const SUBJECT_OPTIONS = [
   }
 ];
 
-// Safe Image component with automatic Unsplash fallback
-const FALLBACK_HERO = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop";
+// Safe Image component with automatic Unsplash fallback (Indonesian children education theme)
+const FALLBACK_HERO = "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop";
 
 export const ImageWithFallback = ({
   src,
@@ -106,20 +110,37 @@ export const ImageWithFallback = ({
 }) => {
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
+  const [hasFinalError, setHasFinalError] = useState(false);
 
   useEffect(() => {
     setImgSrc(src);
     setHasError(false);
+    setHasFinalError(false);
   }, [src]);
+
+  if (hasFinalError) {
+    return (
+      <div className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#0B132B] via-[#1A264D] to-[#0A1024] text-white p-4 ${className || 'w-full h-full'}`}>
+        <div className="w-10 h-10 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center mb-2">
+          <Trophy className="w-5 h-5 text-[#D4AF37]" />
+        </div>
+        <span className="text-xs font-bold text-[#D4AF37] text-center">{alt || 'Olimpiade Siswa Nasional'}</span>
+        <span className="text-[10px] text-neutral-400 mt-0.5">LKP Prestasi Nusantara</span>
+      </div>
+    );
+  }
 
   return (
     <img
       src={imgSrc || fallbackSrc}
-      alt={alt || 'Image'}
+      alt={alt || 'Foto Pendidikan Anak OSN 2026'}
+      referrerPolicy="no-referrer"
       onError={() => {
         if (!hasError) {
           setHasError(true);
           setImgSrc(fallbackSrc);
+        } else {
+          setHasFinalError(true);
         }
       }}
       className={className}
@@ -334,11 +355,12 @@ export default function App() {
     setChildrenForms(prev => {
       const updated = [...prev];
       if (updated[index]) {
+        const previousVal = updated[index][field];
         updated[index] = { ...updated[index], [field]: value };
-        // If parent modifies parentName or fullAddress on child 1, optionally propagate if others are empty
-        if ((field === 'parentName' || field === 'fullAddress') && index === 0) {
+        // If parent modifies shared contact / guardian info on child 1, propagate to others if empty or matching previous
+        if (['parentName', 'fullAddress', 'whatsapp', 'email', 'cityProvince'].includes(field) && index === 0) {
           for (let i = 1; i < updated.length; i++) {
-            if (!updated[i][field]) {
+            if (!updated[i][field] || updated[i][field] === previousVal) {
               updated[i] = { ...updated[i], [field]: value };
             }
           }
@@ -448,7 +470,7 @@ export default function App() {
 
     text += `• Biaya Babak Penyisihan: 100% GRATIS (Bebas Biaya Pendaftaran)\n` +
       `• Status Pendaftaran: Otomatis Tercatat Aktif di Database CBT 2026\n\n` +
-      `Pendaftaran telah otomatis tersimpan pada database resmi OSN. Setiap siswa dapat langsung login ke portal ujian CBT menggunakan Nama Lengkap dan No. WhatsApp masing-masing. Terima kasih.`;
+      `Pendaftaran telah otomatis tersimpan pada database resmi OSN. Peserta/orang tua cukup memasukkan Nomor WhatsApp yang didaftarkan untuk login ke portal ujian CBT (tanpa perlu mengetik nama). Jika 1 nomor mendaftarkan beberapa anak, Anda dapat langsung memilih nama anak di dalam sistem. Terima kasih.`;
 
     return `https://wa.me/${APP_CONFIG.contact.whatsapp}?text=${encodeURIComponent(text)}`;
   };
@@ -555,7 +577,11 @@ export default function App() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs xl:text-sm font-semibold text-[#4A453E]">
+          <nav className="hidden lg:flex items-center gap-5 text-xs xl:text-sm font-semibold text-[#4A453E]">
+            <a href="#keunggulan" className="text-amber-800 hover:text-[#1A1615] font-extrabold transition-colors flex items-center gap-1">
+              <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Keunggulan</span>
+            </a>
             <a href="#jenjang" className="hover:text-[#1A1615] transition-colors">Jenjang Lomba</a>
             <a href="#mapel" className="hover:text-[#1A1615] transition-colors">Mata Pelajaran</a>
             <a href="#jadwal" className="hover:text-[#1A1615] transition-colors">Jadwal & Alur</a>
@@ -629,6 +655,13 @@ export default function App() {
               </button>
             </div>
 
+            <a
+              href="#keunggulan"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-sm font-bold text-amber-900 bg-amber-50/80 border border-amber-200"
+            >
+              ★ Keunggulan & Kredibilitas Resmi OSN
+            </a>
             <a
               href="#jenjang"
               onClick={() => setMobileMenuOpen(false)}
@@ -753,7 +786,7 @@ export default function App() {
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
                 <button
                   onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-xs sm:text-sm font-extrabold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all shadow-[0_10px_25px_rgba(26,22,21,0.25)] flex items-center justify-center gap-2.5 group border border-[#D4AF37]/50"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-xs sm:text-sm font-extrabold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all shadow-[0_10px_25px_rgba(26,22,21,0.25)] flex items-center justify-center gap-2.5 group border border-[#D4AF37]/50 cursor-pointer animate-subtle-pulse ring-2 ring-[#D4AF37]/40 hover:ring-[#D4AF37]"
                 >
                   <Award className="w-4 h-4 text-[#D4AF37] group-hover:rotate-12 transition-transform" />
                   <span>Daftar Sekarang (Penyisihan Gratis)</span>
@@ -909,20 +942,323 @@ export default function App() {
         </div>
       </section>
 
-      {/* 4. STATS COUNTER BAR */}
-      <section className="bg-[#1A1615] text-white py-10 border-b border-[#2A2321]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-            {APP_CONFIG.stats.map((stat, idx) => (
-              <div key={idx} className={`pt-3 sm:pt-0 ${idx > 0 ? 'sm:pl-6' : ''}`}>
-                <p className="text-2xl sm:text-3xl font-extrabold text-[#D4AF37] tracking-tight">
-                  {stat.value}
-                </p>
-                <p className="text-xs sm:text-sm font-bold text-white mt-0.5">{stat.label}</p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">{stat.desc}</p>
-              </div>
-            ))}
+      {/* 4. STATS COUNTER BAR (INTERSECTION-OBSERVER ANIMATED) */}
+      <StatsCounterBar stats={APP_CONFIG.stats as any} />
+
+      {/* 4.5. KEUNGGULAN UTAMA & NILAI TAMBAH RESMI OSN 2026 */}
+      <section id="keunggulan" className="py-20 bg-gradient-to-b from-[#FAF8F5] via-white to-[#FAF8F5] border-b border-[#E8E2D9] relative overflow-hidden">
+        {/* Subtle Decorative Background Accents */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Header Section */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 text-xs font-black uppercase tracking-wider shadow-xs">
+              <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Keunggulan Kompetitif & Nilai Tambah Resmi</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#1A1615] tracking-tight leading-tight">
+              Mengapa Mengikuti{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E7D15] via-[#D4AF37] to-[#855D05]">
+                Olimpiade Siswa Nasional?
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm text-[#66615B] leading-relaxed max-w-2xl mx-auto">
+              Bukan sekadar ajang perlombaan biasa. OSN 2026 diselenggarakan dengan standar mutu pendidikan tinggi oleh lembaga resmi terakreditasi, memberikan manfaat nyata untuk masa depan akademik ananda.
+            </p>
           </div>
+
+          {/* 6 Grid Keunggulan Cards */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Card 1: Sertifikat Resmi Ber-QR */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] hover:border-[#9E7D15] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none transition-all group-hover:scale-110" />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-[#1A1615] text-[#D4AF37] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <QrCode className="w-6 h-6" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                    Verifikasi Instan
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615] group-hover:text-amber-900 transition-colors">
+                    Sertifikat Resmi Ber-QR Code
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Setiap sertifikat kelulusan dilengkapi kode verifikasi QR-Code nasional yang terhubung langsung ke database resmi. Pihak sekolah, dinas, atau panitia seleksi dapat memindai keabsahannya secara <em>real-time</em> kapan saja.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-950 text-[11px]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Terdaftar & Ber-Nomor Registrasi:</span>
+                  </div>
+                  <p className="text-[10px] text-amber-900 leading-snug">
+                    Izin Resmi Kemendikbudristek No. 421.9/234/LKP/2024 · SK Kemenkumham RI
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-extrabold text-emerald-700 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> E-Sertifikat Cetak A4
+                </span>
+                <button
+                  type="button"
+                  onClick={() => openLogin('user')}
+                  className="text-xs font-bold text-[#D4AF37] hover:text-[#1A1615] hover:underline cursor-pointer"
+                >
+                  Cek Contoh Sertifikat &rarr;
+                </button>
+              </div>
+            </div>
+
+            {/* Card 2: Jalur Prestasi Nasional / PPDB */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-emerald-500 hover:border-emerald-600 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full pointer-events-none transition-all group-hover:scale-110" />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <GraduationCap className="w-6 h-6" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
+                    Jalur Prestasi PPDB
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615] group-hover:text-emerald-900 transition-colors">
+                    Portofolio Jalur Prestasi Nasional
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Piagam kejuaraan dan sertifikat resmi ini menjadi bukti kompetensi berharga yang diakui sebagai portofolio akademik untuk pendaftaran sekolah negeri impian (SD ke SMP & SMP ke SMA) melalui <strong>Jalur Prestasi PPDB</strong>.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-950 text-[11px]">
+                    <Award className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Lembaga Akreditasi BAN PAUD PNF:</span>
+                  </div>
+                  <p className="text-[10px] text-emerald-900 leading-snug">
+                    Diterbitkan oleh LKP Prestasi Nusantara dengan tanda tangan Ketua & NIP Resmi.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-extrabold text-emerald-800 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Nilai Tambah PPDB Unggulan
+                </span>
+                <span className="text-[11px] font-semibold text-neutral-500">PAUD, SD, SMP</span>
+              </div>
+            </div>
+
+            {/* Card 3: Babak Penyisihan 100% Bebas Biaya */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-[#855D05] flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                    <Sparkles className="w-6 h-6 text-[#9E7D15]" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                    100% Bebas Biaya
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615]">
+                    Penyisihan Bebas Biaya (GRATIS)
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Kami meyakini setiap anak berhak mendapatkan panggung prestasi tanpa hambatan finansial. Babak penyisihan 100% bebas biaya dan peserta diperbolehkan memilih lebih dari 1 mata pelajaran sekaligus.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A1615] text-[11px]">
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Tanpa Kuota Zonasi Sekolah:</span>
+                  </div>
+                  <p className="text-[10px] text-[#756F68] leading-snug">
+                    Terbuka untuk sekolah negeri, swasta, madrasah (MI/MTs), maupun santri di seluruh Indonesia.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-bold text-amber-800">
+                  Daftar Online Mudah & Cepat
+                </span>
+                <span className="text-[11px] font-bold text-neutral-500">Gratis 100%</span>
+              </div>
+            </div>
+
+            {/* Card 4: Sistem CBT Anti-Kecurangan Mutakhir */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-[#0B132B] text-white flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                    <Laptop className="w-6 h-6 text-[#D4AF37]" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-900 border border-blue-300">
+                    CBT Anti-Cheat Aktif
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615]">
+                    Platform CBT Mutakhir & Objektif
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Sistem Computer Based Test (CBT) interaktif dengan proteksi anti-contek otomatis, timer ujian ketat, acak urutan soal, dan format 20 soal HOTS bergambar berwarna untuk menjamin keadilan penilaian.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A1615] text-[11px]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
+                    <span>Ujian Online Nyaman dari Rumah:</span>
+                  </div>
+                  <p className="text-[10px] text-[#756F68] leading-snug">
+                    Dapat diakses melalui laptop, tablet, maupun smartphone dengan antarmuka yang sangat ramah anak.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-bold text-blue-800">
+                  Transparan & Real-Time
+                </span>
+                <span className="text-[11px] font-semibold text-neutral-500">20 Menit Ujian</span>
+              </div>
+            </div>
+
+            {/* Card 5: Medali Logam Lapis Emas & Piala Kejuaraan */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#855D05] flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                    <Trophy className="w-6 h-6 text-[#9E7D15]" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                    Apresiasi Nyata
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615]">
+                    Medali Fisik Lapis Emas & Piala Juara
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Penghargaan bukan hanya simbolis — para finalis dan juara berhak mendapatkan medali fisik logam kuningan berukir lapis emas tebal, piala trofi juara umum bertingkat, piagam cetak resmi, serta cinderamata eksklusif yang dikirim ke rumah.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A1615] text-[11px]">
+                    <Award className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Kategori Juara Nasional:</span>
+                  </div>
+                  <p className="text-[10px] text-[#756F68] leading-snug">
+                    Juara 1 (Emas), Juara 2 (Perak), Juara 3 (Perunggu), serta Juara Umum Nasional per mata pelajaran.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-bold text-[#855D05]">
+                  Pengiriman Seluruh Indonesia
+                </span>
+                <span className="text-[11px] font-semibold text-neutral-500">Ekspedisi Aman</span>
+              </div>
+            </div>
+
+            {/* Card 6: Pendampingan & Laporan Hasil Komprehensif */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                    <FileCheck className="w-6 h-6 text-purple-700" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-900 border border-purple-300">
+                    Evaluasi Tuntas
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-black text-[#1A1615]">
+                    Laporan Nilai & Notifikasi Otomatis
+                  </h3>
+                  <p className="text-xs text-[#66615B] mt-2 leading-relaxed">
+                    Setiap tahapan ujian dipantau secara transparan. Peserta dan orang tua mendapatkan notifikasi WhatsApp resmi instan begitu nilai selesai dinilai, kartu ujian PDF cetak, dan akses download sertifikat langsung di dasbor peserta.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1A1615] text-[11px]">
+                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Layanan Bantuan Panitia 24/7:</span>
+                  </div>
+                  <p className="text-[10px] text-[#756F68] leading-snug">
+                    Call Center WhatsApp panitia responsif membantu kendala teknis dan administrasi siswa.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs">
+                <span className="text-[11px] font-bold text-purple-800">
+                  Notifikasi WA API Real-Time
+                </span>
+                <span className="text-[11px] font-semibold text-neutral-500">Layanan Prima</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Conversion Banner */}
+          <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#1A1615] via-[#2E2724] to-[#1A1615] text-white border border-[#D4AF37]/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1.5 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-[11px] font-bold">
+                <Sparkles className="w-3 h-3 text-[#D4AF37]" />
+                <span>Peluang Prestasi Terbaik Tahun Ini</span>
+              </div>
+              <h3 className="text-lg sm:text-2xl font-black text-white">
+                Siap Antarkan Ananda Menjadi Juara Nasional?
+              </h3>
+              <p className="text-xs text-neutral-300 max-w-xl">
+                Daftarkan putra-putri tercinta sekarang tanpa biaya pendaftaran (Gratis) dan dapatkan hak akses ke bank simulasi CBT interaktif.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs font-black bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-[#FFF2B2]"
+              >
+                <span>Daftar Gratis Sekarang</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <a
+                href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi%20tentang%20keunggulan%20kompetisi`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full sm:w-auto px-4 py-3.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all flex items-center justify-center gap-2"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Tanya Panitia via WA</span>
+              </a>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1247,53 +1583,13 @@ export default function App() {
       </section>
 
       {/* 8. VISUAL GALLERY JUARA (BERDASARKAN FOTO ASLI LAMPIRAN) */}
-      <section id="galeri" className="py-20 bg-[#FAF8F5] border-b border-[#E8E2D9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A1615]/5 text-xs font-bold text-[#1A1615]">
-              <Trophy className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Dokumentasi Pemenang Nyata</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#1A1615] tracking-tight">
-              Galeri Sang Juara Olimpiade Siswa Nasional
-            </h2>
-            <p className="text-xs sm:text-sm text-[#66615B]">
-              Bukti nyata para juara dengan piala berkilau, medali emas, dan sertifikat resmi ber-QR Code dari LKP Prestasi Nusantara.
-            </p>
-          </div>
+      <GalleryOSN
+        onOpenRegistration={handleOpenRegistration}
+        onOpenLogin={openLogin}
+      />
 
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {APP_CONFIG.gallery.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setLightboxImage(item)}
-                className="group relative h-80 rounded-3xl overflow-hidden cursor-pointer bg-neutral-900 border border-[#E8E2D9] shadow-sm hover:shadow-2xl transition-all flex flex-col justify-end"
-              >
-                <ImageWithFallback
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover absolute inset-0 group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B132B] via-black/40 to-transparent opacity-90 group-hover:opacity-95 transition-opacity" />
-
-                <div className="relative p-5 text-white space-y-1.5">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#D4AF37] text-[#1A1615] uppercase tracking-wider inline-block">
-                    {item.badge}
-                  </span>
-                  <h3 className="text-sm font-bold text-white leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-[11px] text-neutral-300">
-                    {item.subtitle}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
+      {/* 8.5 DYNAMIC 'RECENT WINNERS' MARQUEE SECTION */}
+      <RecentWinnersMarquee />
 
       {/* 9. OFFICIAL ORGANIZER PROFILE (LKP PRESTASI NUSANTARA) */}
       <section id="penyelenggara" className="py-20 bg-white border-b border-[#E8E2D9]">
@@ -1357,12 +1653,6 @@ export default function App() {
                     <Phone className="w-3.5 h-3.5" />
                     <span>Hubungi Pengurus LKP ({APP_CONFIG.contact.displayPhone})</span>
                   </a>
-                  <button
-                    onClick={() => openLogin('admin')}
-                    className="px-5 py-3 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all"
-                  >
-                    Portal Login Otoritas Admin
-                  </button>
                 </div>
 
               </div>
@@ -1475,23 +1765,6 @@ export default function App() {
             })}
           </div>
 
-          {/* Quick WhatsApp Helpdesk Card */}
-          <div className="mt-10 p-6 rounded-3xl bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-white">Butuh bantuan pendaftaran langsung dari panitia?</h3>
-              <p className="text-xs text-neutral-300 mt-0.5">Layanan bantuan WhatsApp panitia aktif setiap hari untuk mendampingi calon peserta.</p>
-            </div>
-            <a
-              href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20butuh%20panduan%20pendaftaran`}
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-3 rounded-xl text-xs font-bold bg-[#D4AF37] text-[#1A1615] hover:bg-[#FFF2B2] transition-all shrink-0 inline-flex items-center gap-2"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              <span>WhatsApp: {APP_CONFIG.contact.displayPhone}</span>
-            </a>
-          </div>
-
         </div>
       </section>
 
@@ -1519,16 +1792,6 @@ export default function App() {
               <span>Daftar Sekarang Juga (Gratis)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-
-            <a
-              href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20mendaftar%20olimpiade`}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all inline-flex items-center justify-center gap-2"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>Chat WhatsApp: {APP_CONFIG.contact.displayPhone}</span>
-            </a>
           </div>
         </div>
       </section>
@@ -1630,23 +1893,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* 14. FLOATING BUTTONS: WHATSAPP QUICK & AI CONSULTANT */}
+      {/* 14. FLOATING BUTTONS: AI CONSULTANT */}
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
-        
-        {/* Floating WhatsApp Call Center */}
-        <a
-          href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi%20pendaftaran`}
-          target="_blank"
-          rel="noreferrer"
-          className="group flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 text-white shadow-[0_8px_25px_rgba(16,185,129,0.5)] hover:bg-emerald-700 transition-all"
-          aria-label="Hubungi WhatsApp"
-        >
-          <Phone className="w-4 h-4" />
-          <span className="text-xs font-bold tracking-wide hidden sm:inline">
-            WA: {APP_CONFIG.contact.displayPhone}
-          </span>
-        </a>
-
         {/* Floating AI Consultant */}
         <button
           onClick={() => setAiDrawerOpen(true)}
@@ -1880,19 +2128,28 @@ export default function App() {
                         {/* Input 4 & 5: No WhatsApp & Alamat Email */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                              No. WhatsApp Aktif (Anak Ke-{idx + 1}) *
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="block text-xs font-bold text-[#1A1615]">
+                                No. WhatsApp Aktif (Anak Ke-{idx + 1}) *
+                              </label>
+                              {idx > 0 && child.whatsapp === childrenForms[0]?.whatsapp && child.whatsapp && (
+                                <span className="text-[9px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
+                                  ✓ Sama dg Anak Ke-1
+                                </span>
+                              )}
+                            </div>
                             <input
                               type="tel"
                               required
                               placeholder="Contoh: 081234567890"
                               value={child.whatsapp}
                               onChange={(e) => updateChildField(idx, 'whatsapp', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5] font-mono"
+                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5] font-mono font-bold"
                             />
                             <p className="text-[10px] text-[#756F68] mt-0.5">
-                              Boleh nomor orang tua atau nomor anak untuk akses login CBT
+                              {idx === 0 
+                                ? 'Nomor ini digunakan untuk mendaftarkan semua anak & akses login CBT'
+                                : '1 nomor WhatsApp dapat menaungi seluruh anak sekaligus'}
                             </p>
                           </div>
 
@@ -2048,7 +2305,7 @@ export default function App() {
                         <div className="flex items-center justify-between pb-1.5 border-b border-[#E8E2D9]">
                           <span className="text-[11px] font-bold text-[#1A1615] flex items-center gap-1.5">
                             <User className="w-3.5 h-3.5 text-[#D4AF37]" />
-                            Kredensial Siswa (Anak Ke-{rIdx + 1}): {rec.fullName}
+                            Data Terdaftar (Anak Ke-{rIdx + 1}): {rec.fullName}
                           </span>
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
                             {rec.id}
@@ -2057,12 +2314,15 @@ export default function App() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                           <div>
-                            <span className="text-[#756F68] block">Nama Login Siswa:</span>
+                            <span className="text-[#756F68] block">Nama Lengkap Siswa:</span>
                             <strong className="text-[#1A1615] text-xs">{rec.fullName}</strong>
                           </div>
                           <div>
-                            <span className="text-[#756F68] block">No. WhatsApp Login:</span>
+                            <span className="text-[#756F68] block">No. WhatsApp Akses Login:</span>
                             <strong className="text-[#1A1615] text-xs font-mono">{rec.whatsapp}</strong>
+                            <span className="text-[9.5px] text-amber-800 font-semibold block mt-0.5">
+                              (Cukup masukkan nomor ini saat login, tanpa perlu mengetik nama)
+                            </span>
                           </div>
                         </div>
 

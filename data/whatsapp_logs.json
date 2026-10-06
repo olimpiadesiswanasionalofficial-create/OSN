@@ -1,0 +1,13 @@
+[
+  {
+    "id": "WA-API-1791261991340-5128",
+    "timestamp": "2026-10-06T04:46:31.340Z",
+    "recipientPhone": "08123456781",
+    "recipientName": "Dzaliqa Assyafa N",
+    "type": "exam_graded",
+    "status": "DELIVERED",
+    "message": "Test Notifikasi WhatsApp Resmi OSN 2026",
+    "data": {},
+    "directWaUrl": "https://wa.me/628123456781?text=Test%20Notifikasi%20WhatsApp%20Resmi%20OSN%202026"
+  }
+]

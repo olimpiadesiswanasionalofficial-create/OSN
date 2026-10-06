@@ -2,20 +2,24 @@ import { QuestionItem, ExamTier, EducationLevel, SubjectName } from './cbtQuesti
 import { ALL_KATEGORI_A_QUESTIONS } from './questionsKategoriA';
 import { ALL_KATEGORI_B_QUESTIONS } from './questionsKategoriB';
 import { ALL_KATEGORI_C_QUESTIONS } from './questionsKategoriC';
+import { DRIVE_OFFICIAL_QUESTIONS } from './cbtDriveQuestionsData';
 
 export * from './cbtQuestionTypes';
 
 const STORAGE_OVERRIDES_KEY = 'osn_cbt_question_overrides_v1';
 const STORAGE_DELETED_KEY = 'osn_cbt_deleted_question_ids_v1';
 
-// TOTAL 1.200 SOAL RESMI BERSTANDAR KURIKULUM NASIONAL & INTERNASIONAL
-// - Kategori A (PAUD/TK): 100 Matematika, 100 B. Inggris, 100 IPA/Sains, 100 B. Indonesia (Total 400)
-// - Kategori B (SD/MI): 100 Matematika, 100 B. Inggris, 100 IPA/Sains, 100 B. Indonesia (Total 400)
-// - Kategori C (SMP/MTs): 100 Matematika, 100 B. Inggris, 100 IPA/Sains, 100 B. Indonesia (Total 400)
-export const ALL_INITIAL_QUESTIONS: QuestionItem[] = [
+// Retain warmup simulation questions and replace all Penyisihan and Final questions with official Google Drive data
+const BASE_SIMULASI_QUESTIONS = [
   ...ALL_KATEGORI_A_QUESTIONS,
   ...ALL_KATEGORI_B_QUESTIONS,
   ...ALL_KATEGORI_C_QUESTIONS
+].filter(q => q.stage === 'simulasi');
+
+// Total Bank Soal: 1.100 Soal Resmi Penyisihan & Final Google Drive + Soal Simulasi Pemanasan
+export const ALL_INITIAL_QUESTIONS: QuestionItem[] = [
+  ...DRIVE_OFFICIAL_QUESTIONS,
+  ...BASE_SIMULASI_QUESTIONS
 ];
 
 // Clean up legacy bloated storage keys to immediately free up browser localStorage quota

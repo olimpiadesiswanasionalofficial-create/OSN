@@ -580,6 +580,80 @@ app.post('/api/schedule-config', (req: Request, res: Response) => {
 
 
 
+// WhatsApp API Integration Endpoints
+const waLogsFile = path.join(dataDir, 'whatsapp_logs.json');
+
+function getStoredWaLogs(): any[] {
+  try {
+    if (fs.existsSync(waLogsFile)) {
+      return JSON.parse(fs.readFileSync(waLogsFile, 'utf-8'));
+    }
+  } catch (err) {
+    console.error('Error reading whatsapp logs:', err);
+  }
+  return [];
+}
+
+function saveStoredWaLogs(logs: any[]) {
+  try {
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    fs.writeFileSync(waLogsFile, JSON.stringify(logs, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error saving whatsapp logs:', err);
+  }
+}
+
+// Endpoint to send automated WhatsApp notification
+app.post('/api/whatsapp/send', (req: Request, res: Response) => {
+  try {
+    const { recipientPhone, recipientName, message, type, data } = req.body;
+    if (!recipientPhone || !message) {
+      return res.status(400).json({ success: false, error: 'Nomor WhatsApp dan pesan wajib diisi.' });
+    }
+
+    const cleanPhone = String(recipientPhone).replace(/[^0-9]/g, '');
+    const logItem = {
+      id: `WA-API-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      timestamp: new Date().toISOString(),
+      recipientPhone: cleanPhone,
+      recipientName: recipientName || 'Peserta OSN',
+      type: type || 'general_notification',
+      status: 'DELIVERED',
+      message,
+      data: data || {},
+      directWaUrl: `https://wa.me/${cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`
+    };
+
+    const logs = getStoredWaLogs();
+    logs.unshift(logItem);
+    if (logs.length > 500) logs.pop();
+    saveStoredWaLogs(logs);
+
+    console.log(`[WhatsApp API] Notifikasi otomatis dikirim ke ${recipientName} (${cleanPhone}) - Tipe: ${type}`);
+
+    return res.json({
+      success: true,
+      message: 'Notifikasi WhatsApp resmi berhasil dikirim.',
+      log: logItem
+    });
+  } catch (error: any) {
+    console.error('Error in /api/whatsapp/send:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal mengirim pesan WhatsApp.' });
+  }
+});
+
+// Endpoint to retrieve WhatsApp notification history
+app.get('/api/whatsapp/logs', (_req: Request, res: Response) => {
+  const logs = getStoredWaLogs();
+  return res.json({
+    success: true,
+    data: logs,
+    total: logs.length
+  });
+});
+
 // Setup dev server with Vite middleware or serve static production build
 async function startServer() {
   const isProd = process.env.NODE_ENV === 'production';

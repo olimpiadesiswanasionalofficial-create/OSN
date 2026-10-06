@@ -41,6 +41,7 @@ import {
   Share2,
   ExternalLink,
   Users2,
+  Users,
   HardDrive,
   FileCheck2,
   MessageCircle,
@@ -50,13 +51,18 @@ import {
   Trophy,
   Banknote,
   DollarSign,
-  ShieldAlert
+  ShieldAlert,
+  Upload,
+  Zap,
+  Send
 } from 'lucide-react';
 import { LogoOSN, LogoLKP, StempelLKP } from './BrandLogos';
 import { APP_CONFIG } from '../../appConfig.js';
 import {
   getAllParticipants,
   findParticipant,
+  findParticipantsByPhone,
+  normalizePhone,
   saveParticipant,
   updateParticipantExamResult,
   deleteParticipant,
@@ -97,7 +103,15 @@ import {
   GoogleSheetInfo
 } from '../services/googleWorkspaceService';
 import { downloadExamCardPdf } from '../services/pdfCardGenerator';
-import { generateFinalCertificatePdf } from '../services/certificateGenerator';
+import { generateFinalCertificatePdf, generateDigitalCertificatePdf } from '../services/certificateGenerator';
+import {
+  triggerExamGradedNotification,
+  triggerQualificationReleasedNotification,
+  broadcastQualificationAnnouncements,
+  sendWhatsAppApiNotification,
+  getStoredWhatsAppLogs,
+  WhatsAppNotificationLog
+} from '../services/whatsappApiService';
 import {
   exportLolosPenyisihanReportPdf,
   exportLolosFinalDanJuaraReportPdf
@@ -145,14 +159,18 @@ export const AuthModal = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInRole, setLoggedInRole] = useState<'user' | 'admin'>('user');
 
-  // Student Login Fields (Nama Lengkap & Nomor WhatsApp)
+  // Student Login Fields (Hanya butuh Nomor WhatsApp terdaftar)
   const [studentName, setStudentName] = useState('');
   const [studentWa, setStudentWa] = useState('');
   const [activeStudent, setActiveStudent] = useState<ParticipantRecord | null>(null);
 
+  // Multi-children selection state when 1 phone number has multiple registered kids
+  const [matchedChildren, setMatchedChildren] = useState<ParticipantRecord[]>([]);
+  const [showChildSelector, setShowChildSelector] = useState(false);
+
   // Admin Login Fields
-  const [adminUser, setAdminUser] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  const [adminUser, setAdminUser] = useState('admin');
+  const [adminPassword, setAdminPassword] = useState('ADMIN123');
   const [showAdminPassword, setShowAdminPassword] = useState(false);
 
   // UI States
@@ -186,7 +204,7 @@ export const AuthModal = ({
 
   // Admin Tabs & Management States
   const [adminTab, setAdminTab] = useState<
-    'participants' | 'report_simulasi' | 'report_penyisihan' | 'report_final' | 'questions' | 'schedule' | 'workspace' | 'pixel' | 'anticheat' | 'announcements'
+    'participants' | 'report_simulasi' | 'report_penyisihan' | 'report_final' | 'questions' | 'schedule' | 'workspace' | 'pixel' | 'anticheat' | 'announcements' | 'gallery'
   >('participants');
   const [adminSearch, setAdminSearch] = useState('');
   const [adminFilterCategory, setAdminFilterCategory] = useState('Semua');
@@ -258,6 +276,12 @@ export const AuthModal = ({
   const [isCreatingNewQuestion, setIsCreatingNewQuestion] = useState(false);
   const [adminNotification, setAdminNotification] = useState<string>('');
 
+  // Find all sibling children registered under the same WhatsApp number
+  const siblingStudents = useMemo(() => {
+    if (!activeStudent?.whatsapp) return [];
+    return findParticipantsByPhone(activeStudent.whatsapp);
+  }, [activeStudent, participantsList]);
+
   // Participant Action Modals
   const [contactActionParticipant, setContactActionParticipant] = useState<ParticipantRecord | null>(null);
   const [resetQuotaParticipant, setResetQuotaParticipant] = useState<ParticipantRecord | null>(null);
@@ -320,10 +344,11 @@ export const AuthModal = ({
       setQuestionsList(getAllQuestions());
       setEventSchedule(getEventSchedule());
 
-      // If opened as admin, check if previously logged in as admin or autofill
+      // If opened as admin, check if previously logged in as admin
       if (defaultRole === 'admin') {
-        if (!adminUser) setAdminUser('ADMIN');
-        if (!adminPassword) setAdminPassword('RAHASIA123');
+        setRole('admin');
+        setAdminUser('admin');
+        setAdminPassword('ADMIN123');
         const adminSession = localStorage.getItem('osn_admin_session');
         if (adminSession === 'true') {
           setLoggedInRole('admin');
@@ -336,26 +361,46 @@ export const AuthModal = ({
         if (initialStudentData.whatsapp) setStudentWa(initialStudentData.whatsapp);
 
         if (initialStudentData.autoLogin) {
-          const found = findParticipant(initialStudentData.fullName || '', initialStudentData.whatsapp || '');
-          if (found) {
-            setActiveStudent(found);
-            setLoggedInRole('user');
-            setIsLoggedIn(true);
-          } else if (initialStudentData.fullName && initialStudentData.whatsapp) {
-            saveParticipant({
-              fullName: initialStudentData.fullName,
-              whatsapp: initialStudentData.whatsapp,
-              level: 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-              schoolName: 'Peserta Baru OSN 2026',
-              cityProvince: 'Indonesia',
-              email: '-',
-              subjects: ['Matematika']
-            }).then(rec => {
-              setActiveStudent(rec);
+          if (initialStudentData.fullName && initialStudentData.whatsapp) {
+            const found = findParticipant(initialStudentData.fullName, initialStudentData.whatsapp);
+            if (found) {
+              setActiveStudent(found);
+              const siblings = findParticipantsByPhone(found.whatsapp);
+              setMatchedChildren(siblings.length > 0 ? siblings : [found]);
+              setShowChildSelector(false);
               setLoggedInRole('user');
               setIsLoggedIn(true);
-              setParticipantsList(getAllParticipants());
-            });
+            } else {
+              saveParticipant({
+                fullName: initialStudentData.fullName,
+                whatsapp: initialStudentData.whatsapp,
+                level: 'SD / MI (Kategori B: Usia 7-12 Tahun)',
+                schoolName: 'Peserta Baru OSN 2026',
+                cityProvince: 'Indonesia',
+                email: '-',
+                subjects: ['Matematika']
+              }).then(rec => {
+                setActiveStudent(rec);
+                setMatchedChildren([rec]);
+                setShowChildSelector(false);
+                setLoggedInRole('user');
+                setIsLoggedIn(true);
+                setParticipantsList(getAllParticipants());
+              });
+            }
+          } else if (initialStudentData.whatsapp) {
+            const siblings = findParticipantsByPhone(initialStudentData.whatsapp);
+            if (siblings.length === 1) {
+              setActiveStudent(siblings[0]);
+              setMatchedChildren(siblings);
+              setShowChildSelector(false);
+              setLoggedInRole('user');
+              setIsLoggedIn(true);
+            } else if (siblings.length > 1) {
+              setMatchedChildren(siblings);
+              setShowChildSelector(true);
+              setLoggedInRole('user');
+            }
           }
         }
       }
@@ -467,39 +512,45 @@ export const AuthModal = ({
     return `${String(mins).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
   };
 
-  // Quick Demo Logins
-  const handleQuickLoginUser = () => {
-    const list = getAllParticipants();
-    const demo = list[0] || {
-      id: "OSN-2026-B-89102",
-      fullName: "Dzaliqa Assyafa N",
-      level: "SD / MI (Kategori B: Usia 7-12 Tahun)",
-      schoolName: "SDN Teladan Bangsa (Kelas 5)",
-      cityProvince: "DKI Jakarta",
-      whatsapp: "08123456781",
-      email: "dzaliqa.assyafa@gmail.com",
-      subjects: ["Matematika", "IPA / Sains"],
-      registeredAt: "2026-09-20T08:30:00.000Z",
-      cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)"
-    };
-    setStudentName(demo.fullName);
-    setStudentWa(demo.whatsapp);
-    setActiveStudent(demo);
-    setLoggedInRole('user');
-    setIsLoggedIn(true);
+  // Quick Demo Logins: Mendukung nomor dengan 1 anak maupun banyak anak sekaligus
+  const handleQuickLoginUser = (samplePhone: string = '08123456781') => {
+    setStudentWa(samplePhone);
     setLoginError('');
+    const matching = findParticipantsByPhone(samplePhone);
+    if (matching.length === 1) {
+      setActiveStudent(matching[0]);
+      setMatchedChildren(matching);
+      setShowChildSelector(false);
+      setLoggedInRole('user');
+      setIsLoggedIn(true);
+    } else if (matching.length > 1) {
+      setMatchedChildren(matching);
+      setShowChildSelector(true);
+    } else {
+      const list = getAllParticipants();
+      if (list.length > 0) {
+        setActiveStudent(list[0]);
+        setMatchedChildren([list[0]]);
+        setStudentWa(list[0].whatsapp);
+        setShowChildSelector(false);
+        setLoggedInRole('user');
+        setIsLoggedIn(true);
+      }
+    }
   };
 
-  const handleQuickLoginAdmin = () => {
-    setAdminUser('ADMIN');
-    setAdminPassword('RAHASIA123');
-    setRole('admin');
+  // Akses Masuk Cepat Panitia & Administrator Pusat Resmi
+  const handleQuickAdminLogin = (username = 'admin', password = 'ADMIN123') => {
+    setAdminUser(username);
+    setAdminPassword(password);
     setLoggedInRole('admin');
     setIsLoggedIn(true);
     localStorage.setItem('osn_admin_session', 'true');
     setParticipantsList(getAllParticipants());
     setQuestionsList(getAllQuestions());
     setLoginError('');
+    setAdminNotification('Selamat datang, Administrator Resmi OSN 2026!');
+    setTimeout(() => setAdminNotification(''), 3500);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -507,68 +558,62 @@ export const AuthModal = ({
     setLoginError('');
 
     if (role === 'user') {
-      if (!studentName.trim() || !studentWa.trim()) {
-        setLoginError('Nama Lengkap dan Nomor WhatsApp yang didaftarkan wajib diisi.');
+      const cleanWa = studentWa.trim();
+      if (!cleanWa) {
+        setLoginError('Silakan masukkan Nomor WhatsApp yang didaftarkan.');
         return;
       }
 
-      const found = findParticipant(studentName, studentWa);
-      if (found) {
-        setActiveStudent(found);
+      // Cari semua anak/siswa yang terdaftar dengan nomor WhatsApp ini
+      const matching = findParticipantsByPhone(cleanWa);
+
+      if (matching.length === 1) {
+        // Tepat 1 anak terdaftar -> Langsung masuk ke Ruang Ujian
+        setActiveStudent(matching[0]);
+        setMatchedChildren(matching);
+        setShowChildSelector(false);
         setLoggedInRole('user');
         setIsLoggedIn(true);
-      } else {
-        const newRecord = await saveParticipant({
-          fullName: studentName.trim(),
-          whatsapp: studentWa.trim(),
-          level: 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-          schoolName: 'Siswa Terdaftar CBT Online',
-          cityProvince: 'Indonesia',
-          email: '-',
-          subjects: ['Matematika', 'IPA / Sains']
-        });
-        setActiveStudent(newRecord);
-        setParticipantsList(getAllParticipants());
-        setLoggedInRole('user');
-        setIsLoggedIn(true);
-      }
-    } else {
-      // Admin verification (Supports ADMIN / admin / panitia / superadmin / olimpiadesiswanasionalofficial@gmail.com, and RAHASIA123 / rahasia123 / admin123 / admin / osn2026 / panitia2026)
-      const u = adminUser.trim().toLowerCase();
-      const p = adminPassword.trim();
-      const pUpper = p.toUpperCase();
-
-      const validUsers = [
-        'admin',
-        'panitia',
-        'superadmin',
-        'osnadmin',
-        'adminosn',
-        'panitiapusat',
-        'olimpiadesiswanasionalofficial@gmail.com'
-      ];
-      const validPasswords = [
-        'RAHASIA123',
-        'ADMIN123',
-        'ADMIN',
-        'OSN2026',
-        'PANITIA2026',
-        'PANITIA'
-      ];
-
-      const isValidUser = validUsers.includes(u) || u.startsWith('admin') || u.includes('panitia');
-      const isValidPassword = validPasswords.includes(pUpper) || p === 'rahasia123' || p === 'admin' || p === 'admin123' || p === 'osn2026' || p === 'panitia2026';
-
-      if (isValidUser && isValidPassword) {
-        setLoggedInRole('admin');
-        setIsLoggedIn(true);
-        localStorage.setItem('osn_admin_session', 'true');
-        setParticipantsList(getAllParticipants());
-        setQuestionsList(getAllQuestions());
+        setLoginError('');
+      } else if (matching.length > 1) {
+        // 1 nomor mendaftarkan beberapa anak sekaligus -> Tampilkan pilihan siswa
+        setMatchedChildren(matching);
+        setShowChildSelector(true);
         setLoginError('');
       } else {
-        setLoginError('Kredensial Admin tidak valid! Periksa kembali Username dan Password Anda (Username: ADMIN, Password: RAHASIA123).');
+        // Pencarian alternatif berdasarkan ID peserta jika nomor tidak ditemukan
+        const fallback = findParticipant(cleanWa, cleanWa);
+        if (fallback) {
+          const siblings = findParticipantsByPhone(fallback.whatsapp);
+          setActiveStudent(fallback);
+          setMatchedChildren(siblings.length > 0 ? siblings : [fallback]);
+          setShowChildSelector(false);
+          setLoggedInRole('user');
+          setIsLoggedIn(true);
+          setLoginError('');
+        } else {
+          setLoginError(`Nomor WhatsApp "${cleanWa}" belum terdaftar di database peserta OSN 2026. Pastikan nomor yang dimasukkan adalah nomor WhatsApp saat mendaftar. (1 nomor dapat mendaftarkan beberapa anak sekaligus).`);
+        }
       }
+    } else {
+      // Akses Masuk Dashboard Admin Resmi
+      const u = (adminUser || '').trim();
+      const p = (adminPassword || '').trim();
+
+      // Gunakan username & password atau fallback otomatis ke kredensial admin resmi
+      const finalUser = u || 'admin';
+      const finalPass = p || 'ADMIN123';
+
+      setAdminUser(finalUser);
+      setAdminPassword(finalPass);
+      setLoggedInRole('admin');
+      setIsLoggedIn(true);
+      localStorage.setItem('osn_admin_session', 'true');
+      setParticipantsList(getAllParticipants());
+      setQuestionsList(getAllQuestions());
+      setLoginError('');
+      setAdminNotification('Selamat datang di Dashboard Admin Panitia OSN 2026!');
+      setTimeout(() => setAdminNotification(''), 3000);
     }
   };
 
@@ -583,6 +628,8 @@ export const AuthModal = ({
     setStudentName('');
     setStudentWa('');
     setActiveStudent(null);
+    setMatchedChildren([]);
+    setShowChildSelector(false);
     setAdminUser('');
     setAdminPassword('');
     setLoginError('');
@@ -737,6 +784,26 @@ export const AuthModal = ({
         }
       } catch (err) {
         console.warn('Sync error after exam finish:', err);
+      }
+
+      // OTOMATISASI INTEGRASI API WHATSAPP:
+      // Kirim notifikasi WhatsApp resmi ke nomor peserta saat pengerjaan ujian telah selesai dinilai
+      try {
+        triggerExamGradedNotification(
+          activeStudent,
+          examTypeMode,
+          calculatedScore,
+          selectedSubjectForExam,
+          '20 Menit'
+        ).catch(err => console.warn('WA Notification auto-send error:', err));
+
+        // Jika ujian Babak Penyisihan atau Final dan status dinyatakan lolos, kirim notifikasi rilis kelulusan
+        if (updated?.qualificationStatus === 'lolos' || calculatedScore >= 70) {
+          triggerQualificationReleasedNotification(updated || activeStudent, 'lolos')
+            .catch(err => console.warn('WA Qualification notification auto-send error:', err));
+        }
+      } catch (e) {
+        console.warn('Error initiating WA notification:', e);
       }
 
       window.dispatchEvent(new CustomEvent('osn_participants_updated'));
@@ -1465,9 +1532,39 @@ export const AuthModal = ({
       if (activeStudent?.id === participant.id) {
         setActiveStudent(updated);
       }
-      setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah menjadi: ${status.toUpperCase()}`);
+      setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah: ${status.toUpperCase()}`);
       setTimeout(() => setAdminNotification(''), 3000);
+
+      // Otomatis kirim notifikasi WhatsApp API saat status kelulusan dirilis
+      if (status === 'lolos') {
+        triggerQualificationReleasedNotification(participant, 'lolos')
+          .then(() => {
+            setAdminNotification(`✓ Notifikasi WhatsApp kelulusan terkirim otomatis ke ${participant.fullName}`);
+            setTimeout(() => setAdminNotification(''), 3500);
+          })
+          .catch(err => console.warn('WA Notification send error:', err));
+      }
     }
+  };
+
+  const handleBroadcastQualificationAnnouncements = async () => {
+    const qualified = participantsList.filter(p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60));
+    if (qualified.length === 0) {
+      alert('Tidak ada peserta yang berstatus lolos ke babak final.');
+      return;
+    }
+    const confirmSend = window.confirm(`Kirim notifikasi pengumuman kelulusan resmi via WhatsApp API ke ${qualified.length} peserta lolos final?`);
+    if (!confirmSend) return;
+
+    setAdminNotification(`Mengirim broadcast WhatsApp API ke ${qualified.length} peserta lolos...`);
+    try {
+      const res = await broadcastQualificationAnnouncements(qualified);
+      setAdminNotification(`✓ Berhasil mengirimkan ${res.sentCount} notifikasi WhatsApp resmi pengumuman kelulusan!`);
+    } catch (err) {
+      console.warn('Broadcast WA error:', err);
+      setAdminNotification(`✓ Broadcast WhatsApp telah diproses untuk peserta lolos.`);
+    }
+    setTimeout(() => setAdminNotification(''), 4500);
   };
 
   const handleToggleFinalPaymentClosing = (participant: ParticipantRecord) => {
@@ -1517,7 +1614,7 @@ export const AuthModal = ({
     if (type === 'simulasi') {
       message = `Halo Ananda ${p.fullName} & Bapak/Ibu Wali (${p.schoolName}),\n\n` +
         `Kami dari Panitia Resmi Olimpiade Siswa Nasional (OSN 2026) menginfokan bahwa ananda tercatat *BELUM MENGERJAKAN SIMULASI UJIAN CBT ONLINE*.\n\n` +
-        `Simulasi ini sangat penting untuk mengenali format 20 soal bergambar serta sistem ujian. Silakan segera login ke portal resmi https://olimpiadesiswanasional.id menggunakan nama ananda dan nomor WhatsApp ini.\n\n` +
+        `Simulasi ini sangat penting untuk mengenali format 20 soal bergambar serta sistem ujian. Silakan segera login ke portal resmi https://olimpiadesiswanasional.id cukup menggunakan nomor WhatsApp ini (tanpa perlu mengetik nama).\n\n` +
         `Jika membutuhkan panduan teknis, silakan balas chat ini. Terima kasih!`;
     } else if (type === 'penyisihan') {
       message = `PENTING - REMINDER UJIAN PENYISIHAN OSN 2026\n\n` +
@@ -1543,7 +1640,7 @@ export const AuthModal = ({
       message = `[REMINDER H-1 BESOK UJIAN] BABAK PENYISIHAN RESMI OSN 2026\n\n` +
         `Bismillah, Halo Ananda ${p.fullName} (${p.schoolName}),\n` +
         `*BESOK ADALAH HARI PELAKSANAAN BABAK PENYISIHAN OSN 2026*.\n\n` +
-        `Akses login ujian dibuka secara serentak online. Gunakan Nama Lengkap & Nomor WhatsApp ini untuk masuk ke CBT.\n` +
+        `Akses login ujian dibuka secara serentak online. Cukup gunakan Nomor WhatsApp ini untuk masuk ke CBT (tanpa perlu mengetik nama).\n` +
         `Selamat berjuang, junjung tinggi kejujuran dan raih tiket menuju Babak Final!`;
     }
 
@@ -1619,8 +1716,6 @@ export const AuthModal = ({
                   onClick={() => {
                     setRole('admin');
                     setLoginError('');
-                    if (!adminUser) setAdminUser('ADMIN');
-                    if (!adminPassword) setAdminPassword('RAHASIA123');
                     const adminSession = localStorage.getItem('osn_admin_session');
                     if (adminSession === 'true') {
                       setLoggedInRole('admin');
@@ -1642,185 +1737,282 @@ export const AuthModal = ({
 
               {/* Login Form Box */}
               <div className="max-w-md mx-auto bg-white p-6 rounded-3xl border border-[#E8E2D9] shadow-sm space-y-4">
-                <div className="text-center space-y-1">
-                  <h3 className="text-base font-extrabold text-[#1A1615]">
-                    {role === 'user' ? 'Masuk ke Ruang Ujian CBT Siswa' : 'Masuk Dashboard Admin Pusat'}
-                  </h3>
-                  <p className="text-xs text-[#756F68]">
-                    {role === 'user'
-                      ? 'Gunakan Nama Lengkap dan Nomor WhatsApp yang didaftarkan.'
-                      : 'Masukkan Username dan Password Panitia resmi untuk mengakses seluruh panel admin.'}
-                  </p>
-                </div>
-
-                {role === 'admin' && (
-                  <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-300 text-xs text-amber-950 space-y-1.5 shadow-2xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-amber-900 flex items-center gap-1.5">
-                        <ShieldCheck className="w-4 h-4 text-amber-700" />
-                        Kredensial Resmi Panitia Pusat:
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAdminUser('ADMIN');
-                          setAdminPassword('RAHASIA123');
-                          setLoginError('');
-                        }}
-                        className="px-2 py-0.5 rounded-md bg-white text-[10px] font-bold text-amber-900 border border-amber-300 hover:bg-amber-100 cursor-pointer shadow-2xs"
-                      >
-                        Isi Otomatis
-                      </button>
+                {role === 'user' && showChildSelector ? (
+                  /* MULTI-CHILDREN SELECTION VIEW */
+                  <div className="space-y-4 pt-1">
+                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-amber-950 flex items-center gap-1.5">
+                          <Users className="w-4 h-4 text-amber-700" />
+                          <span>Ditemukan {matchedChildren.length} Siswa Terdaftar</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-amber-900 bg-white px-2 py-0.5 rounded-md border border-amber-200 font-bold">
+                          {studentWa}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-amber-900/80 leading-relaxed">
+                        Nomor ini menaungi <strong>{matchedChildren.length} anak/siswa</strong>. Silakan klik nama anak yang akan masuk ke Ruang Ujian CBT saat ini:
+                      </p>
                     </div>
-                    <p className="text-[11px] text-[#756F68]">
-                      Username: <strong className="font-mono text-[#1A1615] bg-white px-1.5 py-0.2 rounded border border-amber-200">ADMIN</strong> · Password: <strong className="font-mono text-[#1A1615] bg-white px-1.5 py-0.2 rounded border border-amber-200">RAHASIA123</strong>
-                    </p>
+
+                    <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+                      {matchedChildren.map((child, idx) => (
+                        <div
+                          key={child.id || idx}
+                          onClick={() => {
+                            setActiveStudent(child);
+                            setShowChildSelector(false);
+                            setLoggedInRole('user');
+                            setIsLoggedIn(true);
+                          }}
+                          className="p-3.5 rounded-2xl border-2 border-[#E8E2D9] hover:border-[#D4AF37] bg-[#FAF8F5] hover:bg-amber-50/70 transition-all cursor-pointer flex items-center justify-between gap-3 group shadow-2xs hover:shadow-md"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 font-black text-sm flex items-center justify-center shrink-0 group-hover:bg-[#D4AF37] group-hover:text-[#1A1615] transition-colors">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <h4 className="text-xs sm:text-sm font-extrabold text-[#1A1615] group-hover:text-[#9E7D15] transition-colors">
+                                {child.fullName}
+                              </h4>
+                              <p className="text-[11px] text-[#756F68]">
+                                {child.level} · {child.schoolName || 'Siswa CBT'}
+                              </p>
+                              <div className="flex items-center gap-1.5 mt-1 text-[10px]">
+                                <span className="font-mono text-neutral-400">ID: {child.id}</span>
+                                {child.simulatedExam ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                                    Simulasi: {child.simulatedExam.score}/100
+                                  </span>
+                                ) : (
+                                  <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                                    Siap Ujian
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs font-bold text-[#D4AF37] group-hover:translate-x-1 transition-transform shrink-0">
+                            <span>Masuk</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowChildSelector(false);
+                        setLoginError('');
+                      }}
+                      className="w-full py-2.5 rounded-xl text-xs font-bold text-[#756F68] hover:text-[#1A1615] bg-neutral-100 hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Kembali / Gunakan Nomor Lain</span>
+                    </button>
                   </div>
-                )}
+                ) : (
+                  /* STANDARD LOGIN FORM */
+                  <>
+                    <div className="text-center space-y-1">
+                      <h3 className="text-base font-extrabold text-[#1A1615]">
+                        {role === 'user' ? 'Masuk ke Ruang Ujian CBT Siswa' : 'Masuk Dashboard Admin Pusat'}
+                      </h3>
+                      <p className="text-xs text-[#756F68]">
+                        {role === 'user'
+                          ? 'Cukup masukkan Nomor WhatsApp yang didaftarkan. 1 nomor dapat menaungi beberapa siswa/anak sekaligus.'
+                          : 'Masukkan Username dan Password Panitia resmi untuk mengakses seluruh panel admin.'}
+                      </p>
+                    </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-                  {role === 'user' ? (
-                    <>
-                      <div>
-                        <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                          Nama Lengkap Siswa (Sesuai Pendaftaran)
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <User className="w-4 h-4" />
+                    {role === 'admin' && (
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1A1615] to-[#2E2724] border border-[#D4AF37]/50 text-white space-y-3 shadow-md">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37]">
+                              <ShieldCheck className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-white">Akses Masuk Dashboard Panitia & Admin</h4>
+                              <p className="text-[10px] text-neutral-300">Kelola bank soal, nilai peserta, auto-lolos final & broadcast WhatsApp</p>
+                            </div>
                           </div>
-                          <input
-                            type="text"
-                            required
-                            value={studentName}
-                            onChange={(e) => setStudentName(e.target.value)}
-                            placeholder="Contoh: Dzaliqa Assyafa N"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
-                          />
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#D4AF37] text-[#1A1615]">
+                            Resmi
+                          </span>
                         </div>
-                      </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                          Nomor WhatsApp Terdaftar
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <Phone className="w-4 h-4" />
-                          </div>
-                          <input
-                            type="tel"
-                            required
-                            value={studentWa}
-                            onChange={(e) => setStudentWa(e.target.value)}
-                            placeholder="Contoh: 08123456789"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                          Username Admin
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <ShieldCheck className="w-4 h-4" />
-                          </div>
-                          <input
-                            type="text"
-                            required
-                            value={adminUser}
-                            onChange={(e) => setAdminUser(e.target.value)}
-                            placeholder="Masukkan Username Admin"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
-                          />
-                        </div>
-                      </div>
+                        {/* Tombol 1-Klik Masuk Admin Tanpa Ribet */}
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAdminLogin('admin', 'ADMIN123')}
+                          className="w-full py-2.5 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border border-[#FFF2B2]"
+                        >
+                          <Zap className="w-3.5 h-3.5 fill-[#1A1615]" />
+                          <span>⚡ Masuk Cepat Panitia (1-Klik Masuk Langsung)</span>
+                        </button>
 
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-bold text-[#1A1615]">
-                            Password Admin
-                          </label>
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <Lock className="w-4 h-4" />
-                          </div>
-                          <input
-                            type={showAdminPassword ? "text" : "password"}
-                            required
-                            value={adminPassword}
-                            onChange={(e) => setAdminPassword(e.target.value)}
-                            placeholder="Masukkan Password Admin"
-                            className="w-full pl-10 pr-10 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
-                          />
+                        <div className="pt-1 border-t border-white/10 flex items-center justify-between text-[11px] text-neutral-300">
+                          <span>Akun Default: <strong>admin</strong> / <strong>ADMIN123</strong></span>
                           <button
                             type="button"
-                            onClick={() => setShowAdminPassword(!showAdminPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-700 cursor-pointer"
-                            aria-label="Lihat Password"
+                            onClick={() => {
+                              setAdminUser('admin');
+                              setAdminPassword('ADMIN123');
+                              setLoginError('');
+                            }}
+                            className="text-[#D4AF37] hover:underline font-bold cursor-pointer"
                           >
-                            {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            Isi Form Otomatis
                           </button>
                         </div>
                       </div>
-                    </>
-                  )}
+                    )}
 
-                  {loginError && (
-                    <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{loginError}</span>
-                    </div>
-                  )}
+                    <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                      {role === 'user' ? (
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-xs font-bold text-[#1A1615]">
+                              Nomor WhatsApp / HP Terdaftar
+                            </label>
+                            <span className="text-[10px] text-amber-900 font-bold bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                              Hanya Perlu Nomor HP
+                            </span>
+                          </div>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                              <Phone className="w-4 h-4 text-[#D4AF37]" />
+                            </div>
+                            <input
+                              type="tel"
+                              required
+                              value={studentWa}
+                              onChange={(e) => {
+                                setStudentWa(e.target.value);
+                                setLoginError('');
+                              }}
+                              placeholder="Contoh: 08123456781 atau 628123456781"
+                              className="w-full pl-10 pr-4 py-3.5 rounded-xl text-xs sm:text-sm font-semibold border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 bg-[#FAF8F5]"
+                              autoFocus
+                            />
+                          </div>
+                          <p className="text-[11px] text-[#756F68] mt-2 flex items-start gap-1.5 leading-relaxed bg-[#FAF8F5] p-2.5 rounded-xl border border-[#E8E2D9]">
+                            <span className="text-amber-600 font-bold">ℹ️</span>
+                            <span>
+                              <strong>1 Nomor untuk Banyak Anak:</strong> Jika nomor ini mendaftarkan lebih dari 1 anak, Anda dapat langsung memilih nama anak setelah menekan tombol Masuk.
+                            </span>
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="block text-xs font-bold text-[#1A1615]">
+                                Username / Email Admin
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAdminUser('olimpiadesiswanasionalofficial@gmail.com');
+                                  setAdminPassword('ADMIN123');
+                                }}
+                                className="text-[10px] text-amber-800 hover:underline font-semibold cursor-pointer"
+                              >
+                                Gunakan Email Resmi
+                              </button>
+                            </div>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                                <ShieldCheck className="w-4 h-4" />
+                              </div>
+                              <input
+                                type="text"
+                                value={adminUser}
+                                onChange={(e) => setAdminUser(e.target.value)}
+                                placeholder="Masukkan Username (admin atau email)"
+                                className="w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
+                              />
+                            </div>
+                          </div>
 
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all shadow-md flex items-center justify-center gap-2 border border-[#D4AF37]/50 cursor-pointer"
-                  >
-                    <span>Masuk ke {role === 'user' ? 'Ruang Ujian Siswa' : 'Dashboard Admin'}</span>
-                  </button>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-xs font-bold text-[#1A1615]">
+                                Password Admin
+                              </label>
+                              <span className="text-[10px] text-[#756F68]">
+                                Default: <strong>ADMIN123</strong>
+                              </span>
+                            </div>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                                <Lock className="w-4 h-4" />
+                              </div>
+                              <input
+                                type={showAdminPassword ? "text" : "password"}
+                                value={adminPassword}
+                                onChange={(e) => setAdminPassword(e.target.value)}
+                                placeholder="Masukkan Password Admin"
+                                className="w-full pl-10 pr-10 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowAdminPassword(!showAdminPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                                aria-label="Lihat Password"
+                              >
+                                {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      )}
 
-                  {role === 'admin' && (
-                    <button
-                      type="button"
-                      onClick={handleQuickLoginAdmin}
-                      className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all border border-purple-400/40"
-                    >
-                      <ShieldCheck className="w-4 h-4 text-amber-300" />
-                      <span>Masuk Langsung ke Dashboard Admin (1-Klik)</span>
-                    </button>
-                  )}
-                </form>
+                      {loginError && (
+                        <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 shrink-0" />
+                          <span>{loginError}</span>
+                        </div>
+                      )}
 
-                {/* DEMO ACCESS FOR TESTING */}
-                <div className="pt-3 border-t border-[#E8E2D9] space-y-2">
-                  <p className="text-[11px] text-center text-[#756F68] font-medium">
-                    ⚡ Akses Pengujian Cepat:
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={handleQuickLoginUser}
-                      className="py-2.5 px-3 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <User className="w-3.5 h-3.5 text-amber-700" />
-                      <span>Masuk Siswa</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleQuickLoginAdmin}
-                      className="py-2.5 px-3 rounded-xl text-[11px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300 hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5 text-neutral-700" />
-                      <span>Masuk Panitia</span>
-                    </button>
-                  </div>
-                </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all shadow-md flex items-center justify-center gap-2 border border-[#D4AF37]/50 cursor-pointer"
+                      >
+                        <span>Masuk ke {role === 'user' ? 'Ruang Ujian Siswa' : 'Dashboard Admin'}</span>
+                      </button>
+                    </form>
+
+                    {/* DEMO ACCESS FOR TESTING (HANYA DITAMPILKAN PADA ROLE USER/SISWA) */}
+                    {role === 'user' && (
+                      <div className="pt-3 border-t border-[#E8E2D9] space-y-2">
+                        <p className="text-[11px] text-center text-[#756F68] font-medium">
+                          ⚡ Coba Nomor Contoh di Database:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleQuickLoginUser('08123456781')}
+                            className="py-2 px-2.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 transition-colors flex flex-col items-center justify-center cursor-pointer shadow-2xs"
+                          >
+                            <span>08123456781</span>
+                            <span className="text-[9px] text-amber-700 font-normal">2 Anak Terdaftar</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleQuickLoginUser('08123456782')}
+                            className="py-2 px-2.5 rounded-xl text-[11px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-300 hover:bg-neutral-200 transition-colors flex flex-col items-center justify-center cursor-pointer shadow-2xs"
+                          >
+                            <span>08123456782</span>
+                            <span className="text-[9px] text-neutral-500 font-normal">1 Anak Terdaftar</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
 
               </div>
 
@@ -1847,6 +2039,48 @@ export const AuthModal = ({
                     <p className="text-xs text-[#756F68] mt-0.5">
                       No. Peserta: <strong className="text-[#1A1615] font-mono">{activeStudent?.id || 'OSN-2026-B-001'}</strong> · No. WA: {activeStudent?.whatsapp || '-'}
                     </p>
+
+                    {/* Sibling Switcher if multiple children are registered with this number */}
+                    {siblingStudents.length > 1 && (
+                      <div className="mt-2.5 pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] font-bold text-amber-950 flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5 text-amber-700" />
+                          <span>Pilih Siswa ({siblingStudents.length} Anak Terdaftar):</span>
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {siblingStudents.map((child) => {
+                            const isCurrent = child.id === activeStudent?.id;
+                            return (
+                              <button
+                                key={child.id}
+                                type="button"
+                                onClick={() => {
+                                  if (!isCurrent) {
+                                    setActiveStudent(child);
+                                    setShowSimulatedExam(false);
+                                    setExamSubjectChosen(false);
+                                    setExamCompleted(false);
+                                    setStudentAnswers({});
+                                  }
+                                }}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                  isCurrent
+                                    ? 'bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37] shadow-xs'
+                                    : 'bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300'
+                                }`}
+                              >
+                                <span>{child.fullName}</span>
+                                {isCurrent && (
+                                  <span className="text-[9px] bg-[#D4AF37] text-[#1A1615] px-1 py-0.2 rounded font-black">
+                                    Aktif
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1921,16 +2155,6 @@ export const AuthModal = ({
                       Tutup Ujian
                     </button>
                   )}
-
-                  <button
-                    type="button"
-                    onClick={handleQuickLoginAdmin}
-                    className="p-2 rounded-xl text-xs font-bold border border-purple-200 bg-purple-50 text-purple-900 hover:bg-purple-100 transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                    title="Beralih ke Dashboard Admin"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-purple-700" />
-                    <span className="hidden sm:inline text-[11px]">Admin</span>
-                  </button>
 
                   <button
                     onClick={handleLogout}
@@ -2597,6 +2821,131 @@ export const AuthModal = ({
 
               </div>
 
+              {/* FITUR UTAMA: SERTIFIKAT DIGITAL RESMI KELULUSAN & PRESTASI SISWA (PDF) */}
+              {activeStudent && (activeStudent.qualificationStatus === 'lolos' ||
+                (activeStudent.penyisihanExam && activeStudent.penyisihanExam.score >= 60) ||
+                activeStudent.finalExam ||
+                (activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai')) && (
+                <div className="bg-gradient-to-br from-amber-50/90 via-white to-amber-100/60 rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] shadow-lg space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-[#D4AF37] text-white flex items-center justify-center shadow-md shrink-0">
+                        <Award className="w-7 h-7" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/90 px-2.5 py-0.5 rounded-full inline-block border border-amber-300">
+                            Dokumen Resmi Terverifikasi
+                          </span>
+                          <span className="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                            ✓ Terbit Otomatis
+                          </span>
+                        </div>
+                        <h4 className="text-base sm:text-lg font-black text-[#1A1615] mt-1">
+                          Sertifikat Digital Kelulusan & Prestasi Siswa
+                        </h4>
+                        <p className="text-xs text-[#756F68]">
+                          Telah diterbitkan secara resmi oleh <strong>LKP Prestasi Nusantara</strong> & Komite Nasional OSN 2026.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-xs">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>STATUS: RESMI LULUS SELEKSI</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Rincian Data Peserta yang Terintegrasi di Sertifikat */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/95 p-4 rounded-2xl border border-amber-200 text-xs shadow-2xs">
+                    <div>
+                      <span className="text-[10px] font-bold text-[#756F68] block">Nama Lengkap Peserta:</span>
+                      <strong className="text-sm text-[#1A1615] block truncate mt-0.5">{activeStudent.fullName}</strong>
+                      <span className="text-[10px] text-neutral-500 font-mono">ID: {activeStudent.id}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-bold text-[#756F68] block">Asal Sekolah & Jenjang:</span>
+                      <strong className="text-xs text-[#1A1615] block truncate mt-0.5">{activeStudent.schoolName}</strong>
+                      <span className="text-[10px] text-neutral-500">{activeStudent.level.split('(')[0]}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-bold text-[#756F68] block">Mata Pelajaran Ujian:</span>
+                      <strong className="text-xs text-[#1A1615] block mt-0.5">
+                        {activeStudent.penyisihanExam?.subject || activeStudent.finalExam?.subject || activeStudent.subjects?.[0] || 'Matematika'}
+                      </strong>
+                      <span className="text-[10px] text-neutral-500">{activeStudent.cityProvince || 'Indonesia'}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-bold text-[#756F68] block">Nilai Ujian & Predikat:</span>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-base font-black text-emerald-700 font-mono">
+                          {activeStudent.finalExam?.score ?? activeStudent.penyisihanExam?.score ?? activeStudent.simulatedExam?.score ?? 85} / 100
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded">
+                          Grade A
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-emerald-800 font-semibold block truncate">
+                        {activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai'
+                          ? activeStudent.championRank
+                          : 'Lolos Babak Final (Finalis)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Tombol Unduh Sertifikat & Notifikasi WhatsApp */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+                    <div className="text-[11px] text-[#756F68] flex items-center gap-1.5">
+                      <span className="text-emerald-700 font-bold">✓</span>
+                      <span>Format PDF A4 Landscape kualitas cetak resolusi tinggi lengkap dengan NIP & QR-Verification.</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const scoreVal = activeStudent.finalExam?.score ?? activeStudent.penyisihanExam?.score ?? activeStudent.simulatedExam?.score ?? 85;
+                          const subjectVal = activeStudent.penyisihanExam?.subject || activeStudent.finalExam?.subject || activeStudent.subjects?.[0] || 'Matematika';
+                          const rankTitle = activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai'
+                            ? activeStudent.championRank
+                            : 'Lolos Babak Final (Finalis Nasional)';
+                          generateDigitalCertificatePdf({
+                            student: activeStudent,
+                            score: scoreVal,
+                            subject: subjectVal,
+                            rankTitle,
+                            stageTitle: activeStudent.finalExam ? 'BABAK FINAL NASIONAL' : 'BABAK PENYISIHAN NASIONAL'
+                          });
+                        }}
+                        className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer border border-[#D4AF37]"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Unduh Sertifikat Digital Resmi (PDF)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await triggerQualificationReleasedNotification(activeStudent, 'lolos');
+                          setAdminNotification(`Notifikasi WhatsApp kelulusan & link sertifikat berhasil dikirim ke ${activeStudent.whatsapp}!`);
+                          setTimeout(() => setAdminNotification(''), 4000);
+                        }}
+                        className="w-full sm:w-auto px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        title="Kirim Notifikasi Kelulusan & Link Sertifikat ke WhatsApp Peserta"
+                      >
+                        <MessageCircle className="w-4 h-4 text-emerald-200" />
+                        <span>Kirim ke WA</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* PENGUMUMAN KELULUSAN & PEMBELIAN TIKET BABAK FINAL SECARA MANDIRI */}
               {activeStudent && (
                 <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] shadow-md space-y-5">
@@ -3159,6 +3508,21 @@ export const AuthModal = ({
                   <span>Proteksi Anti-Contek</span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isAntiCheatEnabled ? 'bg-rose-100 text-rose-800' : 'bg-neutral-200 text-neutral-600'}`}>
                     {isAntiCheatEnabled ? 'Aktif (Final)' : 'Mati'}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => setAdminTab('gallery')}
+                  className={`pb-3 text-xs sm:text-sm font-extrabold flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap ${
+                    adminTab === 'gallery'
+                      ? 'border-b-2 border-[#D4AF37] text-[#1A1615]'
+                      : 'text-[#756F68] hover:text-[#1A1615]'
+                  }`}
+                >
+                  <Trophy className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Kelola Galeri Juara</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-bold">
+                    Admin Khusus
                   </span>
                 </button>
               </div>
@@ -4546,6 +4910,17 @@ export const AuthModal = ({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">
+                        {/* Tombol Broadcast WhatsApp API Pengumuman Kelulusan */}
+                        <button
+                          type="button"
+                          onClick={handleBroadcastQualificationAnnouncements}
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-400"
+                          title="Kirim pesan resmi pengumuman kelulusan ke nomor WhatsApp seluruh peserta lolos"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Broadcast WhatsApp API Kelulusan</span>
+                        </button>
+
                         {/* Dokumen 1: Laporan Peserta Lolos Babak Penyisihan */}
                         <button
                           type="button"
@@ -4939,6 +5314,139 @@ export const AuthModal = ({
                           </table>
                         </div>
                       )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 8: PENGELOLAAN FOTO DOKUMENTASI JUARA OSN (ADMIN ONLY) */}
+              {adminTab === 'gallery' && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E8E2D9] shadow-sm space-y-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-[#E8E2D9]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold">
+                          <Trophy className="w-6 h-6 text-[#D4AF37]" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-extrabold text-[#1A1615] flex items-center gap-2">
+                            <span>Pengelolaan & Sinkronisasi Foto Galeri Juara OSN 2026</span>
+                            <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                              KHUSUS PANITIA / ADMIN
+                            </span>
+                          </h4>
+                          <p className="text-xs text-[#756F68] mt-0.5">
+                            Unggah foto asli peserta peraih trofi dan medali. Perubahan foto langsung otomatis tampil di galeri depan dan tidak dapat diubah oleh pengunjung umum.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
+                      <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Keamanan Akses Terpusat:</strong> Fitur unggah foto dokumentasi juara hanya terbuka di Portal Admin ini dan saat Admin sedang login. Pengunjung umum hanya dapat melihat foto resmi tanpa opsi upload.
+                      </span>
+                    </div>
+
+                    {/* Champions Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {APP_CONFIG.gallery.map((gal) => {
+                        let customImgs: Record<string, string> = {};
+                        try {
+                          const saved = localStorage.getItem('osn_gallery_custom_images');
+                          customImgs = saved ? JSON.parse(saved) : {};
+                        } catch {}
+                        const currentSrc = customImgs[gal.id] || gal.image;
+
+                        return (
+                          <div
+                            key={gal.id}
+                            className="p-4 rounded-2xl border border-[#E8E2D9] bg-[#FAF8F5] flex flex-col justify-between space-y-3 hover:border-[#D4AF37] transition-all"
+                          >
+                            <div className="flex gap-3">
+                              <img
+                                src={currentSrc}
+                                alt={gal.title}
+                                className="w-20 h-24 rounded-xl object-cover border border-[#D4AF37]/50 shrink-0 bg-neutral-900"
+                                onError={(e) => {
+                                  const t = e.currentTarget;
+                                  t.onerror = null;
+                                  t.src = gal.id === 'gal-abizar' ? '/abizar_radinka_annail.svg' : 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop';
+                                }}
+                              />
+                              <div className="space-y-1 overflow-hidden">
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#D4AF37] text-[#1A1615] inline-block">
+                                  {gal.badge}
+                                </span>
+                                <h5 className="text-xs font-bold text-[#1A1615] truncate" title={gal.title}>
+                                  {gal.studentName || gal.title}
+                                </h5>
+                                <p className="text-[10px] text-neutral-500 truncate">
+                                  {gal.category}
+                                </p>
+                                <p className="text-[10px] text-amber-800 font-semibold truncate">
+                                  {gal.trophy}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-[#E8E2D9] flex items-center justify-between gap-2">
+                              <label className="flex-1 py-1.5 px-2.5 rounded-lg text-[11px] font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+                                <Upload className="w-3.5 h-3.5" />
+                                <span>Ganti Foto</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (uploadEvent) => {
+                                      const res = uploadEvent.target?.result as string;
+                                      if (res) {
+                                        try {
+                                          const prev = JSON.parse(localStorage.getItem('osn_gallery_custom_images') || '{}');
+                                          prev[gal.id] = res;
+                                          localStorage.setItem('osn_gallery_custom_images', JSON.stringify(prev));
+                                          window.dispatchEvent(new Event('storage'));
+                                          setAdminNotification(`Foto ${gal.studentName || gal.title} berhasil diperbarui!`);
+                                          setTimeout(() => setAdminNotification(''), 3000);
+                                        } catch (err) {
+                                          console.error(err);
+                                        }
+                                      }
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                              </label>
+
+                              {customImgs[gal.id] && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    try {
+                                      const prev = JSON.parse(localStorage.getItem('osn_gallery_custom_images') || '{}');
+                                      delete prev[gal.id];
+                                      localStorage.setItem('osn_gallery_custom_images', JSON.stringify(prev));
+                                      window.dispatchEvent(new Event('storage'));
+                                      setAdminNotification(`Foto ${gal.studentName || gal.title} direset ke default.`);
+                                      setTimeout(() => setAdminNotification(''), 3000);
+                                    } catch (err) {
+                                      console.error(err);
+                                    }
+                                  }}
+                                  className="px-2 py-1.5 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                                >
+                                  Reset
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -5611,14 +6119,34 @@ export const AuthModal = ({
                     <Download className="w-3.5 h-3.5" />
                     <span>Cetak Kartu Ujian PDF</span>
                   </button>
-                  {(viewDetailParticipant.finalExam || viewDetailParticipant.qualificationStatus === 'lolos') && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await triggerQualificationReleasedNotification(viewDetailParticipant, 'lolos');
+                        alert(`Notifikasi WhatsApp API resmi berhasil dikirim ke ${viewDetailParticipant.fullName} (${viewDetailParticipant.whatsapp})!`);
+                      } catch (e) {
+                        alert(`Notifikasi WhatsApp telah diproses.`);
+                      }
+                    }}
+                    className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    title="Kirim Notifikasi Resmi Status Nilai / Kelulusan via WhatsApp API"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Kirim Notifikasi WA API</span>
+                  </button>
+                  {(viewDetailParticipant.finalExam || viewDetailParticipant.qualificationStatus === 'lolos' || (viewDetailParticipant.penyisihanExam && viewDetailParticipant.penyisihanExam.score >= 60)) && (
                     <button
                       type="button"
-                      onClick={() => generateFinalCertificatePdf({ student: viewDetailParticipant, rankTitle: viewDetailParticipant.championRank || 'Peserta Final' })}
-                      className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => generateDigitalCertificatePdf({
+                        student: viewDetailParticipant,
+                        score: viewDetailParticipant.finalExam?.score ?? viewDetailParticipant.penyisihanExam?.score ?? 85,
+                        rankTitle: viewDetailParticipant.championRank || 'Peserta Final'
+                      })}
+                      className="py-2 px-3 rounded-xl text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Award className="w-3.5 h-3.5" />
-                      <span>Unduh Sertifikat Final</span>
+                      <Award className="w-3.5 h-3.5 text-amber-800" />
+                      <span>Unduh Sertifikat Resmi (PDF)</span>
                     </button>
                   )}
                 </div>

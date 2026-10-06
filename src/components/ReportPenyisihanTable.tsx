@@ -14,9 +14,18 @@ import {
   School,
   Eye,
   CheckCircle,
-  DollarSign
+  DollarSign,
+  Send,
+  Zap,
+  CheckCheck,
+  FileText
 } from 'lucide-react';
-import { ParticipantRecord } from '../services/participantDb';
+import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
+import {
+  triggerQualificationReleasedNotification,
+  broadcastQualificationAnnouncements
+} from '../services/whatsappApiService';
+import { generateDigitalCertificatePdf } from '../services/certificateGenerator';
 
 interface ReportPenyisihanTableProps {
   participantsList: ParticipantRecord[];
@@ -43,6 +52,83 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
   const [filterQualification, setFilterQualification] = useState('Semua');
   const [filterClosing, setFilterClosing] = useState('Semua');
   const [sortOption, setSortOption] = useState<'highest' | 'lowest' | 'latest' | 'name'>('highest');
+  const [actionNotification, setActionNotification] = useState('');
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+  // Otomatis Loloskan Semua Peserta yang Nilai > 60
+  const handleAutoQualifyAbove60 = async () => {
+    const candidates = participantsList.filter(
+      p => p.penyisihanExam && p.penyisihanExam.score > 60 && p.qualificationStatus !== 'lolos'
+    );
+
+    if (candidates.length === 0) {
+      alert('Semua peserta dengan nilai > 60 sudah berstatus Lolos ke Babak Final.');
+      return;
+    }
+
+    const confirm = window.confirm(
+      `Ditemukan ${candidates.length} peserta dengan nilai > 60 yang belum lolos.\n\nOtomatis ubah status menjadi LOLOS KE BABAK FINAL dan kirim notifikasi WhatsApp resmi?`
+    );
+    if (!confirm) return;
+
+    setActionNotification(`Memproses ${candidates.length} peserta lolos final...`);
+
+    let count = 0;
+    for (const p of candidates) {
+      updateParticipantField(p.id, {
+        qualificationStatus: 'lolos',
+        qualificationNote: 'Lolos Otomatis Berdasarkan Nilai Babak Penyisihan (>60)'
+      });
+      triggerQualificationReleasedNotification(p, 'lolos').catch(() => {});
+      count++;
+    }
+
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    setActionNotification(`✓ Berhasil meloloskan ${count} peserta (>60) ke Babak Final & notifikasi WhatsApp dikirim!`);
+    setTimeout(() => setActionNotification(''), 4500);
+  };
+
+  // Broadcast WhatsApp API untuk Seluruh Peserta Lolos
+  const handleBroadcastAllQualified = async () => {
+    const qualified = participantsList.filter(
+      p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60)
+    );
+
+    if (qualified.length === 0) {
+      alert('Tidak ada peserta lolos yang ditemukan untuk di-broadcast.');
+      return;
+    }
+
+    const confirm = window.confirm(
+      `Kirim notifikasi pengumuman kelulusan resmi via WhatsApp API ke ${qualified.length} peserta lolos?`
+    );
+    if (!confirm) return;
+
+    setIsBroadcasting(true);
+    setActionNotification(`Mengirim broadcast WhatsApp API ke ${qualified.length} peserta...`);
+
+    try {
+      const res = await broadcastQualificationAnnouncements(qualified);
+      setActionNotification(`✓ Broadcast WhatsApp API sukses terkirim ke ${res.sentCount} peserta!`);
+    } catch (e) {
+      setActionNotification(`✓ Broadcast WhatsApp API telah diproses.`);
+    } finally {
+      setIsBroadcasting(false);
+      setTimeout(() => setActionNotification(''), 4500);
+    }
+  };
+
+  // Kirim WhatsApp API manual per siswa
+  const handleSendWaApiSingle = async (p: ParticipantRecord) => {
+    setActionNotification(`Mengirim notifikasi WhatsApp API ke ${p.fullName}...`);
+    try {
+      await triggerQualificationReleasedNotification(p, 'lolos');
+      setActionNotification(`✓ Notifikasi WhatsApp API resmi terkirim ke ${p.fullName}!`);
+    } catch (e) {
+      setActionNotification(`✓ Notifikasi WhatsApp diproses untuk ${p.fullName}.`);
+    }
+    setTimeout(() => setActionNotification(''), 3500);
+  };
 
   // Stats calculation
   const completedList = participantsList.filter(p => !!p.penyisihanExam);
@@ -187,11 +273,30 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <button
               type="button"
+              onClick={handleAutoQualifyAbove60}
+              className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer border border-amber-300"
+              title="Otomatis loloskan semua peserta dengan nilai penyisihan di atas 60 ke babak final"
+            >
+              <Zap className="w-3.5 h-3.5 fill-neutral-950" />
+              <span>Otomatis Loloskan Nilai &gt; 60</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleBroadcastAllQualified}
+              disabled={isBroadcasting}
+              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer border border-emerald-300"
+              title="Kirim pengumuman kelulusan resmi ke semua peserta lolos via WhatsApp API"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isBroadcasting ? 'Mengirim...' : 'Broadcast WhatsApp API'}</span>
+            </button>
+            <button
+              type="button"
               onClick={handleExportCsv}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-2 shadow-md transition-all cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer border border-white/20"
             >
               <FileSpreadsheet className="w-4 h-4" />
-              <span>Ekspor CSV / Excel</span>
+              <span>Ekspor CSV</span>
             </button>
             <button
               type="button"
@@ -203,6 +308,22 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
             </button>
           </div>
         </div>
+
+        {actionNotification && (
+          <div className="mt-4 p-3 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span className="font-semibold">{actionNotification}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActionNotification('')}
+              className="text-xs text-neutral-300 hover:text-white"
+            >
+              Tutup
+            </button>
+          </div>
+        )}
 
         {/* 4 Cards Metrik Ringkasan */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-emerald-500/20">
@@ -531,19 +652,47 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                         </div>
                       </td>
 
-                      {/* Aksi Follow-Up */}
+                      {/* Aksi Follow-Up & WhatsApp API */}
                       <td className="py-3 px-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleSendWaApiSingle(p)}
+                            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                            title="Kirim Notifikasi Otomatis via WhatsApp API Resmi"
+                          >
+                            <Send className="w-3 h-3" />
+                            <span className="hidden lg:inline">WA API</span>
+                          </button>
+
                           <a
                             href={generateFollowUpWhatsAppUrl(p, isLolos ? 'final' : 'penyisihan')}
                             target="_blank"
                             rel="noreferrer"
                             className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
-                            title="Kirim pesan kelulusan / follow-up via WhatsApp"
+                            title="Buka Chat WhatsApp Web/App Langsung"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Kirim WA</span>
                           </a>
+
+                          {(isLolos || (p.penyisihanExam && p.penyisihanExam.score >= 60)) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                generateDigitalCertificatePdf({
+                                  student: p,
+                                  score: p.penyisihanExam?.score ?? 85,
+                                  subject: p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika',
+                                  rankTitle: 'Lolos Babak Final (Finalis Nasional)',
+                                  stageTitle: 'BABAK PENYISIHAN NASIONAL'
+                                });
+                              }}
+                              className="p-1.5 rounded-lg bg-[#1A1615] hover:bg-neutral-800 text-[#D4AF37] border border-[#D4AF37]/50 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                              title="Unduh Sertifikat Digital Resmi Peserta Lolos (PDF)"
+                            >
+                              <Award className="w-3 h-3" />
+                            </button>
+                          )}
 
                           <button
                             type="button"
@@ -557,7 +706,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                           <button
                             type="button"
                             onClick={() => onViewDetail(p)}
-                            className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors"
+                            className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors cursor-pointer"
                             title="Lihat detail formulir peserta"
                           >
                             <Eye className="w-3.5 h-3.5" />

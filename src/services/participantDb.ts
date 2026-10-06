@@ -1,10 +1,15 @@
 import { QuestionItem, getAllQuestions, getFilteredQuestions } from './cbtQuestionsDb';
+import { DUMMY_PARTICIPANTS_2000 } from './dummyParticipants2000';
+
+export { DUMMY_PARTICIPANTS_2000 };
 
 export interface ExamResultInfo {
   subject: string;
   score: number;
   totalQuestions: number;
   completedAt: string;
+  durationText?: string;
+  durationSeconds?: number;
   status: string;
   violationReason?: string;
   attemptsCount?: number;
@@ -96,6 +101,39 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
       totalQuestions: 20,
       completedAt: "2026-09-23T14:45:00.000Z",
       status: "Selesai Mengerjakan Babak Final"
+    }
+  },
+  {
+    id: "OSN-2026-A-89103",
+    fullName: "Muhammad Rayhan Santoso",
+    level: "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
+    schoolName: "TK Teladan Bangsa",
+    cityProvince: "DKI Jakarta",
+    whatsapp: "08123456781",
+    email: "dzaliqa.assyafa@gmail.com",
+    parentName: "H. Nurhadi Santoso",
+    fullAddress: "Jl. Tebet Barat Dalam No. 14, Tebet, Jakarta Selatan",
+    subjects: ["Matematika", "Bahasa Indonesia"],
+    registeredAt: "2026-09-20T08:35:00.000Z",
+    cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)",
+    qualificationStatus: 'lolos',
+    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
+    finalTicketPaymentStatus: 'unpaid',
+    simulatedAttempts: 1,
+    penyisihanAttempts: 1,
+    simulatedExam: {
+      subject: "Matematika",
+      score: 95,
+      totalQuestions: 20,
+      completedAt: "2026-09-21T14:15:00.000Z",
+      status: "Selesai Simulasi (Lulus)"
+    },
+    penyisihanExam: {
+      subject: "Matematika",
+      score: 90,
+      totalQuestions: 20,
+      completedAt: "2026-09-22T11:20:00.000Z",
+      status: "Selesai Babak Penyisihan (Lolos ke Final)"
     }
   },
   {
@@ -202,9 +240,15 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
   }
 ];
 
-function normalizePhone(phone: string): string {
+export function normalizePhone(phone: string): string {
   if (!phone) return '';
-  return phone.replace(/[^0-9]/g, '').replace(/^62/, '0');
+  let digits = phone.replace(/[^0-9]/g, '');
+  if (digits.startsWith('62')) {
+    digits = '0' + digits.slice(2);
+  } else if (!digits.startsWith('0') && digits.length >= 8) {
+    digits = '0' + digits;
+  }
+  return digits;
 }
 
 function normalizeName(name: string): string {
@@ -215,16 +259,216 @@ function normalizeName(name: string): string {
 export function getAllParticipants(): ParticipantRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PARTICIPANTS));
-      return INITIAL_PARTICIPANTS;
+    const customList: ParticipantRecord[] = raw ? JSON.parse(raw) : INITIAL_PARTICIPANTS;
+    
+    // Efficiently combine custom saved participants with 2,000 dummy records
+    const map = new Map<string, ParticipantRecord>();
+    for (const d of DUMMY_PARTICIPANTS_2000) {
+      map.set(d.id, d);
     }
-    const list: ParticipantRecord[] = JSON.parse(raw);
-    return Array.isArray(list) ? list : INITIAL_PARTICIPANTS;
+    // Custom registrations & edits take precedence
+    for (const c of customList) {
+      map.set(c.id, c);
+    }
+    return Array.from(map.values());
   } catch (err) {
     console.error('Failed to read participants database:', err);
-    return INITIAL_PARTICIPANTS;
+    return [...INITIAL_PARTICIPANTS, ...DUMMY_PARTICIPANTS_2000];
   }
+}
+
+/**
+ * Kebijakan Peningkatan Nilai Massal Panitia OSN 2026:
+ * - jika nilai < 40 otomatis ditingkatkan ke 75
+ * - jika nilai < 50 otomatis ditingkatkan ke 80
+ * - jika nilai < 60 otomatis ditingkatkan ke 85
+ * - jika nilai < 85 otomatis di tingkatkan ke 95
+ * - jika nilai < 95 otomatis di tingkatkan ke 100
+ */
+export function boostScoreByPolicy(score: number): number {
+  if (score < 40) return 75;
+  if (score < 50) return 80;
+  if (score < 60) return 85;
+  if (score < 85) return 95;
+  if (score < 95) return 100;
+  return score;
+}
+
+/**
+ * Terapkan peningkatan nilai secara massal ke peserta
+ */
+export function massBoostScores(stage: 'penyisihan' | 'final' | 'all' = 'penyisihan'): { updatedCount: number; list: ParticipantRecord[] } {
+  const all = getAllParticipants();
+  let count = 0;
+
+  const updated = all.map(p => {
+    let changed = false;
+    const nextP = { ...p };
+
+    if ((stage === 'penyisihan' || stage === 'all') && nextP.penyisihanExam) {
+      const oldScore = nextP.penyisihanExam.score;
+      const newScore = boostScoreByPolicy(oldScore);
+      if (newScore !== oldScore) {
+        nextP.penyisihanExam = {
+          ...nextP.penyisihanExam,
+          score: newScore,
+          status: newScore >= 60 ? 'Selesai Babak Penyisihan (Lolos ke Final)' : nextP.penyisihanExam.status
+        };
+        if (newScore >= 60 && nextP.qualificationStatus !== 'lolos') {
+          nextP.qualificationStatus = 'lolos';
+          nextP.qualificationNote = 'Dinyatakan Lolos ke Babak Final';
+        }
+        changed = true;
+      }
+    }
+
+    if ((stage === 'final' || stage === 'all') && nextP.finalExam) {
+      const oldScore = nextP.finalExam.score;
+      const newScore = boostScoreByPolicy(oldScore);
+      if (newScore !== oldScore) {
+        nextP.finalExam = {
+          ...nextP.finalExam,
+          score: newScore
+        };
+        if (newScore >= 95) nextP.championRank = 'Juara 1';
+        else if (newScore >= 90) nextP.championRank = 'Juara 2';
+        else if (newScore >= 82) nextP.championRank = 'Juara 3';
+        changed = true;
+      }
+    }
+
+    if (stage === 'all' && nextP.simulatedExam) {
+      const oldScore = nextP.simulatedExam.score;
+      const newScore = boostScoreByPolicy(oldScore);
+      if (newScore !== oldScore) {
+        nextP.simulatedExam = {
+          ...nextP.simulatedExam,
+          score: newScore
+        };
+        changed = true;
+      }
+    }
+
+    if (changed) count++;
+    return nextP;
+  });
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  } catch (err) {
+    console.error('Failed to save mass score boost:', err);
+  }
+
+  return { updatedCount: count, list: updated };
+}
+
+/**
+ * Otomatis loloskan semua peserta yang memiliki nilai Babak Penyisihan > 60 ke Babak Final
+ */
+export function autoQualifyParticipantsAbove60(): { qualifiedCount: number; list: ParticipantRecord[] } {
+  const all = getAllParticipants();
+  let count = 0;
+
+  const updated = all.map(p => {
+    const score = p.penyisihanExam ? p.penyisihanExam.score : (p.simulatedExam ? p.simulatedExam.score : 0);
+    if (score > 60 && p.qualificationStatus !== 'lolos') {
+      count++;
+      return {
+        ...p,
+        qualificationStatus: 'lolos' as const,
+        qualificationNote: 'Dinyatakan Lolos ke Babak Final (Nilai > 60)',
+        cbtStatus: 'Lolos ke Babak Final'
+      };
+    }
+    return p;
+  });
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  } catch (err) {
+    console.error('Failed to save auto qualify:', err);
+  }
+
+  return { qualifiedCount: count, list: updated };
+}
+
+/**
+ * Manual edit nilai & waktu pengerjaan per peserta
+ */
+export function manualUpdateParticipantScoreAndTime(
+  participantId: string,
+  updates: {
+    simulasiScore?: number;
+    simulasiDuration?: string;
+    penyisihanScore?: number;
+    penyisihanDuration?: string;
+    finalScore?: number;
+    finalDuration?: string;
+    qualificationStatus?: 'lolos' | 'tidak_lolos' | 'pending';
+    championRank?: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' | 'Belum Dinilai';
+  }
+): ParticipantRecord | null {
+  const all = getAllParticipants();
+  const idx = all.findIndex(p => p.id === participantId);
+  if (idx === -1) return null;
+
+  const p = { ...all[idx] };
+
+  if (updates.simulasiScore !== undefined || updates.simulasiDuration) {
+    p.simulatedExam = {
+      subject: p.simulatedExam?.subject || p.subjects[0] || 'Matematika',
+      score: updates.simulasiScore !== undefined ? updates.simulasiScore : (p.simulatedExam?.score || 80),
+      totalQuestions: 20,
+      completedAt: p.simulatedExam?.completedAt || new Date().toISOString(),
+      durationText: updates.simulasiDuration || p.simulatedExam?.durationText || '18 Menit 30 Detik',
+      status: (updates.simulasiScore || 0) >= 70 ? 'Selesai Simulasi (Lulus)' : 'Selesai Simulasi'
+    };
+  }
+
+  if (updates.penyisihanScore !== undefined || updates.penyisihanDuration) {
+    const score = updates.penyisihanScore !== undefined ? updates.penyisihanScore : (p.penyisihanExam?.score || 85);
+    p.penyisihanExam = {
+      subject: p.penyisihanExam?.subject || p.subjects[0] || 'Matematika',
+      score: score,
+      totalQuestions: 20,
+      completedAt: p.penyisihanExam?.completedAt || new Date().toISOString(),
+      durationText: updates.penyisihanDuration || p.penyisihanExam?.durationText || '17 Menit 45 Detik',
+      status: score >= 60 ? 'Selesai Babak Penyisihan (Lolos ke Final)' : 'Selesai Babak Penyisihan'
+    };
+  }
+
+  if (updates.finalScore !== undefined || updates.finalDuration) {
+    const score = updates.finalScore !== undefined ? updates.finalScore : (p.finalExam?.score || 90);
+    p.finalExam = {
+      subject: p.finalExam?.subject || p.subjects[0] || 'Matematika',
+      score: score,
+      totalQuestions: 20,
+      completedAt: p.finalExam?.completedAt || new Date().toISOString(),
+      durationText: updates.finalDuration || p.finalExam?.durationText || '19 Menit 10 Detik',
+      status: 'Selesai Mengerjakan Babak Final'
+    };
+  }
+
+  if (updates.qualificationStatus) {
+    p.qualificationStatus = updates.qualificationStatus;
+  }
+
+  if (updates.championRank) {
+    p.championRank = updates.championRank;
+  }
+
+  all[idx] = p;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  } catch (err) {
+    console.error('Failed to save manual edit:', err);
+  }
+
+  return p;
 }
 
 /**
@@ -399,6 +643,14 @@ export async function saveMultipleParticipants(
     results.push(saved);
   }
   return results;
+}
+
+export function findParticipantsByPhone(phoneNumber: string): ParticipantRecord[] {
+  if (!phoneNumber) return [];
+  const cleanP = normalizePhone(phoneNumber);
+  if (!cleanP) return [];
+  const all = getAllParticipants();
+  return all.filter(p => normalizePhone(p.whatsapp) === cleanP);
 }
 
 export function findParticipant(searchQuery: string, phoneNumber?: string): ParticipantRecord | null {
