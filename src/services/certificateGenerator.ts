@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { ParticipantRecord } from './participantDb';
 import { APP_CONFIG } from '../../appConfig.js';
+import { getOfficialLogosForPdf } from './pdfLogosHelper';
 
 export interface CertificateOptions {
   student: ParticipantRecord;
@@ -11,9 +12,12 @@ export interface CertificateOptions {
   score?: number;
 }
 
-export function generateDigitalCertificatePdf(options: CertificateOptions): void {
+export async function generateDigitalCertificatePdf(options: CertificateOptions): Promise<void> {
   const { student } = options;
   
+  // Ambil 3 logo resmi asli tanpa mengubah desain, model, warna, atau proporsi
+  const logos = await getOfficialLogosForPdf();
+
   // Resolve exam score: prioritize explicit score, or finalExam, or penyisihanExam, or default
   const resolvedScore = options.score !== undefined
     ? options.score
@@ -103,90 +107,126 @@ export function generateDigitalCertificatePdf(options: CertificateOptions): void
     doc.setFillColor(212, 175, 55);
   });
 
-  // Top Crest / Organization Header
+  // ==========================================
+  // 3. LOGO RESMI 1 & 2 PADA BAGIAN ATAS
+  // ==========================================
+  // Logo 1: LOGO RESMI OSN (Kiri Atas)
+  if (logos.logoOsn) {
+    try {
+      doc.addImage(logos.logoOsn, 'PNG', 16, 14, 24, 24);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo OSN ke sertifikat:', e);
+    }
+  }
+
+  // Logo 2: LOGO RESMI LKP PRESTASI NUSANTARA (Kanan Atas)
+  if (logos.logoLkp) {
+    try {
+      doc.addImage(logos.logoLkp, 'PNG', width - 40, 14, 22, 25);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo LKP ke sertifikat:', e);
+    }
+  }
+
+  // Top Crest / Organization Header Text (Tengah)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
   doc.setTextColor(150, 110, 25);
-  doc.text('LEMBAGA KURSUS DAN PELATIHAN PRESTASI NUSANTARA', width / 2, 23, { align: 'center' });
+  doc.text('LEMBAGA KURSUS DAN PELATIHAN PRESTASI NUSANTARA', width / 2, 22, { align: 'center' });
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(117, 111, 104);
-  doc.text('Izin Operasional Kemendikbudristek No. 421.9/234/LKP/2024 · Akreditasi BAN PAUD PNF & Kemenkumham', width / 2, 28, { align: 'center' });
+  doc.text('Izin Operasional Resmi Kemendikbudristek · Terakreditasi Standar Nasional & Kemenkumham RI', width / 2, 27, { align: 'center' });
 
   // Main Certificate Title
   doc.setFont('times', 'bold');
-  doc.setFontSize(27);
+  doc.setFontSize(26);
   doc.setTextColor(26, 22, 21);
-  doc.text('SERTIFIKAT PENGHARGAAN DIGITAL', width / 2, 42, { align: 'center' });
+  doc.text('SERTIFIKAT PENGHARGAAN RESMI', width / 2, 41, { align: 'center' });
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.setTextColor(180, 140, 30);
-  doc.text(`${stage} - OLIMPIADE SISWA NASIONAL (OSN 2026)`, width / 2, 49, { align: 'center' });
+  doc.text(`${stage} · OLIMPIADE SISWA NASIONAL (OSN 2026)`, width / 2, 48, { align: 'center' });
 
   const certNumber = `OSN/${isFinalStage ? 'FNL' : 'PYS'}/2026/${student.id.replace(/[^0-9]/g, '').slice(-5) || '10882'}`;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(100, 100, 100);
-  doc.text(`Nomor Sertifikat Resmi: ${certNumber}`, width / 2, 55, { align: 'center' });
+  doc.text(`Nomor Sertifikat: ${certNumber}`, width / 2, 54, { align: 'center' });
 
   // Divider Line
   doc.setDrawColor(212, 175, 55);
   doc.setLineWidth(0.8);
-  doc.line(65, 58, width - 65, 58);
+  doc.line(65, 57, width - 65, 57);
 
   // Recipient Intro
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10.5);
-  doc.setTextColor(80, 75, 70);
-  doc.text('Diberikan dengan bangga dan hormat kepada:', width / 2, 66, { align: 'center' });
+  doc.setFontSize(10);
+  doc.setTextColor(90, 85, 80);
+  doc.text('Diberikan dengan penuh kehormatan dan apresiasi setinggi-tingginya kepada:', width / 2, 65, { align: 'center' });
 
-  // Recipient Name - Big & Bold
+  // Student Full Name
   doc.setFont('times', 'bold');
-  doc.setFontSize(24);
+  doc.setFontSize(25);
   doc.setTextColor(26, 22, 21);
-  doc.text(student.fullName.toUpperCase(), width / 2, 78, { align: 'center' });
+  doc.text(student.fullName.toUpperCase(), width / 2, 77, { align: 'center' });
 
-  // Recipient School & Level
+  // Decorative Accent under Name
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(1.2);
+  doc.line(75, 80, width - 75, 80);
+
+  doc.setFillColor(212, 175, 55);
+  doc.circle(width / 2, 80, 1.8, 'F');
+
+  // Student School, Level & ID
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(70, 65, 60);
-  doc.text(`${student.schoolName} · ${student.level}`, width / 2, 85, { align: 'center' });
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.setTextColor(117, 111, 104);
-  doc.text(`Nomor Peserta: ${student.id} · Asal Wilayah: ${student.cityProvince || 'Indonesia'}`, width / 2, 90, { align: 'center' });
-
-  // Achievement & Score Banner Box
-  const bannerY = 96;
-  const isChampion = rank.includes('Juara');
-  doc.setFillColor(isChampion ? 254 : 255, isChampion ? 243 : 251, isChampion ? 199 : 235);
-  doc.setDrawColor(212, 175, 55);
-  doc.setLineWidth(1);
-  doc.roundedRect(36, bannerY, width - 72, 28, 4, 4, 'FD');
-
-  // Title / Rank
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(isChampion ? 146 : 26, isChampion ? 64 : 22, isChampion ? 14 : 21);
-  doc.text(`ATAS PRESTASI : ${rank.toUpperCase()}`, width / 2, bannerY + 8, { align: 'center' });
-
-  // Integrated Score & Predicate Badges
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
   doc.setTextColor(150, 110, 25);
-  doc.text(`Nilai Ujian Resmi: ${resolvedScore} / 100  (Grade ${gradeLetter} · ${predicate})`, width / 2, bannerY + 16, { align: 'center' });
+  doc.text(student.schoolName || 'Siswa Berprestasi Nasional', width / 2, 87, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
-  doc.setTextColor(80, 75, 70);
-  doc.text(`Bidang Mata Pelajaran: ${subject} · Kategori: ${student.level.split('(')[0].trim()}`, width / 2, bannerY + 23, { align: 'center' });
+  doc.setTextColor(100, 95, 90);
+  doc.text(
+    `Nomor Peserta: ${student.id} · Jenjang: ${student.level} · Domisili: ${student.cityProvince || 'Indonesia'}`,
+    width / 2,
+    93,
+    { align: 'center' }
+  );
 
-  // Citation text
+  // Award Rank / Prestasi Box
+  doc.setFillColor(255, 253, 245);
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(48, 98, width - 96, 20, 3, 3, 'FD');
+
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
+  doc.setTextColor(100, 90, 75);
+  doc.text('Dinyatakan Lulus dan Meraih Predikat Penghargaan:', width / 2, 104, { align: 'center' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(160, 105, 10);
+  doc.text(`★  ${rank.toUpperCase()}  ★`, width / 2, 112, { align: 'center' });
+
+  // Subject and Score Info
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text(
+    `Bidang Lomba: ${subject}  |  Skor Akhir: ${resolvedScore}/100 (Grade ${gradeLetter} - ${predicate})`,
+    width / 2,
+    124,
+    { align: 'center' }
+  );
+
+  // Statement of Accomplishment
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
   doc.setTextColor(70, 65, 60);
   doc.text(
     `Atas dedikasi, integritas akademik, dan penguasaan materi yang ditunjukkan pada pelaksanaan Computer Based Test (CBT)`,
@@ -201,64 +241,77 @@ export function generateDigitalCertificatePdf(options: CertificateOptions): void
     { align: 'center' }
   );
 
-  // Execution Date & Signatures Section
-  const footerY = 146;
+  // ==========================================
+  // 4. BAGIAN TANDA TANGAN & STEMPEL RESMI
+  // ==========================================
+  // PERMINTAAN USER:
+  // - Tanda tangan Mengetahui & Mengesahkan, Direktur LKP Prestasi Nusantara
+  // - Tanpa menggunakan nama (hapus semua nama pada tanda tangan sertifikat)
+  // - Hapus (Reg. LKP. 021/PN/DIKNAS/2024, NIP. 19780512 200212 1 003, Dr. H. Hendra Gunawan, M.Si, Hj. Siti Nur Asia, S.Pd., M.)
+  // - Tampilkan Stempel LKP resmi pada pengesahan
+  const footerY = 145;
 
-  // Left Signature: Ketua Pelaksana OSN
+  // Left Signature: Panitia Pelaksana OSN 2026 (Tanpa Nama & Tanpa NIP)
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(90, 85, 80);
-  doc.text(`Ditetapkan di Jakarta, ${executionDate}`, 48, footerY);
-  doc.text('Ketua Pelaksana OSN 2026', 48, footerY + 5);
+  doc.text(`Ditetapkan di Jakarta, ${executionDate}`, 48, footerY, { align: 'center' });
+  doc.text('Panitia Pelaksana OSN 2026', 48, footerY + 5, { align: 'center' });
 
-  doc.setFont('times', 'italic');
-  doc.setFontSize(12.5);
-  doc.setTextColor(26, 22, 21);
-  doc.text('Dr. H. Hendra Gunawan, M.Si.', 48, footerY + 22);
+  // Signature line
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.4);
-  doc.line(25, footerY + 24, 75, footerY + 24);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(110, 110, 110);
-  doc.text('NIP. 19780512 200212 1 003', 48, footerY + 28);
+  doc.line(22, footerY + 24, 74, footerY + 24);
 
-  // Center: Official Gold Seal & QR Verification Code Badge
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text('Panitia Pelaksana Pusat', 48, footerY + 28, { align: 'center' });
+
+  // Center: Official QR Code Verification & Gold Seal
   doc.setFillColor(212, 175, 55);
-  doc.circle(width / 2, footerY + 12, 12, 'F');
+  doc.circle(width / 2, footerY + 11, 11, 'F');
   doc.setFillColor(255, 248, 220);
-  doc.circle(width / 2, footerY + 12, 10, 'F');
+  doc.circle(width / 2, footerY + 11, 9.2, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(150, 100, 20);
-  doc.text('OSN 2026', width / 2, footerY + 11, { align: 'center' });
-  doc.setFontSize(6.5);
-  doc.text('VERIFIED', width / 2, footerY + 15, { align: 'center' });
+  doc.text('OSN 2026', width / 2, footerY + 10, { align: 'center' });
+  doc.setFontSize(6);
+  doc.text('VERIFIED', width / 2, footerY + 14, { align: 'center' });
 
   // Verification note below seal
   doc.setFont('courier', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(120, 115, 110);
-  doc.text(`[QR-VERIFY: https://olimpiadesiswanasional.id/verify/${student.id}]`, width / 2, footerY + 29, { align: 'center' });
+  doc.text(`[QR-VERIFY: https://olimpiadesiswanasional.id/verify/${student.id}]`, width / 2, footerY + 28, { align: 'center' });
 
-  // Right Signature: Direktur LKP Prestasi Nusantara
+  // Right Signature: Mengetahui & Mengesahkan, Direktur LKP Prestasi Nusantara
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(90, 85, 80);
-  doc.text('Mengetahui & Mengesahkan,', width - 48, footerY);
-  doc.text('Direktur LKP Prestasi Nusantara', width - 48, footerY + 5);
+  doc.text('Mengetahui & Mengesahkan,', width - 48, footerY, { align: 'center' });
+  doc.text('Direktur LKP Prestasi Nusantara', width - 48, footerY + 5, { align: 'center' });
 
-  doc.setFont('times', 'italic');
-  doc.setFontSize(12.5);
-  doc.setTextColor(26, 22, 21);
-  doc.text('Hj. Siti Nur Asia, S.Pd., M.M.', width - 48, footerY + 22);
+  // Logo 3: STEMPEL RESMI LKP PRESTASI NUSANTARA (Cap Resmi Biru Asli Tanpa Background)
+  if (logos.stempelLkp) {
+    try {
+      doc.addImage(logos.stempelLkp, 'PNG', width - 64, footerY + 6, 26, 26);
+    } catch (e) {
+      console.warn('Gagal menambahkan stempel LKP ke sertifikat:', e);
+    }
+  }
+
+  // Signature line
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.4);
-  doc.line(width - 75, footerY + 24, width - 25, footerY + 24);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(110, 110, 110);
-  doc.text('Reg. LKP. 021/PN/DIKNAS/2024', width - 48, footerY + 28);
+  doc.line(width - 76, footerY + 24, width - 20, footerY + 24);
+
+  // Title only, WITHOUT personal name or Reg LKP number
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text('Direktur LKP Prestasi Nusantara', width - 48, footerY + 28, { align: 'center' });
 
   // Save the PDF
   const filename = `Sertifikat_Digital_OSN_2026_${rank.replace(/[^a-zA-Z0-9]/g, '_')}_${student.fullName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
@@ -266,8 +319,8 @@ export function generateDigitalCertificatePdf(options: CertificateOptions): void
 }
 
 // Backward-compatible alias for existing callers
-export function generateFinalCertificatePdf(options: CertificateOptions): void {
-  generateDigitalCertificatePdf({
+export async function generateFinalCertificatePdf(options: CertificateOptions): Promise<void> {
+  await generateDigitalCertificatePdf({
     ...options,
     stageTitle: options.stageTitle || 'BABAK FINAL NASIONAL'
   });

@@ -109,14 +109,22 @@ import {
   triggerExamGradedNotification,
   triggerQualificationReleasedNotification,
   broadcastQualificationAnnouncements,
+  broadcastChampionAnnouncements,
+  broadcastExamReminder,
   sendWhatsAppApiNotification,
   getStoredWhatsAppLogs,
-  WhatsAppNotificationLog
+  getWhatsAppApiSettings,
+  saveWhatsAppApiSettings,
+  testWhatsAppApiConnection,
+  WhatsAppNotificationLog,
+  WhatsAppApiSettings
 } from '../services/whatsappApiService';
 import {
   exportLolosPenyisihanReportPdf,
-  exportLolosFinalDanJuaraReportPdf
+  exportLolosFinalDanJuaraReportPdf,
+  exportSimulasiReportPdf
 } from '../services/officialReportsGenerator';
+import { showToast } from './NotificationToast';
 import {
   getMetaPixelConfig,
   saveMetaPixelConfig,
@@ -205,7 +213,7 @@ export const AuthModal = ({
 
   // Admin Tabs & Management States
   const [adminTab, setAdminTab] = useState<
-    'participants' | 'report_simulasi' | 'report_penyisihan' | 'report_final' | 'questions' | 'schedule' | 'workspace' | 'pixel' | 'anticheat' | 'announcements' | 'gallery'
+    'participants' | 'report_simulasi' | 'report_penyisihan' | 'report_final' | 'questions' | 'schedule' | 'workspace' | 'pixel' | 'anticheat' | 'announcements' | 'gallery' | 'whatsapp_api'
   >('participants');
   const [adminSearch, setAdminSearch] = useState('');
   const [adminFilterCategory, setAdminFilterCategory] = useState('Semua');
@@ -214,6 +222,13 @@ export const AuthModal = ({
   const [adminStartDate, setAdminStartDate] = useState('');
   const [adminEndDate, setAdminEndDate] = useState('');
   const [participantsList, setParticipantsList] = useState<ParticipantRecord[]>([]);
+
+  // WhatsApp API Settings & Broadcast State
+  const [waSettings, setWaSettings] = useState<WhatsAppApiSettings>(() => getWhatsAppApiSettings());
+  const [waTestPhone, setWaTestPhone] = useState('085810243460');
+  const [isTestingWa, setIsTestingWa] = useState(false);
+  const [isBroadcastingWa, setIsBroadcastingWa] = useState(false);
+  const [waLogsList, setWaLogsList] = useState<WhatsAppNotificationLog[]>(() => getStoredWhatsAppLogs());
 
   // Mode Akses Cepat & Ringan: Batasi tabel peserta hanya 10 baris per halaman, diurutkan mulai dari yang terbaru
   const [adminParticipantsPage, setAdminParticipantsPage] = useState(1);
@@ -1926,9 +1941,6 @@ export const AuthModal = ({
                               <label className="text-xs font-bold text-[#1A1615]">
                                 Password Admin
                               </label>
-                              <span className="text-[10px] text-[#756F68]">
-                                Default: <strong>ADMIN123</strong>
-                              </span>
                             </div>
                             <div className="relative">
                               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">

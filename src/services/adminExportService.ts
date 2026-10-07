@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { ParticipantRecord } from './participantDb';
 import { APP_CONFIG } from '../../appConfig.js';
+import { getOfficialLogosForPdf } from './pdfLogosHelper';
 
 // 1. Export Participants List to Excel (.xlsx or clean compatible .csv/spreadsheet format)
 export function exportParticipantsToExcel(participants: ParticipantRecord[], titleSuffix: string = ''): void {
@@ -72,7 +73,9 @@ export function exportParticipantsToExcel(participants: ParticipantRecord[], tit
 }
 
 // 2. Export Participants List to Formatted PDF Table
-export function exportParticipantsToPdf(participants: ParticipantRecord[], filterDescription: string = ''): void {
+export async function exportParticipantsToPdf(participants: ParticipantRecord[], filterDescription: string = ''): Promise<void> {
+  const logos = await getOfficialLogosForPdf();
+
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -90,16 +93,34 @@ export function exportParticipantsToPdf(participants: ParticipantRecord[], filte
   doc.setFillColor(212, 175, 55); // Gold
   doc.rect(0, 28, pageWidth, 2, 'F');
 
+  // Logo 1: Logo OSN
+  if (logos.logoOsn) {
+    try {
+      doc.addImage(logos.logoOsn, 'PNG', 12, 3.5, 21, 21);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo OSN ke PDF peserta:', e);
+    }
+  }
+
+  // Logo 2: Logo LKP
+  if (logos.logoLkp) {
+    try {
+      doc.addImage(logos.logoLkp, 'PNG', pageWidth - 32, 3.5, 19, 21);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo LKP ke PDF peserta:', e);
+    }
+  }
+
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(13);
   doc.setTextColor(255, 242, 178);
-  doc.text('LAPORAN DATA PESERTA & PROGRES UJIAN CBT OSN 2026', 15, 12);
+  doc.text('LAPORAN DATA PESERTA & PROGRES UJIAN CBT OSN 2026', pageWidth / 2, 11, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(230, 230, 230);
-  doc.text(`Penyelenggara: ${APP_CONFIG.organizer} · LKP Prestasi Nusantara · Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 15, 19);
-  doc.text(`Filter/Kriteria: ${filterDescription || 'Seluruh Database'} · Total: ${participants.length} Siswa`, 15, 25);
+  doc.text(`Penyelenggara: ${APP_CONFIG.organizer} · LKP Prestasi Nusantara · Dicetak pada: ${new Date().toLocaleString('id-ID')}`, pageWidth / 2, 18, { align: 'center' });
+  doc.text(`Kriteria: ${filterDescription || 'Seluruh Database'} · Total: ${participants.length} Siswa`, pageWidth / 2, 24, { align: 'center' });
 
   // Table Headers
   let currentY = 38;
@@ -211,6 +232,39 @@ export function exportParticipantsToPdf(participants: ParticipantRecord[], filte
 
     currentY += 7.5;
   });
+
+  // Bagian Pengesahan & Tanda Tangan pada Halaman Terakhir
+  if (currentY > pageHeight - 40) {
+    doc.addPage();
+    currentY = 25;
+  } else {
+    currentY += 6;
+  }
+
+  const signX = pageWidth - 65;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(50, 50, 50);
+  doc.text('Mengetahui & Mengesahkan,', signX, currentY, { align: 'center' });
+  doc.text('Direktur LKP Prestasi Nusantara', signX, currentY + 5, { align: 'center' });
+
+  // Logo 3: Stempel Resmi LKP
+  if (logos.stempelLkp) {
+    try {
+      doc.addImage(logos.stempelLkp, 'PNG', signX - 12, currentY + 6, 24, 24);
+    } catch (e) {
+      console.warn('Gagal menambahkan stempel LKP:', e);
+    }
+  }
+
+  doc.setDrawColor(180, 180, 180);
+  doc.setLineWidth(0.4);
+  doc.line(signX - 30, currentY + 23, signX + 30, currentY + 23);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text('Direktur LKP Prestasi Nusantara', signX, currentY + 27, { align: 'center' });
 
   // Footer note
   doc.setFont('helvetica', 'italic');

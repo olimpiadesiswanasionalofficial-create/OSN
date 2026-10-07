@@ -47,6 +47,7 @@ import { RecentWinnersMarquee } from './components/RecentWinnersMarquee';
 import { GalleryOSN } from './components/GalleryOSN';
 import { CompetitionCountdown } from './components/CompetitionCountdown';
 import { PublicAnnouncementTable } from './components/PublicAnnouncementTable';
+import { NotificationToastContainer } from './components/NotificationToast';
 import { saveParticipant, saveMultipleParticipants, getAllParticipants, ParticipantRecord } from './services/participantDb';
 import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
 import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
@@ -2636,6 +2637,9 @@ export default function App() {
         defaultRole={authModalDefaultRole}
         initialStudentData={authStudentInitialData}
       />
+
+      {/* Global Notification Toast Container for all functions */}
+      <NotificationToastContainer />
 
     </div>
   );
