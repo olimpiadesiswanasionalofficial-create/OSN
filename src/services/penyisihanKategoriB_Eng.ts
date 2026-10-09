@@ -1,10 +1,12 @@
 import { QuestionItem } from './cbtQuestionTypes';
-import { createSimulasiSvg } from './simulasiSvgIllustrations';
+import { createPenyisihanSvg } from './simulasiSvgIllustrations';
 
 // SOAL RESMI BABAK PENYISIHAN: BAHASA INGGRIS SD/MI (Kategori B)
-// 20 Soal Lengkap Pilihan Ganda dengan Kunci Jawaban Resmi & Ilustrasi Visual
+// 20 Soal Pilihan Ganda Kurikulum Campuran (Merdeka, Cambridge, Singapore, IB)
+// Tingkat Kesulitan: Menengah | 100% Bergambar & Unik
 
 export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
+  // --- KURIKULUM MERDEKA (Soal 1 - 5) ---
   {
     id: 'PENY-B-ENG-01',
     number: 1,
@@ -13,16 +15,25 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the English word for “buku”?',
+    difficulty: 'Menengah',
+    questionText: 'Look at the picture! Yesterday afternoon, Rafi and his sister ... bicycle in the community park happily.',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'School Object: Buku', '#3B82F6',
-        `<g transform="translate(130, 20)"><rect x="20" y="20" width="80" height="90" rx="8" fill="#3B82F6" stroke="#1D4ED8" stroke-width="3"/><path d="M 25 25 L 95 25 M 25 40 L 95 40 M 25 55 L 75 55" stroke="#FFFFFF" stroke-width="2.5"/><text x="60" y="85" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="middle">BOOK</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Past Tense', 'Past Activity in the Park', '#0284C7',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="70" rx="12" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+          <text x="140" y="50" font-size="28" text-anchor="middle">🚴‍♂️ 👧 🌳</text>
+          <text x="140" y="75" font-size="12" font-weight="bold" fill="#0369A1" text-anchor="middle">Time signal: "Yesterday afternoon"</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Book' }, { key: 'B', text: 'Bag' }, { key: 'C', text: 'Pen' }, { key: 'D', text: 'Table' }],
-    correctAnswer: 'A',
-    explanation: 'Kata bahasa Inggris untuk "buku" adalah "Book".'
+    options: [
+      { key: 'A', text: 'ride' },
+      { key: 'B', text: 'rode' },
+      { key: 'C', text: 'riding' },
+      { key: 'D', text: 'rides' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'The sentence uses the time signal "Yesterday afternoon", which indicates the Simple Past Tense. The past form (V2) of "ride" is "rode".'
   },
   {
     id: 'PENY-B-ENG-02',
@@ -32,16 +43,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Choose the correct answer:\n“How are you?”',
+    difficulty: 'Menengah',
+    questionText: 'Study the public sign in the school hallway. What is the main message of this sign?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Greetings', '#10B981',
-        `<g transform="translate(100, 20)"><rect x="10" y="10" width="180" height="40" rx="10" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><text x="100" y="35" font-size="13" font-weight="bold" fill="#065F46" text-anchor="middle">"How are you?"</text><rect x="10" y="60" width="180" height="40" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/><text x="100" y="85" font-size="13" font-weight="900" fill="#92400E" text-anchor="middle">"I am fine." ✓</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Public Notice', 'School Caution Sign', '#E11D48',
+        `<g transform="translate(70, 15)">
+          <rect x="30" y="15" width="200" height="75" rx="10" fill="#FFE4E6" stroke="#E11D48" stroke-width="2"/>
+          <text x="130" y="45" font-size="22" text-anchor="middle">⚠️</text>
+          <text x="130" y="65" font-size="12" font-weight="900" fill="#9F1239" text-anchor="middle">QUIET PLEASE!</text>
+          <text x="130" y="80" font-size="10" font-weight="bold" fill="#BE123C" text-anchor="middle">EXAM IN PROGRESS</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'My name is Rina.' }, { key: 'B', text: 'I am fine.' }, { key: 'C', text: 'Good night.' }, { key: 'D', text: 'See you tomorrow.' }],
+    options: [
+      { key: 'A', text: 'Students must enter the room loudly.' },
+      { key: 'B', text: 'People should remain silent because students are taking a test.' },
+      { key: 'C', text: 'The room is currently closed for renovation.' },
+      { key: 'D', text: 'Students are invited to chat inside.' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Respon tepat terhadap pertanyaan kabar "How are you?" adalah "I am fine."'
+    explanation: '"Quiet please! Exam in progress" means people in the surrounding area must stay quiet so that test-takers are not disturbed.'
   },
   {
     id: 'PENY-B-ENG-03',
@@ -51,16 +72,31 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What color is the sky on a clear day?',
+    difficulty: 'Menengah',
+    questionText: 'Look at the comparative chart of three buildings. Which statement accurately compares their heights?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'The Sky Color', '#0284C7',
-        `<g transform="translate(110, 20)"><circle cx="80" cy="55" r="45" fill="#38BDF8"/><path d="M 40 70 Q 55 50 75 60 Q 95 45 115 65 Z" fill="#FFFFFF"/><text x="80" y="115" font-size="14" font-weight="900" fill="#0369A1" text-anchor="middle">BLUE SKY ☁️</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Degree of Comparison', 'Height Comparison Chart', '#7C3AED',
+        `<g transform="translate(60, 10)">
+          <!-- Building A -->
+          <rect x="30" y="55" width="45" height="45" fill="#DDD6FE" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="52" y="115" font-size="10" font-weight="bold" fill="#4C1D95" text-anchor="middle">Tower A (15m)</text>
+          <!-- Building B -->
+          <rect x="110" y="30" width="45" height="70" fill="#C4B5FD" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="132" y="115" font-size="10" font-weight="bold" fill="#4C1D95" text-anchor="middle">Tower B (25m)</text>
+          <!-- Building C -->
+          <rect x="190" y="10" width="45" height="90" fill="#A78BFA" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="212" y="115" font-size="10" font-weight="bold" fill="#4C1D95" text-anchor="middle">Tower C (35m)</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Green' }, { key: 'B', text: 'Blue' }, { key: 'C', text: 'Black' }, { key: 'D', text: 'Orange' }],
-    correctAnswer: 'B',
-    explanation: 'Langit pada hari yang cerah berwarna biru (Blue).'
+    options: [
+      { key: 'A', text: 'Tower A is taller than Tower B.' },
+      { key: 'B', text: 'Tower B is the tallest among all three.' },
+      { key: 'C', text: 'Tower C is the tallest building.' },
+      { key: 'D', text: 'Tower B is shorter than Tower A.' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Tower C has a height of 35 m, which is greater than Tower B (25 m) and Tower A (15 m). Thus, Tower C is the tallest.'
   },
   {
     id: 'PENY-B-ENG-04',
@@ -70,16 +106,31 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“She ___ a student.”',
+    difficulty: 'Menengah',
+    questionText: 'Where is the school library located based on the map illustration below?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Grammar: To Be', '#8B5CF6',
-        `<g transform="translate(90, 25)"><rect x="10" y="20" width="200" height="60" rx="12" fill="#F3E8FF" stroke="#8B5CF6" stroke-width="2"/><text x="110" y="55" font-size="15" font-weight="900" fill="#6B21A8" text-anchor="middle">"She IS a student"</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Prepositions', 'School Floor Plan', '#059669',
+        `<g transform="translate(50, 15)">
+          <rect x="10" y="20" width="80" height="60" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
+          <text x="50" y="55" font-size="10" font-weight="bold" fill="#065F46" text-anchor="middle">Class 4</text>
+          
+          <rect x="110" y="20" width="80" height="60" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/>
+          <text x="150" y="48" font-size="10" font-weight="900" fill="#854D0E" text-anchor="middle">Library</text>
+          <text x="150" y="65" font-size="14" text-anchor="middle">📚</text>
+          
+          <rect x="210" y="20" width="80" height="60" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
+          <text x="250" y="55" font-size="10" font-weight="bold" fill="#065F46" text-anchor="middle">Class 5</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'am' }, { key: 'B', text: 'are' }, { key: 'C', text: 'is' }, { key: 'D', text: 'be' }],
-    correctAnswer: 'C',
-    explanation: 'Subjek tunggal "She" menggunakan to be "is".'
+    options: [
+      { key: 'A', text: 'Behind Class 4' },
+      { key: 'B', text: 'Between Class 4 and Class 5' },
+      { key: 'C', text: 'Far away from Class 5' },
+      { key: 'D', text: 'Under Class 4' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'The library is situated in the middle with Class 4 on its left and Class 5 on its right; therefore, it is "between Class 4 and Class 5".'
   },
   {
     id: 'PENY-B-ENG-05',
@@ -89,17 +140,32 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the opposite of “big”?',
+    difficulty: 'Menengah',
+    questionText: 'Read the habit calendar: Maya waters the house garden every single day without exception. Maya ... waters the plants in the garden.',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Opposites (Lawan Kata)', '#F59E0B',
-        `<g transform="translate(90, 20)"><circle cx="50" cy="55" r="35" fill="#FBBF24"/><text x="50" y="60" font-size="12" font-weight="900" fill="#78350F" text-anchor="middle">BIG</text><text x="105" y="60" font-size="16" font-weight="900" fill="#92400E" text-anchor="middle">↔</text><circle cx="150" cy="55" r="16" fill="#FCD34D"/><text x="150" y="60" font-size="10" font-weight="900" fill="#78350F" text-anchor="middle">SMALL</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Adverbs of Frequency', 'Weekly Habit Calendar', '#D97706',
+        `<g transform="translate(40, 15)">
+          <rect x="10" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="30" y="50" font-size="10" font-weight="bold" text-anchor="middle">Mon ✓</text>
+          <rect x="55" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="75" y="50" font-size="10" font-weight="bold" text-anchor="middle">Tue ✓</text>
+          <rect x="100" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="120" y="50" font-size="10" font-weight="bold" text-anchor="middle">Wed ✓</text>
+          <rect x="145" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="165" y="50" font-size="10" font-weight="bold" text-anchor="middle">Thu ✓</text>
+          <rect x="190" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="210" y="50" font-size="10" font-weight="bold" text-anchor="middle">Fri ✓</text>
+          <rect x="235" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="255" y="50" font-size="10" font-weight="bold" text-anchor="middle">Sat ✓</text>
+          <rect x="280" y="25" width="40" height="40" fill="#DCFCE7" stroke="#16A34A"/><text x="300" y="50" font-size="10" font-weight="bold" text-anchor="middle">Sun ✓</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Tall' }, { key: 'B', text: 'Small' }, { key: 'C', text: 'Long' }, { key: 'D', text: 'Fast' }],
-    correctAnswer: 'B',
-    explanation: 'Lawan kata dari "big" (besar) adalah "small" (kecil).'
+    options: [
+      { key: 'A', text: 'rarely' },
+      { key: 'B', text: 'sometimes' },
+      { key: 'C', text: 'never' },
+      { key: 'D', text: 'always' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'An activity performed 100% of the time (every single day) corresponds to the frequency adverb "always".'
   },
+
+  // --- CAMBRIDGE PRIMARY (Soal 6 - 10) ---
   {
     id: 'PENY-B-ENG-06',
     number: 6,
@@ -107,17 +173,27 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which one is an animal?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Read the short scientific paragraph in the diagram. What is the main idea of the text?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Animals Category', '#EA580C',
-        `<g transform="translate(110, 20)"><circle cx="80" cy="55" r="42" fill="#FED7AA" stroke="#EA580C" stroke-width="3"/><text x="80" y="60" font-size="13" font-weight="900" fill="#9A3412" text-anchor="middle">TIGER 🐯</text><text x="80" y="115" font-size="12" font-weight="bold" fill="#C2410C" text-anchor="middle">Animal (Hewan)</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Main Idea', 'Honeybees & Pollination', '#CA8A04',
+        `<g transform="translate(40, 15)">
+          <rect x="10" y="15" width="340" height="75" rx="10" fill="#FEF9C3" stroke="#CA8A04" stroke-width="1.5"/>
+          <text x="30" y="38" font-size="11" font-weight="bold" fill="#854D0E">"Honeybees fly from flower to flower gathering nectar.</text>
+          <text x="30" y="55" font-size="11" font-weight="bold" fill="#854D0E">During this visit, pollen sticks to their fuzzy bodies and</text>
+          <text x="30" y="72" font-size="11" font-weight="bold" fill="#854D0E">helps plants reproduce. Without bees, many crops cannot grow."</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Chair' }, { key: 'B', text: 'Pencil' }, { key: 'C', text: 'Tiger' }, { key: 'D', text: 'Book' }],
-    correctAnswer: 'C',
-    explanation: 'Tiger (harimau) adalah hewan (animal).'
+    options: [
+      { key: 'A', text: 'Honeybees prefer to sleep during daytime.' },
+      { key: 'B', text: 'Honeybees play a vital role in pollination and plant reproduction.' },
+      { key: 'C', text: 'Flowers produce nectar only to feed birds.' },
+      { key: 'D', text: 'Bees damage crops when they fly in fields.' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'The paragraph explains how bees collect nectar, transfer pollen, and help plants reproduce, showing that their primary role is essential pollination.'
   },
   {
     id: 'PENY-B-ENG-07',
@@ -126,17 +202,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“I ___ two brothers.”',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Choose the correct subject-verb agreement: Neither the teacher nor the students ... late for the science assembly this morning.',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Have / Has', '#0D9488',
-        `<g transform="translate(90, 25)"><rect x="15" y="20" width="190" height="60" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="2"/><text x="110" y="55" font-size="15" font-weight="900" fill="#115E59" text-anchor="middle">"I HAVE two brothers"</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Grammar Rule', 'Subject-Verb Agreement', '#2563EB',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <text x="140" y="45" font-size="12" font-weight="bold" fill="#1E40AF" text-anchor="middle">Rule: "Neither ... nor [plural noun] ... "</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#3B82F6" text-anchor="middle">Verb agrees with the closer subject: "students"</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'has' }, { key: 'B', text: 'have' }, { key: 'C', text: 'having' }, { key: 'D', text: 'am' }],
+    options: [
+      { key: 'A', text: 'was' },
+      { key: 'B', text: 'were' },
+      { key: 'C', text: 'is' },
+      { key: 'D', text: 'are' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Subjek "I" berpasangan dengan "have" ("I have two brothers").'
+    explanation: 'In the structure "Neither ... nor", the verb agrees with the noun closest to it ("the students", plural). For past tense, "were" is the correct verb form.'
   },
   {
     id: 'PENY-B-ENG-08',
@@ -145,17 +230,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is “Senin” in English?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Complete the sentence with the appropriate question tag: "You have submitted your science experiment log, ...?"',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Days of the Week', '#4F46E5',
-        `<g transform="translate(100, 20)"><rect x="25" y="15" width="150" height="80" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/><rect x="25" y="15" width="150" height="25" fill="#4F46E5" rx="4"/><text x="100" y="32" font-size="11" font-weight="900" fill="#FFF" text-anchor="middle">CALENDAR</text><text x="100" y="70" font-size="18" font-weight="900" fill="#312E81" text-anchor="middle">MONDAY</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Question Tags', 'Tag Question Formation', '#4F46E5',
+        `<g transform="translate(50, 15)">
+          <rect x="20" y="20" width="260" height="65" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="150" y="45" font-size="12" font-weight="bold" fill="#3730A3" text-anchor="middle">Positive Statement ("You have...")</text>
+          <text x="150" y="68" font-size="12" font-weight="bold" fill="#4F46E5" text-anchor="middle">➔ Negative Tag ("haven\'t you?")</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Sunday' }, { key: 'B', text: 'Monday' }, { key: 'C', text: 'Tuesday' }, { key: 'D', text: 'Friday' }],
+    options: [
+      { key: 'A', text: 'have you' },
+      { key: 'B', text: 'haven\'t you' },
+      { key: 'C', text: 'did you' },
+      { key: 'D', text: 'don\'t you' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Hari Senin dalam bahasa Inggris adalah "Monday".'
+    explanation: 'The auxiliary verb is "have" in a positive clause, so the tag question requires the negative auxiliary "haven\'t you?".'
   },
   {
     id: 'PENY-B-ENG-09',
@@ -164,17 +258,30 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which sentence is correct?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Read the context: "The desert air is extremely arid, making it hard for plants to survive." What is the exact antonym (opposite meaning) of the word "arid"?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Subject-Verb Agreement', '#16A34A',
-        `<g transform="translate(90, 25)"><rect x="15" y="20" width="190" height="60" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/><text x="110" y="55" font-size="15" font-weight="900" fill="#14532D" text-anchor="middle">✓ "He is happy."</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Vocabulary', 'Contextual Antonym', '#B45309',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="110" height="65" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <text x="75" y="48" font-size="11" font-weight="bold" fill="#92400E" text-anchor="middle">Arid (Dry) 🏜️</text>
+          
+          <text x="150" y="55" font-size="16" font-weight="bold" fill="#B45309" text-anchor="middle">↔</text>
+          
+          <rect x="170" y="20" width="110" height="65" rx="8" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+          <text x="225" y="48" font-size="11" font-weight="bold" fill="#0369A1" text-anchor="middle">Opposite = ? 💧</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'He are happy.' }, { key: 'B', text: 'He am happy.' }, { key: 'C', text: 'He is happy.' }, { key: 'D', text: 'He be happy.' }],
-    correctAnswer: 'C',
-    explanation: 'Kalimat yang benar adalah "He is happy." karena subjek "He" memakai to be "is".'
+    options: [
+      { key: 'A', text: 'Hot' },
+      { key: 'B', text: 'Humid / Moist' },
+      { key: 'C', text: 'Barren' },
+      { key: 'D', text: 'Sandy' }
+    ],
+    correctAnswer: 'B',
+    explanation: '"Arid" means lacking moisture or extremely dry. Its direct opposite is "humid" or "moist" (rich in water vapor and damp).'
   },
   {
     id: 'PENY-B-ENG-10',
@@ -183,18 +290,29 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What do we use to write?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Fill in the relative pronoun: "The young scientist ... designed the solar-powered water filter won the national award."',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Stationery: Writing', '#CA8A04',
-        `<g transform="translate(110, 20)"><polygon points="30,80 120,20 135,32 45,92" fill="#FACC15" stroke="#CA8A04" stroke-width="2"/><polygon points="20,90 30,80 45,92" fill="#FED7AA"/><text x="80" y="115" font-size="14" font-weight="900" fill="#854D0E" text-anchor="middle">PENCIL ✏️</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Relative Pronoun', 'Relative Clause for Persons', '#10B981',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+          <text x="140" y="45" font-size="12" font-weight="bold" fill="#065F46" text-anchor="middle">Antecedent: "The young scientist" (Person)</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">Subject relative pronoun: "who"</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Pencil' }, { key: 'B', text: 'Shoes' }, { key: 'C', text: 'Spoon' }, { key: 'D', text: 'Hat' }],
-    correctAnswer: 'A',
-    explanation: 'Benda yang kita gunakan untuk menulis adalah pensil (Pencil).'
+    options: [
+      { key: 'A', text: 'which' },
+      { key: 'B', text: 'whose' },
+      { key: 'C', text: 'who' },
+      { key: 'D', text: 'where' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'When referring to a person as the subject of the relative clause ("The young scientist"), the appropriate relative pronoun is "who".'
   },
+
+  // --- SINGAPORE CURRICULUM (Soal 11 - 15) ---
   {
     id: 'PENY-B-ENG-11',
     number: 11,
@@ -202,17 +320,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Choose the correct word:\n“There are seven days in a ___.”',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Synthesis & Transformation: Combine the two sentences using "Unless":\nSentence 1: You wear a helmet.\nSentence 2: You cannot ride this race scooter.',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Time: 7 Days', '#0284C7',
-        `<g transform="translate(90, 20)"><rect x="15" y="15" width="190" height="75" rx="10" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/><text x="110" y="45" font-size="14" font-weight="900" fill="#0369A1" text-anchor="middle">7 DAYS = 1 WEEK</text><text x="110" y="70" font-size="12" font-weight="bold" fill="#075985" text-anchor="middle">(1 Minggu = 7 Hari)</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Synthesis', 'Sentence Transformation (Unless)', '#9333EA',
+        `<g transform="translate(50, 15)">
+          <rect x="20" y="20" width="260" height="65" rx="10" fill="#FAF5FF" stroke="#9333EA" stroke-width="1.5"/>
+          <text x="150" y="45" font-size="11" font-weight="bold" fill="#6B21A8" text-anchor="middle">Rule: "Unless" = "If ... not"</text>
+          <text x="150" y="68" font-size="11" font-weight="bold" fill="#7E22CE" text-anchor="middle">Unless you wear a helmet, you cannot ride...</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'month' }, { key: 'B', text: 'year' }, { key: 'C', text: 'week' }, { key: 'D', text: 'day' }],
-    correctAnswer: 'C',
-    explanation: 'Terdapat tujuh hari dalam satu minggu ("seven days in a week").'
+    options: [
+      { key: 'A', text: 'Unless you wear a helmet, you can ride this race scooter.' },
+      { key: 'B', text: 'Unless you wear a helmet, you cannot ride this race scooter.' },
+      { key: 'C', text: 'Unless you do not wear a helmet, you cannot ride.' },
+      { key: 'D', text: 'You wear a helmet unless you cannot ride.' }
+    ],
+    correctAnswer: 'B',
+    explanation: '"Unless" means "if not". "Unless you wear a helmet, you cannot ride this race scooter" accurately conveys that wearing a helmet is a strict requirement.'
   },
   {
     id: 'PENY-B-ENG-12',
@@ -221,17 +348,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the plural form of “cat”?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Look at the idiom illustration: Before going on stage for her violin recital, Clara\'s mom whispered, "Break a leg, honey!" What does "break a leg" mean?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Plural Nouns', '#EC4899',
-        `<g transform="translate(100, 25)"><rect x="15" y="15" width="170" height="60" rx="10" fill="#FDF2F8" stroke="#EC4899" stroke-width="2"/><text x="100" y="45" font-size="14" font-weight="bold" fill="#9D174D" text-anchor="middle">1 Cat → 2 Cats</text><text x="100" y="65" font-size="12" font-weight="900" fill="#BE185D" text-anchor="middle">Add '-s' = CATS</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Idioms', 'Idiomatic Expression', '#EA580C',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+          <text x="140" y="45" font-size="20" text-anchor="middle">🎻 🎭</text>
+          <text x="140" y="70" font-size="12" font-weight="900" fill="#C2410C" text-anchor="middle">"Break a leg!" = Good luck!</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Cats' }, { key: 'B', text: 'Cates' }, { key: 'C', text: 'Caties' }, { key: 'D', text: 'Caties' }],
-    correctAnswer: 'A',
-    explanation: 'Bentuk jamak (plural) dari kata "cat" adalah "Cats".'
+    options: [
+      { key: 'A', text: 'Be careful not to injure your bones.' },
+      { key: 'B', text: 'Good luck with your performance.' },
+      { key: 'C', text: 'Run as fast as you can.' },
+      { key: 'D', text: 'Stop playing immediately.' }
+    ],
+    correctAnswer: 'B',
+    explanation: '"Break a leg" is a widely recognized English idiom used to wish performers good luck before a show.'
   },
   {
     id: 'PENY-B-ENG-13',
@@ -240,17 +376,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“They ___ playing football.”',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Cloze Passage: "Although the storm was severe, the crew managed to navigate safely ... the harbor." What preposition correctly fits the blank?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Present Continuous', '#6366F1',
-        `<g transform="translate(90, 25)"><rect x="15" y="20" width="190" height="60" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/><text x="110" y="55" font-size="15" font-weight="900" fill="#3730A3" text-anchor="middle">"They ARE playing"</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Cloze Test', 'Navigation & Direction', '#0891B2',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="2"/>
+          <text x="140" y="45" font-size="11" font-weight="bold" fill="#0E7490" text-anchor="middle">Movement toward an enclosed haven</text>
+          <text x="140" y="68" font-size="12" font-weight="bold" fill="#155E75" text-anchor="middle">"navigate safely into the harbor"</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'is' }, { key: 'B', text: 'am' }, { key: 'C', text: 'are' }, { key: 'D', text: 'be' }],
-    correctAnswer: 'C',
-    explanation: 'Subjek jamak "They" menggunakan to be "are".'
+    options: [
+      { key: 'A', text: 'onto' },
+      { key: 'B', text: 'into' },
+      { key: 'C', text: 'over' },
+      { key: 'D', text: 'above' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'The verb "navigate into" expresses directional entry into a designated location such as a harbor or port.'
   },
   {
     id: 'PENY-B-ENG-14',
@@ -259,17 +404,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which one is a fruit?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Select the correct modal auxiliary for a polite and formal request: "... I borrow your dictionary for a moment, Mr. Adams?"',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Food & Fruits', '#EF4444',
-        `<g transform="translate(110, 20)"><circle cx="80" cy="55" r="42" fill="#FEE2E2" stroke="#EF4444" stroke-width="3"/><text x="80" y="60" font-size="14" font-weight="900" fill="#991B1B" text-anchor="middle">APPLE 🍎</text><text x="80" y="115" font-size="12" font-weight="bold" fill="#15803D" text-anchor="middle">Fruit (Buah)</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Modals', 'Formal Polite Request', '#6366F1',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.5"/>
+          <text x="140" y="45" font-size="12" font-weight="bold" fill="#4338CA" text-anchor="middle">Polite inquiry directed to a teacher</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#312E81" text-anchor="middle">Formal permission: "May I...?"</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Carrot' }, { key: 'B', text: 'Potato' }, { key: 'C', text: 'Apple' }, { key: 'D', text: 'Onion' }],
+    options: [
+      { key: 'A', text: 'Must' },
+      { key: 'B', text: 'Should' },
+      { key: 'C', text: 'May' },
+      { key: 'D', text: 'Will' }
+    ],
     correctAnswer: 'C',
-    explanation: 'Apple (apel) adalah buah (fruit), sedangkan wortel, kentang, dan bawang adalah sayuran (vegetables).'
+    explanation: '"May I...?" is the standard polite and formal modal verb construction used to request permission.'
   },
   {
     id: 'PENY-B-ENG-15',
@@ -278,18 +432,29 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Read the sentence:\n“Rina has a red bag.”\nWhat color is Rina\'s bag?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Sentence Connector: "Daniel practiced piano diligently every evening; ..., he earned first place in the competition."',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Reading: Red Bag', '#DC2626',
-        `<g transform="translate(110, 15)"><rect x="40" y="40" width="80" height="65" rx="12" fill="#EF4444" stroke="#B91C1C" stroke-width="3"/><path d="M 60 40 Q 80 20 100 40" stroke="#B91C1C" stroke-width="4" fill="none"/><text x="80" y="80" font-size="13" font-weight="900" fill="#FFF" text-anchor="middle">RED</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Connectors', 'Cause & Result Transition', '#15803D',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#F0FDF4" stroke="#15803D" stroke-width="2"/>
+          <text x="140" y="45" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">Cause: Practiced diligently every evening</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#15803D" text-anchor="middle">Result: "... consequently / as a result ..."</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Blue' }, { key: 'B', text: 'Green' }, { key: 'C', text: 'Red' }, { key: 'D', text: 'Yellow' }],
-    correctAnswer: 'C',
-    explanation: 'Dalam teks disebutkan "a red bag", jadi tas Rina berwarna merah (Red).'
+    options: [
+      { key: 'A', text: 'however' },
+      { key: 'B', text: 'consequently' },
+      { key: 'C', text: 'otherwise' },
+      { key: 'D', text: 'nevertheless' }
+    ],
+    correctAnswer: 'B',
+    explanation: '"Consequently" introduces a direct result or outcome of the preceding hard work. The other options introduce contrast or negative alternatives.'
   },
+
+  // --- INTERNATIONAL BACCALAUREATE (IB PYP) (Soal 16 - 20) ---
   {
     id: 'PENY-B-ENG-16',
     number: 16,
@@ -297,17 +462,27 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the opposite of “hot”?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Analyze the global sustainability poster. What is the key action recommended by the slogan "Reduce, Reuse, Recycle"?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Opposites: Temperature', '#0284C7',
-        `<g transform="translate(90, 20)"><circle cx="50" cy="55" r="30" fill="#FEE2E2"/><text x="50" y="60" font-size="12" font-weight="900" fill="#DC2626" text-anchor="middle">HOT 🔥</text><text x="105" y="60" font-size="16" font-weight="900" fill="#64748B" text-anchor="middle">↔</text><circle cx="150" cy="55" r="30" fill="#E0F2FE"/><text x="150" y="60" font-size="12" font-weight="900" fill="#0284C7" text-anchor="middle">COLD ❄️</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Sustainability Poster', 'Waste Management Slogan', '#059669',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="15" width="240" height="75" rx="12" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="140" y="40" font-size="22" text-anchor="middle">♻️ 🌍</text>
+          <text x="140" y="62" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle">REDUCE • REUSE • RECYCLE</text>
+          <text x="140" y="78" font-size="9" font-weight="bold" fill="#047857" text-anchor="middle">Guardians of Our Living Planet</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Warm' }, { key: 'B', text: 'Cold' }, { key: 'C', text: 'Big' }, { key: 'D', text: 'Dry' }],
+    options: [
+      { key: 'A', text: 'Consume more single-use plastic bottles.' },
+      { key: 'B', text: 'Minimize waste and conserve Earth\'s natural resources.' },
+      { key: 'C', text: 'Burn all domestic trash in gardens.' },
+      { key: 'D', text: 'Throw recyclable containers into open rivers.' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Lawan kata dari "hot" (panas) adalah "cold" (dingin).'
+    explanation: 'The 3Rs slogan urges responsible consumption: minimizing waste generation, reusing existing items, and recycling materials to conserve resources.'
   },
   {
     id: 'PENY-B-ENG-17',
@@ -316,17 +491,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Choose the correct answer:\n“Where do you live?”',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Read the intercultural dialogue: Kenji says, "In Japan, we bow respectfully when greeting elders." What communicative value is Kenji highlighting?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Asking Location', '#8B5CF6',
-        `<g transform="translate(90, 20)"><rect x="15" y="15" width="190" height="75" rx="10" fill="#F3E8FF" stroke="#8B5CF6" stroke-width="2"/><text x="110" y="42" font-size="13" font-weight="bold" fill="#6B21A8" text-anchor="middle">"Where do you live?"</text><text x="110" y="68" font-size="14" font-weight="900" fill="#581C87" text-anchor="middle">"I live in Surabaya." ✓</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Intercultural Inquiry', 'Cultural Greeting & Respect', '#DB2777',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="1.5"/>
+          <text x="140" y="45" font-size="20" text-anchor="middle">🙇‍♂️ 🤝 🌏</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#9D174D" text-anchor="middle">Cultural customs showing respect to elders</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'I am ten years old.' }, { key: 'B', text: 'I live in Surabaya.' }, { key: 'C', text: 'My name is Dita.' }, { key: 'D', text: 'I like apples.' }],
+    options: [
+      { key: 'A', text: 'Competitive sportsmanship' },
+      { key: 'B', text: 'Mutual respect and cultural courtesy' },
+      { key: 'C', text: 'Financial transaction' },
+      { key: 'D', text: 'Academic grading' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Pertanyaan "Where do you live?" menanyakan tempat tinggal, sehingga jawabannya adalah "I live in Surabaya."'
+    explanation: 'Bowing to elders in Japanese tradition embodies deep respect, politeness, and social harmony.'
   },
   {
     id: 'PENY-B-ENG-18',
@@ -335,17 +519,26 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“My mother is cooking in the ___.”',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Read the procedural inquiry: "Step 1: Place bean seeds on moist cotton. Step 2: Keep in indirect sunlight. Step 3: Record daily stem growth." What text type is this?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Rooms in the House', '#F59E0B',
-        `<g transform="translate(100, 20)"><rect x="25" y="15" width="150" height="80" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/><text x="100" y="45" font-size="14" font-weight="900" fill="#92400E" text-anchor="middle">🍳 KITCHEN</text><text x="100" y="70" font-size="11" font-weight="bold" fill="#B45309" text-anchor="middle">Cooking in the kitchen</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Text Types', 'Scientific Procedural Text', '#D97706',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <text x="140" y="45" font-size="11" font-weight="bold" fill="#B45309" text-anchor="middle">Step-by-step sequential instructions</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#92400E" text-anchor="middle">Goal: Conduct a seed germination test</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'bedroom' }, { key: 'B', text: 'bathroom' }, { key: 'C', text: 'kitchen' }, { key: 'D', text: 'garden' }],
-    correctAnswer: 'C',
-    explanation: 'Kegiatan memasak (cooking) umumnya dilakukan di dapur (kitchen).'
+    options: [
+      { key: 'A', text: 'Fictional Fairy Tale' },
+      { key: 'B', text: 'Procedural / Instructional Text' },
+      { key: 'C', text: 'Poetry' },
+      { key: 'D', text: 'Advertisement flyer' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'A text that outlines sequential steps and methods to achieve a specific goal or conduct an experiment is a procedural/instructional text.'
   },
   {
     id: 'PENY-B-ENG-19',
@@ -354,17 +547,32 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which word means “sekolah”?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Cause and Effect inquiry: "Due to heavy deforestation on the hillside, the fertile topsoil was washed away during rainy seasons." What was the cause in this scenario?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Places: Sekolah', '#3B82F6',
-        `<g transform="translate(110, 20)"><rect x="30" y="30" width="100" height="60" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/><polygon points="80,10 20,30 140,30" fill="#2563EB"/><text x="80" y="65" font-size="13" font-weight="900" fill="#1E40AF" text-anchor="middle">SCHOOL 🏫</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Cause and Effect', 'Ecosystem Inquiry', '#15803D',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="115" height="65" rx="8" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+          <text x="77" y="45" font-size="10" font-weight="bold" fill="#991B1B" text-anchor="middle">CAUSE</text>
+          <text x="77" y="65" font-size="9" font-weight="bold" fill="#B91C1C" text-anchor="middle">Deforestation</text>
+          
+          <text x="147" y="55" font-size="16" font-weight="bold" fill="#475569" text-anchor="middle">➔</text>
+          
+          <rect x="160" y="20" width="115" height="65" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <text x="217" y="45" font-size="10" font-weight="bold" fill="#92400E" text-anchor="middle">EFFECT</text>
+          <text x="217" y="65" font-size="9" font-weight="bold" fill="#B45309" text-anchor="middle">Soil Erosion</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'School' }, { key: 'B', text: 'Station' }, { key: 'C', text: 'Store' }, { key: 'D', text: 'Street' }],
-    correctAnswer: 'A',
-    explanation: 'Kata bahasa Inggris untuk "sekolah" adalah "School".'
+    options: [
+      { key: 'A', text: 'Soil erosion' },
+      { key: 'B', text: 'Heavy deforestation on the hillside' },
+      { key: 'C', text: 'Planting new mahogany trees' },
+      { key: 'D', text: 'Building bird sanctuaries' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'The cause introduced by "Due to" is "heavy deforestation on the hillside", which led to the effect of topsoil washing away.'
   },
   {
     id: 'PENY-B-ENG-20',
@@ -373,16 +581,25 @@ export const PENYISIHAN_B_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Read carefully:\n“Tom has three apples. He gives one apple to his sister.”\nHow many apples does Tom have now?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Read the reflective journal entry: "I learned that listening openly to classmates from different backgrounds helped us solve the puzzle faster." Which IB Learner Profile attribute is demonstrated?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Math in English: 3 - 1', '#10B981',
-        `<g transform="translate(90, 20)"><rect x="15" y="15" width="190" height="75" rx="10" fill="#DCFCE7" stroke="#10B981" stroke-width="2"/><text x="110" y="45" font-size="15" font-weight="900" fill="#14532D" text-anchor="middle">3 Apples - 1 Apple = ?</text><text x="110" y="70" font-size="14" font-weight="900" fill="#15803D" text-anchor="middle">TWO (2) APPLES ✓</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Learner Profile', 'Reflective & Open-Minded', '#2563EB',
+        `<g transform="translate(60, 15)">
+          <rect x="20" y="20" width="240" height="65" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+          <text x="140" y="45" font-size="20" text-anchor="middle">💡 🤝 🧩</text>
+          <text x="140" y="68" font-size="11" font-weight="bold" fill="#1E40AF" text-anchor="middle">Value: Valuing diverse perspectives & collaboration</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'One' }, { key: 'B', text: 'Two' }, { key: 'C', text: 'Three' }, { key: 'D', text: 'Four' }],
+    options: [
+      { key: 'A', text: 'Risk-averse' },
+      { key: 'B', text: 'Open-Minded and Collaborative' },
+      { key: 'C', text: 'Passive observer' },
+      { key: 'D', text: 'Aggressive competitor' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Tom memiliki 3 apel lalu memberikan 1 apel kepada adiknya. 3 - 1 = 2 (Two).'
+    explanation: 'Actively listening to other perspectives and collaborating respectfully embodies the IB Learner Profile attribute of being "Open-Minded".'
   }
 ];

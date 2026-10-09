@@ -1,10 +1,12 @@
 import { QuestionItem } from './cbtQuestionTypes';
-import { createSimulasiSvg } from './simulasiSvgIllustrations';
+import { createPenyisihanSvg } from './simulasiSvgIllustrations';
 
-// SOAL RESMI BABAK PENYISIHAN: BAHASA INGGRIS KATEGORI PAUD/TK (Kategori A)
-// 20 Soal Resmi Pilihan Ganda dengan Kunci Jawaban Resmi & Ilustrasi Visual Berkualitas Tinggi
+// SOAL RESMI BABAK PENYISIHAN: BAHASA INGGRIS PAUD/TK (Kategori A)
+// 20 Soal Pilihan Ganda Kurikulum Campuran (Merdeka, Cambridge, Singapore, IB)
+// Tingkat Kesulitan: Menengah | 100% Bergambar & Unik
 
 export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
+  // --- KURIKULUM MERDEKA (Soal 1 - 5) ---
   {
     id: 'PENY-A-ENG-01',
     number: 1,
@@ -13,39 +15,24 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     level: 'PAUD/TK',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What color is the sun usually?',
+    difficulty: 'Menengah',
+    questionText: 'Look at the picture! What color is this fresh sunflower? (Warna bunga matahari)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Sun Color',
-        '#F59E0B',
-        `<g transform="translate(130, 15)">
-          <circle cx="70" cy="70" r="42" fill="#FBBF24" stroke="#F59E0B" stroke-width="4"/>
-          <line x1="70" y1="12" x2="70" y2="24" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="70" y1="116" x2="70" y2="128" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="12" y1="70" x2="24" y2="70" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="116" y1="70" x2="128" y2="70" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="28" y1="28" x2="38" y2="38" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="102" y1="102" x2="112" y2="112" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="28" y1="112" x2="38" y2="102" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <line x1="102" y1="38" x2="112" y2="28" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="58" cy="62" r="5" fill="#78350F"/>
-          <circle cx="82" cy="62" r="5" fill="#78350F"/>
-          <path d="M 58 76 Q 70 88 82 76" stroke="#78350F" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <text x="70" y="104" font-size="12" font-weight="900" fill="#B45309" text-anchor="middle">SUN</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Colors', 'Yellow Sunflower', '#EAB308',
+        `<g transform="translate(110, 20)">
+          <text x="50" y="65" font-size="44">🌻</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#CA8A04">Y E L L O W</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#854D0E" text-anchor="middle">Bright Sunflower</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Blue' },
-      { key: 'B', text: 'Yellow' },
-      { key: 'C', text: 'Green' },
-      { key: 'D', text: 'Purple' }
+      { key: 'A', text: 'Yellow (Kuning)' },
+      { key: 'B', text: 'Blue (Biru)' },
+      { key: 'C', text: 'Red (Merah)' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Matahari pada umumnya tampak berwarna kuning cerah (Yellow).'
+    correctAnswer: 'A',
+    explanation: 'Bunga matahari berwarna kuning cerah, dalam bahasa Inggris adalah "Yellow".'
   },
   {
     id: 'PENY-A-ENG-02',
@@ -55,38 +42,24 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     level: 'PAUD/TK',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is “kucing” in English?',
+    difficulty: 'Menengah',
+    questionText: 'What is this friendly pet that says "Meow"? (Hewan peliharaan lucu)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Animals: Kucing',
-        '#EC4899',
-        `<g transform="translate(130, 15)">
-          <circle cx="70" cy="72" r="42" fill="#FCE7F3" stroke="#EC4899" stroke-width="3"/>
-          <polygon points="40,46 30,16 60,34" fill="#F472B6" stroke="#DB2777" stroke-width="2"/>
-          <polygon points="100,46 110,16 80,34" fill="#F472B6" stroke="#DB2777" stroke-width="2"/>
-          <circle cx="56" cy="66" r="5" fill="#831843"/>
-          <circle cx="84" cy="66" r="5" fill="#831843"/>
-          <polygon points="70,76 65,72 75,72" fill="#DB2777"/>
-          <path d="M 70 76 Q 64 84 56 82 M 70 76 Q 76 84 84 82" stroke="#831843" stroke-width="2.5" fill="none"/>
-          <line x1="32" y1="72" x2="50" y2="74" stroke="#DB2777" stroke-width="2"/>
-          <line x1="30" y1="80" x2="50" y2="78" stroke="#DB2777" stroke-width="2"/>
-          <line x1="108" y1="72" x2="90" y2="74" stroke="#DB2777" stroke-width="2"/>
-          <line x1="110" y1="80" x2="90" y2="78" stroke="#DB2777" stroke-width="2"/>
-          <text x="70" y="104" font-size="13" font-weight="900" fill="#BE185D" text-anchor="middle">CAT</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Animals', 'Cute Pet Cat', '#0284C7',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🐱</text>
+          <text x="120" y="65" font-size="30" font-weight="900" fill="#0284C7">C - A - T</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#0369A1" text-anchor="middle">Purring Pet</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Dog' },
-      { key: 'B', text: 'Cat' },
-      { key: 'C', text: 'Bird' },
-      { key: 'D', text: 'Fish' }
+      { key: 'A', text: 'Cat' },
+      { key: 'B', text: 'Cow' },
+      { key: 'C', text: 'Duck' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Kata bahasa Inggris untuk "kucing" adalah "Cat".'
+    correctAnswer: 'A',
+    explanation: 'Kucing dalam bahasa Inggris adalah "Cat".'
   },
   {
     id: 'PENY-A-ENG-03',
@@ -96,38 +69,24 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     level: 'PAUD/TK',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'How many fingers are on one hand?',
+    difficulty: 'Menengah',
+    questionText: 'Look at the classroom object! What do we use to carry our books to school?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Counting Fingers',
-        '#3B82F6',
-        `<g transform="translate(130, 10)">
-          <rect x="35" y="60" width="70" height="60" rx="16" fill="#BFDBFE" stroke="#3B82F6" stroke-width="3"/>
-          <rect x="20" y="55" width="22" height="36" rx="10" fill="#93C5FD" stroke="#2563EB" stroke-width="2" transform="rotate(-30 30 70)"/>
-          <rect x="42" y="20" width="14" height="48" rx="7" fill="#93C5FD" stroke="#2563EB" stroke-width="2"/>
-          <rect x="58" y="14" width="14" height="54" rx="7" fill="#93C5FD" stroke="#2563EB" stroke-width="2"/>
-          <rect x="74" y="20" width="14" height="48" rx="7" fill="#93C5FD" stroke="#2563EB" stroke-width="2"/>
-          <rect x="90" y="32" width="13" height="38" rx="6" fill="#93C5FD" stroke="#2563EB" stroke-width="2"/>
-          <circle cx="20" cy="52" r="8" fill="#1D4ED8"/><text x="20" y="56" font-size="10" font-weight="900" fill="#FFF" text-anchor="middle">1</text>
-          <circle cx="49" cy="14" r="8" fill="#1D4ED8"/><text x="49" y="18" font-size="10" font-weight="900" fill="#FFF" text-anchor="middle">2</text>
-          <circle cx="65" cy="8" r="8" fill="#1D4ED8"/><text x="65" y="12" font-size="10" font-weight="900" fill="#FFF" text-anchor="middle">3</text>
-          <circle cx="81" cy="14" r="8" fill="#1D4ED8"/><text x="81" y="18" font-size="10" font-weight="900" fill="#FFF" text-anchor="middle">4</text>
-          <circle cx="97" cy="26" r="8" fill="#1D4ED8"/><text x="97" y="30" font-size="10" font-weight="900" fill="#FFF" text-anchor="middle">5</text>
-          <text x="70" y="100" font-size="16" font-weight="900" fill="#1E40AF" text-anchor="middle">5 FINGERS</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · School Bag', 'School Bag for Books', '#9333EA',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🎒</text>
+          <text x="120" y="65" font-size="30" font-weight="900" fill="#7E22CE">B - A - G</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#6B21A8" text-anchor="middle">School Backpack</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Three' },
-      { key: 'B', text: 'Four' },
-      { key: 'C', text: 'Five' },
-      { key: 'D', text: 'Six' }
+      { key: 'A', text: 'Bag (Tas)' },
+      { key: 'B', text: 'Chair (Kursi)' },
+      { key: 'C', text: 'Table (Meja)' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Pada satu tangan manusia terdapat lima (Five) jari: ibu jari, telunjuk, tengah, manis, kelingking.'
+    correctAnswer: 'A',
+    explanation: 'Tas sekolah dalam bahasa Inggris adalah "Bag" (school bag/backpack).'
   },
   {
     id: 'PENY-A-ENG-04',
@@ -137,30 +96,26 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     level: 'PAUD/TK',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What do we say in the morning?',
+    difficulty: 'Menengah',
+    questionText: 'Count the red balloons! How many balloons are in the sky? (Jumlah balon udara)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Daily Greetings',
-        '#F97316',
-        `<g transform="translate(100, 15)">
-          <path d="M 10 95 Q 100 35 190 95 Z" fill="#FED7AA"/>
-          <circle cx="100" cy="50" r="30" fill="#F97316"/>
-          <rect x="0" y="85" width="200" height="20" fill="#84CC16" rx="4"/>
-          <text x="100" y="120" font-size="14" font-weight="900" fill="#C2410C" text-anchor="middle">GOOD MORNING 🌅</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Number Words', 'Four Red Balloons', '#DC2626',
+        `<g transform="translate(70, 20)">
+          <text x="30" y="65" font-size="36">🎈</text>
+          <text x="80" y="65" font-size="36">🎈</text>
+          <text x="130" y="65" font-size="36">🎈</text>
+          <text x="180" y="65" font-size="36">🎈</text>
+          <text x="110" y="115" font-size="13" font-weight="900" fill="#B91C1C" text-anchor="middle">Count: 1, 2, 3, 4</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Good night' },
-      { key: 'B', text: 'Good morning' },
-      { key: 'C', text: 'Goodbye' },
-      { key: 'D', text: 'Thank you' }
+      { key: 'A', text: 'Three balloons' },
+      { key: 'B', text: 'Four balloons' },
+      { key: 'C', text: 'Five balloons' }
     ],
     correctAnswer: 'B',
-    explanation: 'Ucapan salam saat pagi hari adalah "Good morning" (Selamat pagi).'
+    explanation: 'Terdapat 4 buah balon (Four balloons).'
   },
   {
     id: 'PENY-A-ENG-05',
@@ -170,37 +125,27 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     level: 'PAUD/TK',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which animal says “woof”?',
+    difficulty: 'Menengah',
+    questionText: 'Look at the smiling boy! Which body part does he use to SEE colorful toys? (Bagian tubuh untuk melihat)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Animal Sounds',
-        '#8B5CF6',
-        `<g transform="translate(120, 15)">
-          <circle cx="65" cy="70" r="38" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="3"/>
-          <ellipse cx="35" cy="55" rx="10" ry="24" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2"/>
-          <ellipse cx="95" cy="55" rx="10" ry="24" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2"/>
-          <circle cx="54" cy="66" r="4.5" fill="#4C1D95"/>
-          <circle cx="76" cy="66" r="4.5" fill="#4C1D95"/>
-          <ellipse cx="65" cy="76" rx="8" ry="6" fill="#5B21B6"/>
-          <rect x="110" y="25" width="60" height="32" rx="8" fill="#FBBF24"/>
-          <polygon points="110,40 100,45 110,48" fill="#FBBF24"/>
-          <text x="140" y="46" font-size="11" font-weight="900" fill="#78350F" text-anchor="middle">WOOF!</text>
-          <text x="65" y="125" font-size="13" font-weight="900" fill="#6D28D9" text-anchor="middle">DOG 🐶</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Body Parts', 'Eyes for Seeing', '#2563EB',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">👀</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#1D4ED8">E Y E S</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">Sense of Sight</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Cat' },
-      { key: 'B', text: 'Cow' },
-      { key: 'C', text: 'Dog' },
-      { key: 'D', text: 'Duck' }
+      { key: 'A', text: 'Eyes (Mata)' },
+      { key: 'B', text: 'Ears (Telinga)' },
+      { key: 'C', text: 'Nose (Hidung)' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Suara gonggongan "woof" adalah suara anjing (Dog).'
+    correctAnswer: 'A',
+    explanation: 'Mata dalam bahasa Inggris adalah "Eyes", digunakan untuk melihat (to see).'
   },
+
+  // --- CAMBRIDGE EARLY YEARS (Soal 6 - 10) ---
   {
     id: 'PENY-A-ENG-06',
     number: 6,
@@ -208,30 +153,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What color is grass?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Cambridge Phonics: What is the beginning letter sound of "SUN" (Matahari)?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Nature Colors: Grass',
-        '#10B981',
-        `<g transform="translate(110, 20)">
-          <path d="M 20 85 L 30 25 L 40 85 L 55 18 L 70 85 L 85 30 L 100 85 L 115 15 L 130 85 L 145 28 L 160 85 Z" fill="#22C55E" stroke="#15803D" stroke-width="2"/>
-          <rect x="10" y="85" width="160" height="15" fill="#16A34A" rx="4"/>
-          <text x="90" y="120" font-size="15" font-weight="900" fill="#15803D" text-anchor="middle">GREEN 🌿</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Phonics Sound', 'Letter Sound S for Sun', '#EA580C',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">☀️</text>
+          <text x="120" y="65" font-size="34" font-weight="900" fill="#EA580C">_ U N</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#9A3412" text-anchor="middle">Initial Letter Sound</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Green' },
-      { key: 'B', text: 'Red' },
-      { key: 'C', text: 'Black' },
-      { key: 'D', text: 'Pink' }
+      { key: 'A', text: 'Letter S' },
+      { key: 'B', text: 'Letter M' },
+      { key: 'C', text: 'Letter T' }
     ],
     correctAnswer: 'A',
-    explanation: 'Rumput pada umumnya berwarna hijau (Green).'
+    explanation: 'Kata "Sun" (matahari) diawali oleh huruf S dengan bunyi fonik /s/.'
   },
   {
     id: 'PENY-A-ENG-07',
@@ -240,31 +180,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is “apel” in English?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Look at the picture! The big brown animal that roars loudly in the forest is a ...',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Fruits: Apel',
-        '#EF4444',
-        `<g transform="translate(135, 15)">
-          <path d="M 50 25 C 20 25 10 55 10 75 C 10 100 35 110 50 110 C 65 110 90 100 90 75 C 90 55 80 25 50 25 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="2"/>
-          <path d="M 50 25 Q 52 10 60 5" stroke="#78350F" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-          <ellipse cx="65" cy="12" rx="10" ry="5" fill="#22C55E" transform="rotate(-20 65 12)"/>
-          <text x="50" y="75" font-size="12" font-weight="900" fill="#FFFFFF" text-anchor="middle">APPLE</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Wild Animals', 'King Lion', '#D97706',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🦁</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#B45309">L I O N</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#78350F" text-anchor="middle">King of the Jungle</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Apple' },
-      { key: 'B', text: 'Orange' },
-      { key: 'C', text: 'Banana' },
-      { key: 'D', text: 'Mango' }
+      { key: 'A', text: 'Lion (Singa)' },
+      { key: 'B', text: 'Rabbit (Kelinci)' },
+      { key: 'C', text: 'Fish (Ikan)' }
     ],
     correctAnswer: 'A',
-    explanation: 'Bahasa Inggris dari kata "apel" adalah "Apple".'
+    explanation: 'Singa dalam bahasa Inggris adalah "Lion".'
   },
   {
     id: 'PENY-A-ENG-08',
@@ -273,41 +207,26 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'How many eyes do you have?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Cambridge Social Phrases: When teacher enters the classroom in the morning, what do pupils say?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Body Parts: Eyes',
-        '#06B6D4',
-        `<g transform="translate(100, 20)">
-          <!-- Left Eye -->
-          <ellipse cx="50" cy="55" rx="35" ry="24" fill="#FFFFFF" stroke="#0891B2" stroke-width="3"/>
-          <circle cx="50" cy="55" r="14" fill="#0284C7"/>
-          <circle cx="50" cy="55" r="7" fill="#0F172A"/>
-          <circle cx="47" cy="51" r="3" fill="#FFFFFF"/>
-          <text x="50" y="24" font-size="13" font-weight="900" fill="#0891B2" text-anchor="middle">Eye 1</text>
-          
-          <!-- Right Eye -->
-          <ellipse cx="140" cy="55" rx="35" ry="24" fill="#FFFFFF" stroke="#0891B2" stroke-width="3"/>
-          <circle cx="140" cy="55" r="14" fill="#0284C7"/>
-          <circle cx="140" cy="55" r="7" fill="#0F172A"/>
-          <circle cx="137" cy="51" r="3" fill="#FFFFFF"/>
-          <text x="140" y="24" font-size="13" font-weight="900" fill="#0891B2" text-anchor="middle">Eye 2</text>
-          <text x="95" y="110" font-size="14" font-weight="900" fill="#0E7490" text-anchor="middle">TWO EYES (2)</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Classroom Greeting', 'Teacher Greeting', '#16A34A',
+        `<g transform="translate(90, 20)">
+          <text x="50" y="65" font-size="40">👩‍🏫</text>
+          <text x="110" y="65" font-size="26">💬</text>
+          <text x="160" y="65" font-size="40">👦👧</text>
+          <text x="105" y="115" font-size="12" font-weight="800" fill="#15803D" text-anchor="middle">Good Morning Teacher!</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'One' },
-      { key: 'B', text: 'Two' },
-      { key: 'C', text: 'Three' },
-      { key: 'D', text: 'Four' }
+      { key: 'A', text: 'Good morning, Teacher!' },
+      { key: 'B', text: 'Good night, Teacher!' },
+      { key: 'C', text: 'Goodbye, Teacher!' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Manusia memiliki 2 (Two) mata untuk melihat.'
+    correctAnswer: 'A',
+    explanation: 'Ucapan salam pagi hari kepada guru adalah "Good morning, Teacher!".'
   },
   {
     id: 'PENY-A-ENG-09',
@@ -316,31 +235,24 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“My name ___ Budi.”',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Opposite Word: An airplane flies UP high, while a submarine dives ...',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Self Introduction',
-        '#6366F1',
-        `<g transform="translate(110, 15)">
-          <circle cx="85" cy="40" r="26" fill="#FEE2E2"/>
-          <rect x="60" y="70" width="50" height="35" rx="8" fill="#4F46E5"/>
-          <rect x="20" y="105" width="130" height="30" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/>
-          <text x="85" y="125" font-size="12" font-weight="800" fill="#3730A3" text-anchor="middle">"My name is Budi"</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Opposites', 'Up vs Down Direction', '#0284C7',
+        `<g transform="translate(90, 20)">
+          <text x="40" y="45" font-size="34">✈️ UP (Atas)</text>
+          <text x="40" y="95" font-size="34">⚓ DOWN (Bawah)</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'am' },
-      { key: 'B', text: 'are' },
-      { key: 'C', text: 'is' },
-      { key: 'D', text: 'be' }
+      { key: 'A', text: 'Down' },
+      { key: 'B', text: 'Hot' },
+      { key: 'C', text: 'Fast' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Kata kerja bantu (to be) yang tepat untuk "My name" adalah "is". Kalimat lengkap: "My name is Budi."'
+    correctAnswer: 'A',
+    explanation: 'Lawan kata dari "Up" (ke atas) adalah "Down" (ke bawah).'
   },
   {
     id: 'PENY-A-ENG-10',
@@ -349,38 +261,28 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which one is a fruit?',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Healthy Habits: Which delicious fruit is rich in vitamin C and has a yellow peel? (Buah pisang)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Vocabulary: Fruit',
-        '#E11D48',
-        `<g transform="translate(90, 20)">
-          <!-- Apple (Fruit) -->
-          <circle cx="50" cy="50" r="30" fill="#EF4444"/>
-          <text x="50" y="55" font-size="11" font-weight="900" fill="#FFF" text-anchor="middle">APPLE</text>
-          <text x="50" y="95" font-size="11" font-weight="bold" fill="#15803D" text-anchor="middle">✓ FRUIT</text>
-          
-          <!-- Chair (Furniture) -->
-          <rect x="130" y="30" width="30" height="35" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
-          <line x1="135" y1="65" x2="135" y2="85" stroke="#64748B" stroke-width="3"/>
-          <line x1="155" y1="65" x2="155" y2="85" stroke="#64748B" stroke-width="3"/>
-          <text x="145" y="95" font-size="11" font-weight="bold" fill="#94A3B8" text-anchor="middle">CHAIR</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Fruits', 'Yellow Banana', '#CA8A04',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🍌</text>
+          <text x="120" y="65" font-size="26" font-weight="900" fill="#A16207">B A N A N A</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#713F12" text-anchor="middle">Sweet Yellow Fruit</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Apple' },
-      { key: 'B', text: 'Chair' },
-      { key: 'C', text: 'Pencil' },
-      { key: 'D', text: 'Book' }
+      { key: 'A', text: 'Banana' },
+      { key: 'B', text: 'Tomato' },
+      { key: 'C', text: 'Carrot' }
     ],
     correctAnswer: 'A',
-    explanation: 'Apple (apel) adalah buah (fruit), sedangkan Chair (kursi), Pencil (pensil), dan Book (buku) adalah benda mati.'
+    explanation: 'Pisang dalam bahasa Inggris adalah "Banana".'
   },
+
+  // --- SINGAPORE EARLY LANGUAGE CURRICULUM (Soal 11 - 15) ---
   {
     id: 'PENY-A-ENG-11',
     number: 11,
@@ -388,29 +290,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the English word for “merah”?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Singapore CPA English: Complete the phrase. "A red ... that drives on the road." (Mobil merah)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Color: Merah',
-        '#DC2626',
-        `<g transform="translate(130, 15)">
-          <circle cx="70" cy="65" r="45" fill="#EF4444" stroke="#B91C1C" stroke-width="4"/>
-          <text x="70" y="72" font-size="20" font-weight="900" fill="#FFFFFF" text-anchor="middle">RED</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Vehicles', 'Red Car on Road', '#EF4444',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🚗</text>
+          <text x="120" y="65" font-size="30" font-weight="900" fill="#DC2626">C - A - R</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#991B1B" text-anchor="middle">Vehicle on Wheels</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Blue' },
-      { key: 'B', text: 'Yellow' },
-      { key: 'C', text: 'Red' },
-      { key: 'D', text: 'Green' }
+      { key: 'A', text: 'Car' },
+      { key: 'B', text: 'Boat' },
+      { key: 'C', text: 'Plane' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Warna "merah" dalam bahasa Inggris disebut "Red".'
+    correctAnswer: 'A',
+    explanation: 'Mobil dalam bahasa Inggris adalah "Car".'
   },
   {
     id: 'PENY-A-ENG-12',
@@ -419,35 +317,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What animal can swim?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Look at the shape! Which word describes this shape with three corners? (Segitiga)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Animals: Swimming',
-        '#0284C7',
-        `<g transform="translate(120, 20)">
-          <!-- Fish -->
-          <ellipse cx="65" cy="55" rx="42" ry="26" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>
-          <polygon points="105,55 130,35 130,75" fill="#0284C7"/>
-          <circle cx="45" cy="48" r="5" fill="#0F172A"/>
-          <circle cx="43" cy="46" r="2" fill="#FFFFFF"/>
-          <circle cx="25" cy="38" r="4" fill="#E0F2FE"/>
-          <circle cx="18" cy="25" r="3" fill="#E0F2FE"/>
-          <text x="70" y="105" font-size="14" font-weight="900" fill="#0369A1" text-anchor="middle">FISH CAN SWIM 🐟</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Shapes', 'Triangle Shape', '#2563EB',
+        `<g transform="translate(100, 20)">
+          <polygon points="50,25 20,85 80,85" fill="#BFDBFE" stroke="#1D4ED8" stroke-width="3"/>
+          <text x="140" y="65" font-size="20" font-weight="900" fill="#1E40AF">TRIANGLE</text>
+          <text x="95" y="115" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">3 Straight Sides</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Fish' },
-      { key: 'B', text: 'Cat' },
-      { key: 'C', text: 'Chicken' },
-      { key: 'D', text: 'Rabbit' }
+      { key: 'A', text: 'Triangle' },
+      { key: 'B', text: 'Circle' },
+      { key: 'C', text: 'Square' }
     ],
     correctAnswer: 'A',
-    explanation: 'Fish (ikan) adalah hewan yang hidup di air dan dapat berenang (can swim).'
+    explanation: 'Segitiga dalam bahasa Inggris adalah "Triangle".'
   },
   {
     id: 'PENY-A-ENG-13',
@@ -456,37 +344,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is the number after 3?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Action Word (Verb): What is the happy frog doing on the pond leaf? (Melompat)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Number Sequence',
-        '#8B5CF6',
-        `<g transform="translate(70, 25)">
-          <circle cx="40" cy="50" r="24" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
-          <text x="40" y="58" font-size="20" font-weight="900" fill="#6D28D9" text-anchor="middle">2</text>
-          
-          <circle cx="110" cy="50" r="24" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
-          <text x="110" y="58" font-size="20" font-weight="900" fill="#6D28D9" text-anchor="middle">3</text>
-          
-          <line x1="140" y1="50" x2="170" y2="50" stroke="#7C3AED" stroke-width="3" stroke-dasharray="4"/>
-          
-          <circle cx="200" cy="50" r="28" fill="#FBBF24" stroke="#D97706" stroke-width="3"/>
-          <text x="200" y="60" font-size="24" font-weight="900" fill="#78350F" text-anchor="middle">4</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Action Words', 'Frog Jumping', '#16A34A',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🐸</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#15803D">J U M P</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#14532D" text-anchor="middle">Hopping Action</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: '2' },
-      { key: 'B', text: '4' },
-      { key: 'C', text: '5' },
-      { key: 'D', text: '6' }
+      { key: 'A', text: 'Jump (Melompat)' },
+      { key: 'B', text: 'Sleep (Tidur)' },
+      { key: 'C', text: 'Read (Membaca)' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Setelah angka 3 (Three) adalah angka 4 (Four).'
+    correctAnswer: 'A',
+    explanation: 'Katak bergerak dengan cara melompat (Jump).'
   },
   {
     id: 'PENY-A-ENG-14',
@@ -495,32 +371,26 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which body part do we use to see?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Time of Day: When the silver moon and bright stars appear in the dark sky, it is ...',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Five Senses: Sight',
-        '#0284C7',
-        `<g transform="translate(130, 15)">
-          <ellipse cx="70" cy="65" rx="55" ry="32" fill="#FFFFFF" stroke="#0284C7" stroke-width="4"/>
-          <circle cx="70" cy="65" r="20" fill="#0EA5E9"/>
-          <circle cx="70" cy="65" r="10" fill="#0F172A"/>
-          <circle cx="66" cy="60" r="4" fill="#FFFFFF"/>
-          <text x="70" y="115" font-size="14" font-weight="900" fill="#0369A1" text-anchor="middle">EYE (MATA) 👀</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Day and Night', 'Night Sky with Moon', '#312E81',
+        `<g transform="translate(100, 20)">
+          <rect x="20" y="20" width="160" height="75" rx="12" fill="#1E1B4B"/>
+          <text x="60" y="65" font-size="36">🌙</text>
+          <text x="120" y="65" font-size="28">⭐✨</text>
+          <text x="100" y="120" font-size="12" font-weight="900" fill="#312E81" text-anchor="middle">Dark Sky Time</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Nose' },
-      { key: 'B', text: 'Ear' },
-      { key: 'C', text: 'Eye' },
-      { key: 'D', text: 'Hand' }
+      { key: 'A', text: 'Night (Malam)' },
+      { key: 'B', text: 'Morning (Pagi)' },
+      { key: 'C', text: 'Afternoon (Siang)' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Bagian tubuh yang kita gunakan untuk melihat (to see) adalah mata (Eye).'
+    correctAnswer: 'A',
+    explanation: 'Saat bulan dan bintang tampak di langit gelap adalah waktu malam hari (Night).'
   },
   {
     id: 'PENY-A-ENG-15',
@@ -529,32 +399,32 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What do you say when someone helps you?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Preposition of Place: Where is the red ball? (Bola berada di atas meja)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Good Manners',
-        '#10B981',
-        `<g transform="translate(90, 20)">
-          <rect x="20" y="20" width="180" height="55" rx="14" fill="#ECFDF5" stroke="#10B981" stroke-width="3"/>
-          <polygon points="110,75 100,90 120,75" fill="#ECFDF5"/>
-          <text x="110" y="55" font-size="16" font-weight="900" fill="#047857" text-anchor="middle">“THANK YOU!” 🙏</text>
-          <text x="110" y="110" font-size="12" font-weight="bold" fill="#065F46" text-anchor="middle">Say when helped</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Prepositions', 'Ball ON the Table', '#059669',
+        `<g transform="translate(110, 20)">
+          <!-- Bola di atas meja -->
+          <circle cx="80" cy="35" r="14" fill="#EF4444"/>
+          <!-- Meja -->
+          <rect x="30" y="50" width="100" height="10" rx="3" fill="#D97706"/>
+          <line x1="45" y1="60" x2="45" y2="90" stroke="#B45309" stroke-width="4"/>
+          <line x1="115" y1="60" x2="115" y2="90" stroke="#B45309" stroke-width="4"/>
+          <text x="80" y="115" font-size="12" font-weight="800" fill="#047857" text-anchor="middle">ON the table</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Sorry' },
-      { key: 'B', text: 'Goodbye' },
-      { key: 'C', text: 'Thank you' },
-      { key: 'D', text: 'Good night' }
+      { key: 'A', text: 'ON the table (Di atas meja)' },
+      { key: 'B', text: 'UNDER the table (Di bawah meja)' },
+      { key: 'C', text: 'IN the box (Di dalam kotak)' }
     ],
-    correctAnswer: 'C',
-    explanation: 'Saat seseorang membantu kita, ungkapan sopan yang kita katakan adalah "Thank you" (Terima kasih).'
+    correctAnswer: 'A',
+    explanation: 'Bola diletakkan menempel di permukaan atas meja (ON the table).'
   },
+
+  // --- INTERNATIONAL BACCALAUREATE (IB PYP) (Soal 16 - 20) ---
   {
     id: 'PENY-A-ENG-16',
     number: 16,
@@ -562,32 +432,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Which one is a school object?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'IB Caring for Animals: What do pet dogs love to eat? (Makanan kesukaan anjing peliharaan)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'School Supplies',
-        '#F59E0B',
-        `<g transform="translate(110, 15)">
-          <polygon points="30,85 130,25 145,35 45,95" fill="#FBBF24" stroke="#D97706" stroke-width="2"/>
-          <polygon points="20,95 30,85 45,95" fill="#FED7AA"/>
-          <circle cx="22" cy="93" r="3" fill="#1E293B"/>
-          <rect x="135" y="22" width="16" height="16" rx="3" fill="#F472B6" transform="rotate(30 143 30)"/>
-          <text x="90" y="118" font-size="14" font-weight="900" fill="#92400E" text-anchor="middle">PENCIL ✏️</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('IB PYP · Animal Needs', 'Dog and Bone', '#B45309',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🐶</text>
+          <text x="120" y="65" font-size="34">🦴</text>
+          <text x="85" y="115" font-size="12" font-weight="900" fill="#92400E" text-anchor="middle">Dog Loves Bone</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Pencil' },
-      { key: 'B', text: 'Banana' },
-      { key: 'C', text: 'Tiger' },
-      { key: 'D', text: 'Apple' }
+      { key: 'A', text: 'Bone (Tulang)' },
+      { key: 'B', text: 'Grass (Rumput)' },
+      { key: 'C', text: 'Leaves (Dedaunan)' }
     ],
     correctAnswer: 'A',
-    explanation: 'Pencil (pensil) adalah benda/alat perlengkapan sekolah (school object).'
+    explanation: 'Anjing menyukai tulang (Bone) atau makanan daging olahan khusus hewan.'
   },
   {
     id: 'PENY-A-ENG-17',
@@ -596,34 +459,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What is “anjing” in English?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'IB Social Interaction: When someone gives you a gift, what polite words do you say?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Animals: Anjing',
-        '#3B82F6',
-        `<g transform="translate(130, 15)">
-          <circle cx="70" cy="65" r="40" fill="#DBEAFE" stroke="#3B82F6" stroke-width="3"/>
-          <ellipse cx="40" cy="50" rx="9" ry="20" fill="#93C5FD"/>
-          <ellipse cx="100" cy="50" rx="9" ry="20" fill="#93C5FD"/>
-          <circle cx="58" cy="60" r="4.5" fill="#1E3A8A"/>
-          <circle cx="82" cy="60" r="4.5" fill="#1E3A8A"/>
-          <ellipse cx="70" cy="72" rx="7" ry="5" fill="#1D4ED8"/>
-          <text x="70" y="118" font-size="14" font-weight="900" fill="#1D4ED8" text-anchor="middle">DOG 🐕</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('IB PYP · Courtesy Words', 'Thank You Appreciation', '#DB2777',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🎁</text>
+          <text x="120" y="65" font-size="22" font-weight="900" fill="#BE185D">"Thank You!"</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#9D174D" text-anchor="middle">Gratitude & Politeness</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Cat' },
-      { key: 'B', text: 'Dog' },
-      { key: 'C', text: 'Horse' },
-      { key: 'D', text: 'Bird' }
+      { key: 'A', text: 'Thank you!' },
+      { key: 'B', text: 'Sorry!' },
+      { key: 'C', text: 'Stop!' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Kata bahasa Inggris untuk "anjing" adalah "Dog".'
+    correctAnswer: 'A',
+    explanation: 'Saat menerima pemberian atau hadiah, kita mengucapkan "Thank you!" (Terima kasih).'
   },
   {
     id: 'PENY-A-ENG-18',
@@ -632,32 +486,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Complete the sentence:\n“This is my ___.”\n👃',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'IB Family Concept: Who is the caring man who loves and guides us at home? (Ayah)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Face Parts: Nose',
-        '#EC4899',
-        `<g transform="translate(130, 15)">
-          <circle cx="70" cy="70" r="45" fill="#FDF2F8" stroke="#F472B6" stroke-width="2"/>
-          <!-- Nose Icon -->
-          <path d="M 68 40 L 78 72 Q 74 78 62 78 Q 54 78 54 72" stroke="#DB2777" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <ellipse cx="60" cy="74" rx="4" ry="2.5" fill="#BE185D"/>
-          <text x="70" y="112" font-size="15" font-weight="900" fill="#9D174D" text-anchor="middle">NOSE (HIDUNG) 👃</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('IB PYP · Family Member', 'Loving Father', '#0284C7',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">👨</text>
+          <text x="120" y="65" font-size="26" font-weight="900" fill="#0369A1">F A T H E R</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#075985" text-anchor="middle">Beloved Father</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Eye' },
-      { key: 'B', text: 'Nose' },
-      { key: 'C', text: 'Ear' },
-      { key: 'D', text: 'Hand' }
+      { key: 'A', text: 'Father (Ayah)' },
+      { key: 'B', text: 'Sister (Saudari)' },
+      { key: 'C', text: 'Baby (Bayi)' }
     ],
-    correctAnswer: 'B',
-    explanation: 'Gambar tersebut adalah hidung. Dalam bahasa Inggris adalah "Nose". Kalimat: "This is my nose."'
+    correctAnswer: 'A',
+    explanation: 'Ayah dalam bahasa Inggris adalah "Father".'
   },
   {
     id: 'PENY-A-ENG-19',
@@ -666,31 +513,25 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'What color is a banana usually?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'IB Weather Inquiry: Look at the sky! There are white clouds and rain falling down. What weather is it?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Banana Color',
-        '#FACC15',
-        `<g transform="translate(120, 20)">
-          <path d="M 30 75 Q 80 110 130 35 Q 85 80 30 75 Z" fill="#FDE047" stroke="#CA8A04" stroke-width="3"/>
-          <rect x="25" y="73" width="8" height="6" fill="#713F12" rx="2"/>
-          <rect x="127" y="32" width="7" height="6" fill="#854D0E" rx="2"/>
-          <text x="80" y="115" font-size="14" font-weight="900" fill="#A16207" text-anchor="middle">YELLOW 🍌</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('IB PYP · Weather Types', 'Rainy Weather Cloud', '#2563EB',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🌧️</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#1D4ED8">R A I N Y</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle">Rainy Weather</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'Yellow' },
-      { key: 'B', text: 'Blue' },
-      { key: 'C', text: 'Black' },
-      { key: 'D', text: 'Purple' }
+      { key: 'A', text: 'Rainy (Hujan)' },
+      { key: 'B', text: 'Sunny (Cerah)' },
+      { key: 'C', text: 'Windy (Berangin)' }
     ],
     correctAnswer: 'A',
-    explanation: 'Pisang matang pada umumnya berwarna kuning cerah (Yellow).'
+    explanation: 'Cuaca hujan saat air turun dari awan dalam bahasa Inggris adalah "Rainy".'
   },
   {
     id: 'PENY-A-ENG-20',
@@ -699,31 +540,24 @@ export const PENYISIHAN_A_ENGLISH: QuestionItem[] = [
     subject: 'Bahasa Inggris',
     level: 'PAUD/TK',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Choose the correct answer:\n“How are you?”',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'IB Music & Sound: Which musical instrument has keys that produce sweet melodies? (Piano)',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg(
-        'Penyisihan TK',
-        'Conversation: How are you?',
-        '#10B981',
-        `<g transform="translate(80, 20)">
-          <rect x="10" y="15" width="110" height="40" rx="10" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
-          <text x="65" y="40" font-size="11" font-weight="bold" fill="#0369A1" text-anchor="middle">"How are you?"</text>
-          
-          <rect x="140" y="45" width="110" height="40" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
-          <text x="195" y="70" font-size="11" font-weight="900" fill="#15803D" text-anchor="middle">"I am fine." ✓</text>
-        </g>`
-      );
+      const { svg, dataUri } = createPenyisihanSvg('IB PYP · Instruments', 'Musical Piano Instrument', '#4338CA',
+        `<g transform="translate(100, 20)">
+          <text x="50" y="65" font-size="44">🎹</text>
+          <text x="120" y="65" font-size="28" font-weight="900" fill="#3730A3">P I A N O</text>
+          <text x="85" y="115" font-size="12" font-weight="800" fill="#312E81" text-anchor="middle">Keyboard Melodies</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
     options: [
-      { key: 'A', text: 'I am fine.' },
-      { key: 'B', text: 'My name is Rina.' },
-      { key: 'C', text: 'Good night.' },
-      { key: 'D', text: 'Thank you.' }
+      { key: 'A', text: 'Piano' },
+      { key: 'B', text: 'Drum' },
+      { key: 'C', text: 'Flute' }
     ],
     correctAnswer: 'A',
-    explanation: 'Jawaban yang tepat saat ditanya "How are you?" (Bagaimana kabarmu?) adalah "I am fine." (Saya baik-baik saja).'
+    explanation: 'Alat musik tuts tuts piano dalam bahasa Inggris disebut "Piano".'
   }
 ];

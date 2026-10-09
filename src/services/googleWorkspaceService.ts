@@ -171,21 +171,30 @@ export async function exportParticipantsToGoogleSheet(
   const sheetData = await createRes.json();
   const spreadsheetId = sheetData.spreadsheetId;
   const spreadsheetUrl = sheetData.spreadsheetUrl;
+  const firstSheetTitle = sheetData.sheets?.[0]?.properties?.title || 'Sheet1';
 
-  // 2. Prepare Rows
+  // 2. Prepare Detailed Rows
   const headers = [
     'No',
     'No Peserta',
     'Nama Lengkap',
     'Nomor WhatsApp',
-    'Jenjang',
-    'Bidang Sains',
+    'Jenjang Kategori',
+    'Mata Pelajaran',
     'Asal Sekolah',
-    'Provinsi',
-    'Kab/Kota',
-    'Status Ujian',
-    'Nilai Terakhir',
-    'Tanggal Daftar'
+    'Kabupaten / Kota',
+    'Alamat Lengkap',
+    'Nama Wali Murid',
+    'Email Wali',
+    'Status CBT',
+    'Nilai Simulasi',
+    'Nilai Penyisihan',
+    'Nilai Final',
+    'Status Kelulusan',
+    'Status Tiket Final (Closing)',
+    'Rekomendasi Juara',
+    'Juara Ditetapkan Admin',
+    'Tanggal Terdaftar'
   ];
 
   const rows = participants.map((p, idx) => [
@@ -197,17 +206,25 @@ export async function exportParticipantsToGoogleSheet(
     p.subjects ? p.subjects.join(', ') : 'Matematika',
     p.schoolName || '-',
     p.cityProvince || '-',
-    p.cityProvince || '-',
-    p.finalExam ? `Final (Skor: ${p.finalExam.score})` : (p.simulatedExam ? `Simulasi (Skor: ${p.simulatedExam.score})` : 'Belum Ujian'),
-    p.finalExam ? p.finalExam.score : (p.simulatedExam ? p.simulatedExam.score : '-'),
+    p.fullAddress || '-',
+    p.parentName || '-',
+    p.email || '-',
+    p.cbtStatus || 'Aktif & Siap Ujian',
+    p.simulatedExam ? p.simulatedExam.score : '-',
+    p.penyisihanExam ? p.penyisihanExam.score : '-',
+    p.finalExam ? p.finalExam.score : '-',
+    p.qualificationStatus === 'lolos' ? 'LOLOS FINAL' : (p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'MENUNGGU HASIL'),
+    p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS (RP 99.000)' : 'BELUM BAYAR',
+    p.recommendedChampionRank || '-',
+    p.championRank || 'Belum Ditetapkan',
     p.registeredAt ? new Date(p.registeredAt).toLocaleString('id-ID') : '-'
   ]);
 
   const values = [headers, ...rows];
 
-  // 3. Append values
+  // 3. Append values to the resolved sheet
   const appendRes = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(firstSheetTitle)}!A1:append?valueInputOption=USER_ENTERED`,
     {
       method: 'POST',
       headers: {

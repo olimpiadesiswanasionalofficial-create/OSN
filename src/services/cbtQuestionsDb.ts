@@ -78,8 +78,32 @@ export function getAllQuestions(): QuestionItem[] {
     }
   }
 
-  inMemoryQuestions = result;
-  return result;
+  // Filter out any duplicate questions and any question lacking an image
+  const seenIds = new Set<string>();
+  const seenTexts = new Set<string>();
+  const sanitizedResult: QuestionItem[] = [];
+
+  for (const q of result) {
+    // Filter out questions without images (must have imageSvg or imageUrl)
+    if (!q.imageUrl && !q.imageSvg) {
+      continue;
+    }
+    // Filter out duplicate IDs
+    if (seenIds.has(q.id)) {
+      continue;
+    }
+    // Filter out duplicate question texts within category and subject
+    const textKey = `${q.category}_${q.subject}_${(q.questionText || '').trim().toLowerCase()}`;
+    if (seenTexts.has(textKey)) {
+      continue;
+    }
+    seenIds.add(q.id);
+    seenTexts.add(textKey);
+    sanitizedResult.push(q);
+  }
+
+  inMemoryQuestions = sanitizedResult;
+  return sanitizedResult;
 }
 
 export function saveAllQuestions(questions: QuestionItem[]): void {

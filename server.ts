@@ -526,10 +526,14 @@ app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
       p.cbtStatus = violationReason
         ? `Pelanggaran Final: ${violationReason}`
         : `Selesai Ujian Final (${score}/100)`;
-      if (score >= 90) p.championRank = 'Juara 1';
-      else if (score >= 80) p.championRank = 'Juara 2';
-      else if (score >= 70) p.championRank = 'Juara 3';
-      else p.championRank = 'Peserta Final';
+      if (score >= 90) p.recommendedChampionRank = 'Juara 1';
+      else if (score >= 80) p.recommendedChampionRank = 'Juara 2';
+      else if (score >= 70) p.recommendedChampionRank = 'Juara 3';
+      else p.recommendedChampionRank = 'Peserta Final';
+
+      if (!p.championRank || p.championRank === 'Belum Dinilai') {
+        p.championRank = 'Belum Ditetapkan';
+      }
     } else if (examType === 'penyisihan') {
       p.penyisihanExam = examInfo;
       p.penyisihanAttempts = (p.penyisihanAttempts || 0) + 1;

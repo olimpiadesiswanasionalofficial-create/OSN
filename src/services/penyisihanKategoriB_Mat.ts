@@ -1,10 +1,12 @@
 import { QuestionItem } from './cbtQuestionTypes';
-import { createSimulasiSvg } from './simulasiSvgIllustrations';
+import { createPenyisihanSvg } from './simulasiSvgIllustrations';
 
 // SOAL RESMI BABAK PENYISIHAN: MATEMATIKA SD/MI (Kategori B)
-// 20 Soal Pilihan Ganda Lengkap dengan Kunci Jawaban & Ilustrasi Visual
+// 20 Soal Pilihan Ganda Kurikulum Campuran (Merdeka, Cambridge, Singapore, IB)
+// Tingkat Kesulitan: Menengah | 100% Bergambar & Unik
 
 export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
+  // --- KURIKULUM MERDEKA (Soal 1 - 5) ---
   {
     id: 'PENY-B-MAT-01',
     number: 1,
@@ -13,16 +15,34 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: '25 + 14 = ...',
+    difficulty: 'Menengah',
+    questionText: 'Perhatikan model pecahan senilai berikut! Nilai pecahan yang ditunjukkan oleh daerah yang diarsir pada Gambar 1 dan Gambar 2 adalah setara. Berapakah nilai n pada gambar?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Operasi Penjumlahan', '#3B82F6',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/><text x="105" y="45" font-size="20" font-weight="900" fill="#1E40AF" text-anchor="middle">25 + 14 = 39</text><text x="105" y="70" font-size="12" font-weight="bold" fill="#3B82F6" text-anchor="middle">Penjumlahan Puluhan & Satuan</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Pecahan Senilai', 'Model Pecahan Senilai', '#2563EB',
+        `<g transform="translate(40, 15)">
+          <rect x="10" y="20" width="130" height="70" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <rect x="10" y="20" width="65" height="70" fill="#3B82F6"/>
+          <text x="75" y="115" font-size="12" font-weight="bold" fill="#1E40AF" text-anchor="middle">Gambar 1: 2/4 = 1/2</text>
+          
+          <text x="175" y="65" font-size="24" font-weight="bold" fill="#2563EB" text-anchor="middle">=</text>
+          
+          <rect x="210" y="20" width="130" height="70" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <rect x="210" y="20" width="65" height="70" fill="#60A5FA"/>
+          <line x1="242" y1="20" x2="242" y2="90" stroke="#FFFFFF" stroke-width="1.5"/>
+          <line x1="275" y1="20" x2="275" y2="90" stroke="#2563EB" stroke-width="1.5"/>
+          <line x1="307" y1="20" x2="307" y2="90" stroke="#FFFFFF" stroke-width="1.5"/>
+          <text x="275" y="115" font-size="12" font-weight="bold" fill="#1E40AF" text-anchor="middle">Gambar 2: n/8</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '38' }, { key: 'B', text: '39' }, { key: 'C', text: '40' }, { key: 'D', text: '41' }],
-    correctAnswer: 'B',
-    explanation: '25 + 14 = (20 + 10) + (5 + 4) = 30 + 9 = 39.'
+    options: [
+      { key: 'A', text: 'n = 2' },
+      { key: 'B', text: 'n = 3' },
+      { key: 'C', text: 'n = 4' },
+      { key: 'D', text: 'n = 5' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Daerah terarsir pada Gambar 1 bernilai 2/4 atau 1/2. Pecahan senilai dengan penyebut 8 adalah 1/2 = 4/8, sehingga nilai n = 4.'
   },
   {
     id: 'PENY-B-MAT-02',
@@ -32,16 +52,28 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: '50 - 20 = ...',
+    difficulty: 'Menengah',
+    questionText: 'Sebuah taman kota berbentuk bangun datar gabungan seperti pada sketsa gambar. Berapakah luas total taman tersebut?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Operasi Pengurangan', '#EF4444',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FEF2F2" stroke="#EF4444" stroke-width="2"/><text x="105" y="45" font-size="20" font-weight="900" fill="#991B1B" text-anchor="middle">50 - 20 = 30</text><text x="105" y="70" font-size="12" font-weight="bold" fill="#EF4444" text-anchor="middle">Pengurangan Puluhan Bersih</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Geometri', 'Luas Bangun Datar Gabungan', '#16A34A',
+        `<g transform="translate(60, 10)">
+          <!-- Persegi panjang bawah -->
+          <rect x="40" y="45" width="200" height="60" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+          <!-- Persegi atas -->
+          <rect x="90" y="5" width="100" height="40" fill="#BBF7D0" stroke="#16A34A" stroke-width="2"/>
+          <text x="140" y="28" font-size="11" font-weight="bold" fill="#15803D" text-anchor="middle">Bagian A: 10 m × 4 m</text>
+          <text x="140" y="80" font-size="11" font-weight="bold" fill="#15803D" text-anchor="middle">Bagian B: 20 m × 6 m</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '20' }, { key: 'B', text: '25' }, { key: 'C', text: '30' }, { key: 'D', text: '35' }],
-    correctAnswer: 'C',
-    explanation: '50 dikurangi 20 menghasilkan 30.'
+    options: [
+      { key: 'A', text: '140 m²' },
+      { key: 'B', text: '160 m²' },
+      { key: 'C', text: '180 m²' },
+      { key: 'D', text: '200 m²' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Luas Bagian A = 10 m × 4 m = 40 m². Luas Bagian B = 20 m × 6 m = 120 m². Luas total = 40 m² + 120 m² = 160 m².'
   },
   {
     id: 'PENY-B-MAT-03',
@@ -51,16 +83,28 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Lambang bilangan dari tiga ratus lima puluh adalah ...',
+    difficulty: 'Menengah',
+    questionText: 'Lampu hias merah menyala setiap 6 detik sekali, sedangkan lampu hijau menyala setiap 8 detik sekali. Jika kedua lampu menyala bersamaan pada detik ke-0, pada detik ke berapa kedua lampu akan menyala bersamaan lagi untuk pertama kali?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Lambang Bilangan Ratusan', '#F59E0B',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2"/><text x="105" y="45" font-size="22" font-weight="900" fill="#B45309" text-anchor="middle">350</text><text x="105" y="70" font-size="11" font-weight="bold" fill="#D97706" text-anchor="middle">"Tiga Ratus Lima Puluh"</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Bilangan (KPK)', 'Jadwal Nyala Lampu Bersama', '#D97706',
+        `<g transform="translate(50, 15)">
+          <circle cx="60" cy="50" r="30" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+          <text x="60" y="55" font-size="12" font-weight="bold" fill="#B91C1C" text-anchor="middle">Merah: 6s</text>
+          <circle cx="240" cy="50" r="30" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+          <text x="240" y="55" font-size="12" font-weight="bold" fill="#15803D" text-anchor="middle">Hijau: 8s</text>
+          <path d="M 100 50 Q 150 20 200 50" fill="none" stroke="#D97706" stroke-width="2" stroke-dasharray="4"/>
+          <text x="150" y="75" font-size="12" font-weight="800" fill="#B45309" text-anchor="middle">KPK (6, 8) = ?</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '305' }, { key: 'B', text: '315' }, { key: 'C', text: '350' }, { key: 'D', text: '530' }],
+    options: [
+      { key: 'A', text: 'Detik ke-14' },
+      { key: 'B', text: 'Detik ke-18' },
+      { key: 'C', text: 'Detik ke-24' },
+      { key: 'D', text: 'Detik ke-48' }
+    ],
     correctAnswer: 'C',
-    explanation: 'Tiga ratus lima puluh ditulis 350 (3 ratusan + 5 puluhan + 0 satuan).'
+    explanation: 'Kelipatan persekutuan terkecil (KPK) dari 6 dan 8: Kelipatan 6 = {6, 12, 18, 24, ...}; Kelipatan 8 = {8, 16, 24, ...}. KPK = 24 detik.'
   },
   {
     id: 'PENY-B-MAT-04',
@@ -70,16 +114,40 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: '6 x 4 = ...',
+    difficulty: 'Menengah',
+    questionText: 'Diagram batang berikut menunjukkan data pengunjung perpustakaan sekolah selama 5 hari. Berapakah rata-rata (mean) pengunjung per hari?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Operasi Perkalian', '#10B981',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><text x="105" y="45" font-size="20" font-weight="900" fill="#065F46" text-anchor="middle">6 × 4 = 24</text><text x="105" y="70" font-size="12" font-weight="bold" fill="#059669" text-anchor="middle">6 + 6 + 6 + 6 = 24</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Statistika', 'Diagram Batang Pengunjung', '#7C3AED',
+        `<g transform="translate(60, 10)">
+          <!-- Sumbu X & Y -->
+          <line x1="20" y1="100" x2="280" y2="100" stroke="#6B7280" stroke-width="2"/>
+          <line x1="20" y1="10" x2="20" y2="100" stroke="#6B7280" stroke-width="2"/>
+          <!-- Batang Senin (30) -->
+          <rect x="40" y="55" width="25" height="45" fill="#C4B5FD"/>
+          <text x="52" y="115" font-size="10" font-weight="bold" fill="#4B5563" text-anchor="middle">Sen</text>
+          <!-- Batang Selasa (40) -->
+          <rect x="90" y="40" width="25" height="60" fill="#A78BFA"/>
+          <text x="102" y="115" font-size="10" font-weight="bold" fill="#4B5563" text-anchor="middle">Sel</text>
+          <!-- Batang Rabu (50) -->
+          <rect x="140" y="25" width="25" height="75" fill="#8B5CF6"/>
+          <text x="152" y="115" font-size="10" font-weight="bold" fill="#4B5563" text-anchor="middle">Rab</text>
+          <!-- Batang Kamis (35) -->
+          <rect x="190" y="48" width="25" height="52" fill="#7C3AED"/>
+          <text x="202" y="115" font-size="10" font-weight="bold" fill="#4B5563" text-anchor="middle">Kam</text>
+          <!-- Batang Jumat (45) -->
+          <rect x="240" y="32" width="25" height="68" fill="#6D28D9"/>
+          <text x="252" y="115" font-size="10" font-weight="bold" fill="#4B5563" text-anchor="middle">Jum</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '20' }, { key: 'B', text: '24' }, { key: 'C', text: '28' }, { key: 'D', text: '30' }],
+    options: [
+      { key: 'A', text: '38 siswa' },
+      { key: 'B', text: '40 siswa' },
+      { key: 'C', text: '42 siswa' },
+      { key: 'D', text: '45 siswa' }
+    ],
     correctAnswer: 'B',
-    explanation: '6 dikalikan 4 sama dengan 24.'
+    explanation: 'Total pengunjung = 30 + 40 + 50 + 35 + 45 = 200 siswa. Rata-rata = 200 / 5 hari = 40 siswa per hari.'
   },
   {
     id: 'PENY-B-MAT-05',
@@ -89,17 +157,29 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     level: 'SD/MI',
     stage: 'penyisihan',
     curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: '20 : 5 = ...',
+    difficulty: 'Menengah',
+    questionText: 'Sebuah bak penampungan air berbentuk kubus memiliki panjang rusuk bagian dalam 80 cm. Jika bak tersebut sudah terisi 3/4 bagian, berapa liter air yang ada di dalam bak?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Operasi Pembagian', '#8B5CF6',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="2"/><text x="105" y="45" font-size="20" font-weight="900" fill="#5B21B6" text-anchor="middle">20 ÷ 5 = 4</text><text x="105" y="70" font-size="12" font-weight="bold" fill="#7C3AED" text-anchor="middle">20 dibagi rata ke 5 kelompok</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Merdeka · Bangun Ruang', 'Volume Kubus 3/4 Terisi', '#0284C7',
+        `<g transform="translate(100, 10)">
+          <rect x="20" y="20" width="80" height="80" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+          <rect x="20" y="40" width="80" height="60" fill="#38BDF8" fill-opacity="0.6"/>
+          <text x="60" y="75" font-size="12" font-weight="bold" fill="#0369A1" text-anchor="middle">Air 3/4</text>
+          <text x="60" y="115" font-size="11" font-weight="bold" fill="#1E293B" text-anchor="middle">s = 80 cm</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '3' }, { key: 'B', text: '4' }, { key: 'C', text: '5' }, { key: 'D', text: '6' }],
+    options: [
+      { key: 'A', text: '256 liter' },
+      { key: 'B', text: '384 liter' },
+      { key: 'C', text: '420 liter' },
+      { key: 'D', text: '512 liter' }
+    ],
     correctAnswer: 'B',
-    explanation: '20 dibagi 5 sama dengan 4 karena 4 x 5 = 20.'
+    explanation: 'Volume total bak = s³ = 80 × 80 × 80 = 512.000 cm³ = 512 liter. Volume air (3/4 bagian) = 3/4 × 512 = 384 liter.'
   },
+
+  // --- CAMBRIDGE PRIMARY (Soal 6 - 10) ---
   {
     id: 'PENY-B-MAT-06',
     number: 6,
@@ -107,17 +187,30 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Angka 5 pada bilangan 258 menempati nilai tempat ...',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Look at the angle diagram on a straight line. Angle x and an angle of 65° form a linear pair on line AB. What is the value of angle x?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Nilai Tempat Bilangan', '#0284C7',
-        `<g transform="translate(90, 20)"><rect x="10" y="15" width="60" height="70" rx="8" fill="#E0F2FE"/><text x="40" y="45" font-size="20" font-weight="900" fill="#0369A1" text-anchor="middle">2</text><text x="40" y="70" font-size="9" fill="#0284C7" text-anchor="middle">Ratusan</text><rect x="80" y="15" width="60" height="70" rx="8" fill="#BAE6FD" stroke="#0284C7" stroke-width="2"/><text x="110" y="45" font-size="20" font-weight="900" fill="#0C4A6E" text-anchor="middle">5</text><text x="110" y="70" font-size="9" font-weight="bold" fill="#0284C7" text-anchor="middle">PULUHAN</text><rect x="150" y="15" width="60" height="70" rx="8" fill="#E0F2FE"/><text x="180" y="45" font-size="20" font-weight="900" fill="#0369A1" text-anchor="middle">8</text><text x="180" y="70" font-size="9" fill="#0284C7" text-anchor="middle">Satuan</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Angles', 'Angles on a Straight Line', '#DC2626',
+        `<g transform="translate(60, 20)">
+          <line x1="20" y1="80" x2="260" y2="80" stroke="#1E293B" stroke-width="3"/>
+          <line x1="140" y1="80" x2="210" y2="15" stroke="#DC2626" stroke-width="3"/>
+          <path d="M 170 80 A 30 30 0 0 0 162 60" fill="none" stroke="#DC2626" stroke-width="2"/>
+          <text x="180" y="65" font-size="12" font-weight="bold" fill="#DC2626">65°</text>
+          <path d="M 110 80 A 30 30 0 0 1 145 50" fill="none" stroke="#2563EB" stroke-width="2"/>
+          <text x="110" y="65" font-size="12" font-weight="bold" fill="#2563EB">x</text>
+          <text x="140" y="105" font-size="11" font-weight="bold" fill="#64748B" text-anchor="middle">Line AB = 180°</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Satuan' }, { key: 'B', text: 'Puluhan' }, { key: 'C', text: 'Ratusan' }, { key: 'D', text: 'Ribuan' }],
+    options: [
+      { key: 'A', text: '105°' },
+      { key: 'B', text: '115°' },
+      { key: 'C', text: '125°' },
+      { key: 'D', text: '135°' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Pada bilangan 258, angka 2 adalah ratusan (200), angka 5 adalah puluhan (50), dan angka 8 adalah satuan (8).'
+    explanation: 'Angles on a straight line add up to 180°. Therefore, x = 180° - 65° = 115°.'
   },
   {
     id: 'PENY-B-MAT-07',
@@ -126,17 +219,32 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Urutan bilangan berikut dari yang paling kecil adalah ...\n12, 8, 15, 5',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'A train departs from City A at 08:45 and arrives at City B at 11:15. How long did the journey take?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Mengurutkan Bilangan', '#F97316',
-        `<g transform="translate(85, 20)"><rect x="10" y="15" width="210" height="70" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="2"/><text x="115" y="45" font-size="16" font-weight="900" fill="#9A3412" text-anchor="middle">5  →  8  →  12  →  15</text><text x="115" y="70" font-size="11" font-weight="bold" fill="#EA580C" text-anchor="middle">Urutan Terkecil ke Terbesar</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Time Interval', 'Journey Elapsed Time', '#0D9488',
+        `<g transform="translate(60, 20)">
+          <rect x="20" y="20" width="100" height="60" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="2"/>
+          <text x="70" y="45" font-size="14" font-weight="900" fill="#0F766E" text-anchor="middle">08:45</text>
+          <text x="70" y="65" font-size="10" font-weight="bold" fill="#0D9488" text-anchor="middle">Departure</text>
+          
+          <line x1="130" y1="50" x2="170" y2="50" stroke="#0D9488" stroke-width="3" stroke-dasharray="4"/>
+          
+          <rect x="180" y="20" width="100" height="60" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="2"/>
+          <text x="230" y="45" font-size="14" font-weight="900" fill="#0F766E" text-anchor="middle">11:15</text>
+          <text x="230" y="65" font-size="10" font-weight="bold" fill="#0D9488" text-anchor="middle">Arrival</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '5, 8, 12, 15' }, { key: 'B', text: '8, 5, 12, 15' }, { key: 'C', text: '15, 12, 8, 5' }, { key: 'D', text: '5, 12, 8, 15' }],
-    correctAnswer: 'A',
-    explanation: 'Urutan dari nilai terkecil ke terbesar adalah 5, 8, 12, lalu 15.'
+    options: [
+      { key: 'A', text: '2 hours 15 minutes' },
+      { key: 'B', text: '2 hours 30 minutes' },
+      { key: 'C', text: '2 hours 45 minutes' },
+      { key: 'D', text: '3 hours' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'From 08:45 to 09:00 is 15 minutes. From 09:00 to 11:00 is 2 hours. From 11:00 to 11:15 is 15 minutes. Total = 2 hours + 15 min + 15 min = 2 hours 30 minutes.'
   },
   {
     id: 'PENY-B-MAT-08',
@@ -145,17 +253,26 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Bangun datar yang memiliki 4 sisi sama panjang dan 4 sudut siku-siku adalah ...',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Convert 3.75 into a mixed number in its simplest form. Which of the following is correct?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Geometri: Persegi', '#10B981',
-        `<g transform="translate(130, 20)"><rect x="20" y="20" width="70" height="70" rx="4" fill="#D1FAE5" stroke="#059669" stroke-width="3"/><text x="55" y="60" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle">PERSEGI</text><text x="55" y="75" font-size="9" fill="#047857" text-anchor="middle">4 sisi sama</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Number', 'Decimal to Mixed Number', '#4F46E5',
+        `<g transform="translate(80, 20)">
+          <rect x="20" y="20" width="200" height="60" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="120" y="48" font-size="18" font-weight="bold" fill="#3730A3" text-anchor="middle">3.75 = 3 + 75/100</text>
+          <text x="120" y="68" font-size="11" font-weight="bold" fill="#4F46E5" text-anchor="middle">Simplify fraction to lowest terms</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Segitiga' }, { key: 'B', text: 'Lingkaran' }, { key: 'C', text: 'Persegi' }, { key: 'D', text: 'Trapesium' }],
+    options: [
+      { key: 'A', text: '3 1/4' },
+      { key: 'B', text: '3 1/2' },
+      { key: 'C', text: '3 3/4' },
+      { key: 'D', text: '3 4/5' }
+    ],
     correctAnswer: 'C',
-    explanation: 'Persegi adalah bangun datar segiempat yang memiliki 4 sisi sama panjang dan 4 sudut siku-siku (90 derajat).'
+    explanation: '3.75 = 3 and 75/100. Simplifying 75/100 by dividing numerator and denominator by 25 yields 3/4. Thus, 3 3/4.'
   },
   {
     id: 'PENY-B-MAT-09',
@@ -164,17 +281,27 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Sedang',
-    questionText: 'Keliling sebuah persegi dengan panjang sisi 6 cm adalah ...',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'Look at the rectangle with perimeter 48 cm. If the width is 9 cm, what is the length of the rectangle?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Keliling Persegi', '#6366F1',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/><text x="105" y="42" font-size="14" font-weight="900" fill="#3730A3" text-anchor="middle">K = 4 × sisi = 4 × 6 cm</text><text x="105" y="68" font-size="16" font-weight="900" fill="#4F46E5" text-anchor="middle">K = 24 cm</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Perimeter', 'Perimeter of a Rectangle', '#EA580C',
+        `<g transform="translate(60, 15)">
+          <rect x="30" y="25" width="220" height="60" rx="6" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+          <text x="140" y="20" font-size="12" font-weight="bold" fill="#C2410C" text-anchor="middle">Length (L) = ?</text>
+          <text x="260" y="60" font-size="12" font-weight="bold" fill="#C2410C">9 cm</text>
+          <text x="140" y="60" font-size="13" font-weight="bold" fill="#9A3412" text-anchor="middle">Perimeter = 48 cm</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '12 cm' }, { key: 'B', text: '18 cm' }, { key: 'C', text: '24 cm' }, { key: 'D', text: '36 cm' }],
-    correctAnswer: 'C',
-    explanation: 'Rumus keliling persegi = 4 x sisi = 4 x 6 cm = 24 cm.'
+    options: [
+      { key: 'A', text: '12 cm' },
+      { key: 'B', text: '15 cm' },
+      { key: 'C', text: '18 cm' },
+      { key: 'D', text: '21 cm' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Perimeter = 2 × (Length + Width) = 48. Length + Width = 24. Length = 24 - 9 = 15 cm.'
   },
   {
     id: 'PENY-B-MAT-10',
@@ -183,18 +310,30 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Sedang',
-    questionText: 'Hasil dari 1/2 + 1/4 adalah ...',
+    curriculum: 'Cambridge Primary/Checkpoint',
+    difficulty: 'Menengah',
+    questionText: 'A recipe uses flour and sugar in the ratio 4 : 3. If Sarah uses 360 g of flour, how much sugar does she need?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Pecahan Dasar', '#EC4899',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FDF2F8" stroke="#EC4899" stroke-width="2"/><text x="105" y="42" font-size="15" font-weight="900" fill="#9D174D" text-anchor="middle">2/4 + 1/4 = 3/4</text><text x="105" y="68" font-size="11" font-weight="bold" fill="#DB2777" text-anchor="middle">Menyamakan Penyebut</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Cambridge · Ratio', 'Ratio of Flour to Sugar', '#10B981',
+        `<g transform="translate(60, 20)">
+          <rect x="20" y="20" width="120" height="30" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+          <text x="80" y="40" font-size="11" font-weight="bold" fill="#065F46" text-anchor="middle">Flour (4 parts) = 360g</text>
+          <rect x="20" y="60" width="90" height="30" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="65" y="80" font-size="11" font-weight="bold" fill="#92400E" text-anchor="middle">Sugar (3 parts) = ?</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '2/4' }, { key: 'B', text: '3/4' }, { key: 'C', text: '2/6' }, { key: 'D', text: '1/4' }],
+    options: [
+      { key: 'A', text: '240 g' },
+      { key: 'B', text: '270 g' },
+      { key: 'C', text: '300 g' },
+      { key: 'D', text: '320 g' }
+    ],
     correctAnswer: 'B',
-    explanation: '1/2 diubah menjadi 2/4. Maka 2/4 + 1/4 = 3/4.'
+    explanation: '4 parts = 360 g, so 1 part = 360 / 4 = 90 g. 3 parts of sugar = 3 × 90 g = 270 g.'
   },
+
+  // --- SINGAPORE CURRICULUM (Soal 11 - 15) ---
   {
     id: 'PENY-B-MAT-11',
     number: 11,
@@ -202,17 +341,32 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Jarum panjang menunjuk angka 12 dan jarum pendek menunjuk angka 3. Waktu tersebut menunjukkan pukul ...',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Using the Singapore Bar Model below: Ali and Ben have $180 altogether. Ali has twice as much money as Ben. How much money does Ali have?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Membaca Jam', '#14B8A6',
-        `<g transform="translate(130, 20)"><circle cx="55" cy="55" r="45" fill="#CCFBF1" stroke="#0F766E" stroke-width="3"/><line x1="55" y1="55" x2="55" y2="25" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/><line x1="55" y1="55" x2="80" y2="55" stroke="#0F766E" stroke-width="4" stroke-linecap="round"/><text x="55" y="115" font-size="12" font-weight="900" fill="#0F766E" text-anchor="middle">03.00 WIB</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Bar Model', 'Comparison Bar Model', '#8B5CF6',
+        `<g transform="translate(50, 15)">
+          <text x="30" y="35" font-size="12" font-weight="bold" fill="#6D28D9">Ali:</text>
+          <rect x="65" y="20" width="70" height="25" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="1.5"/>
+          <rect x="135" y="20" width="70" height="25" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="1.5"/>
+          
+          <text x="30" y="70" font-size="12" font-weight="bold" fill="#6D28D9">Ben:</text>
+          <rect x="65" y="55" width="70" height="25" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="1.5"/>
+          
+          <path d="M 215 20 C 235 20 235 80 215 80" fill="none" stroke="#6D28D9" stroke-width="2"/>
+          <text x="245" y="55" font-size="14" font-weight="bold" fill="#4C1D95">Total = $180</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '03.00' }, { key: 'B', text: '12.03' }, { key: 'C', text: '03.12' }, { key: 'D', text: '12.00' }],
-    correctAnswer: 'A',
-    explanation: 'Jarum panjang di angka 12 tepat menit ke-00 dan jarum pendek di angka 3 menunjukkan tepat pukul 03.00.'
+    options: [
+      { key: 'A', text: '$60' },
+      { key: 'B', text: '$90' },
+      { key: 'C', text: '$120' },
+      { key: 'D', text: '$140' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Total units = 2 units (Ali) + 1 unit (Ben) = 3 units. 3 units = $180, so 1 unit = $60. Ali has 2 units = 2 × $60 = $120.'
   },
   {
     id: 'PENY-B-MAT-12',
@@ -221,17 +375,35 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Ibu membeli 3 kantong jeruk. Setiap kantong berisi 8 buah jeruk. Berapa jumlah seluruh jeruk ibu?',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Look at the balance scale model. 3 identical cubes balance with 1 cube plus a 14 kg weight. What is the mass of one cube?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Soal Cerita Perkalian', '#F97316',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="2"/><text x="105" y="45" font-size="18" font-weight="900" fill="#9A3412" text-anchor="middle">3 × 8 = 24 Jeruk</text><text x="105" y="70" font-size="11" font-weight="bold" fill="#EA580C" text-anchor="middle">3 Kantong @ 8 Jeruk</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Balance Model', 'Algebraic Balance Scale', '#059669',
+        `<g transform="translate(60, 20)">
+          <!-- Balance beam -->
+          <line x1="20" y1="50" x2="260" y2="50" stroke="#334155" stroke-width="4"/>
+          <polygon points="140,50 130,85 150,85" fill="#64748B"/>
+          <!-- Left pan: 3 cubes -->
+          <rect x="40" y="25" width="20" height="20" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+          <rect x="65" y="25" width="20" height="20" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+          <rect x="90" y="25" width="20" height="20" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+          <text x="75" y="15" font-size="10" font-weight="bold" fill="#065F46" text-anchor="middle">3 cubes</text>
+          <!-- Right pan: 1 cube + 14 kg -->
+          <rect x="180" y="25" width="20" height="20" fill="#34D399" stroke="#059669" stroke-width="1.5"/>
+          <circle cx="225" cy="35" r="14" fill="#FDE047" stroke="#CA8A04" stroke-width="1.5"/>
+          <text x="225" y="39" font-size="9" font-weight="bold" fill="#854D0E" text-anchor="middle">14 kg</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '21 buah' }, { key: 'B', text: '22 buah' }, { key: 'C', text: '24 buah' }, { key: 'D', text: '28 buah' }],
+    options: [
+      { key: 'A', text: '5 kg' },
+      { key: 'B', text: '6 kg' },
+      { key: 'C', text: '7 kg' },
+      { key: 'D', text: '8 kg' }
+    ],
     correctAnswer: 'C',
-    explanation: 'Total jeruk = 3 kantong x 8 buah = 24 buah jeruk.'
+    explanation: 'Equation: 3c = c + 14. Subtract 1c from both sides: 2c = 14 kg, so c = 7 kg.'
   },
   {
     id: 'PENY-B-MAT-13',
@@ -240,17 +412,29 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Nilai tempat ratusan pada bilangan 1.425 ditempati oleh angka ...',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'A bookstore sells a storybook with an original price of $40 at a 25% discount. What is the discounted selling price of the book?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Nilai Tempat Ribuan', '#3B82F6',
-        `<g transform="translate(90, 20)"><rect x="10" y="15" width="200" height="70" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/><text x="110" y="45" font-size="20" font-weight="900" fill="#1E40AF" text-anchor="middle">1. 4 2 5</text><text x="110" y="70" font-size="11" font-weight="bold" fill="#2563EB" text-anchor="middle">4 menempati Ratusan (400)</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Percentage', 'Percentage Discount Model', '#E11D48',
+        `<g transform="translate(60, 20)">
+          <rect x="20" y="20" width="240" height="30" rx="4" fill="#FFE4E6" stroke="#E11D48" stroke-width="1.5"/>
+          <!-- 25% discount section -->
+          <rect x="200" y="20" width="60" height="30" fill="#FDA4AF"/>
+          <text x="230" y="40" font-size="11" font-weight="bold" fill="#9F1239" text-anchor="middle">25% Off</text>
+          <text x="110" y="40" font-size="11" font-weight="bold" fill="#BE123C" text-anchor="middle">75% Selling Price</text>
+          <text x="140" y="75" font-size="12" font-weight="bold" fill="#881337" text-anchor="middle">Original Price = $40 (100%)</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '1' }, { key: 'B', text: '4' }, { key: 'C', text: '2' }, { key: 'D', text: '5' }],
+    options: [
+      { key: 'A', text: '$28' },
+      { key: 'B', text: '$30' },
+      { key: 'C', text: '$32' },
+      { key: 'D', text: '$35' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Pada 1.425: angka 1 = ribuan, 4 = ratusan, 2 = puluhan, 5 = satuan.'
+    explanation: 'Discount amount = 25% × $40 = 1/4 × $40 = $10. Discounted price = $40 - $10 = $30.'
   },
   {
     id: 'PENY-B-MAT-14',
@@ -259,17 +443,27 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Bentuk pecahan desimal dari 1/2 adalah ...',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'A car travels at an average speed of 60 km/h. How many kilometers will the car travel in 2 hours and 30 minutes?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Konversi Pecahan Desimal', '#10B981',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><text x="105" y="45" font-size="18" font-weight="900" fill="#065F46" text-anchor="middle">1/2 = 0,5</text><text x="105" y="70" font-size="11" font-weight="bold" fill="#059669" text-anchor="middle">Setengah = Nol Koma Lima</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Speed & Distance', 'Speed, Distance, Time', '#0284C7',
+        `<g transform="translate(60, 20)">
+          <rect x="30" y="20" width="220" height="50" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="2"/>
+          <text x="140" y="42" font-size="12" font-weight="bold" fill="#0369A1" text-anchor="middle">Speed = 60 km/h</text>
+          <text x="140" y="60" font-size="12" font-weight="bold" fill="#0284C7" text-anchor="middle">Time = 2.5 hours (2 h 30 min)</text>
+          <text x="140" y="90" font-size="11" font-weight="800" fill="#075985" text-anchor="middle">Distance = Speed × Time</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '0,5' }, { key: 'B', text: '0,2' }, { key: 'C', text: '0,25' }, { key: 'D', text: '0,05' }],
-    correctAnswer: 'A',
-    explanation: '1 dibagi 2 = 0,5.'
+    options: [
+      { key: 'A', text: '120 km' },
+      { key: 'B', text: '140 km' },
+      { key: 'C', text: '150 km' },
+      { key: 'D', text: '160 km' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Distance = Speed × Time = 60 km/h × 2.5 hours = 150 km.'
   },
   {
     id: 'PENY-B-MAT-15',
@@ -278,18 +472,35 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Sedang',
-    questionText: 'Sebuah persegi panjang memiliki panjang 8 cm dan lebar 5 cm. Luas persegi panjang tersebut adalah ...',
+    curriculum: 'Singapore Curriculum',
+    difficulty: 'Menengah',
+    questionText: 'Mrs. Tan had some apples. She gave 2/5 of her apples to her neighbor and had 24 apples left. How many apples did Mrs. Tan have at first?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Luas Persegi Panjang', '#8B5CF6',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="2"/><text x="105" y="42" font-size="14" font-weight="900" fill="#5B21B6" text-anchor="middle">L = p × l = 8 × 5</text><text x="105" y="68" font-size="16" font-weight="900" fill="#7C3AED" text-anchor="middle">L = 40 cm²</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('Singapore · Fraction Model', 'Part-Whole Fraction Model', '#D97706',
+        `<g transform="translate(60, 20)">
+          <!-- 5 equal boxes -->
+          <rect x="20" y="20" width="40" height="35" fill="#FED7AA" stroke="#D97706" stroke-width="1.5"/>
+          <rect x="60" y="20" width="40" height="35" fill="#FED7AA" stroke="#D97706" stroke-width="1.5"/>
+          <text x="60" y="70" font-size="10" font-weight="bold" fill="#9A3412" text-anchor="middle">2/5 given</text>
+          
+          <rect x="100" y="20" width="40" height="35" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <rect x="140" y="20" width="40" height="35" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <rect x="180" y="20" width="40" height="35" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <text x="160" y="70" font-size="10" font-weight="bold" fill="#92400E" text-anchor="middle">3/5 left = 24 apples</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '26 cm²' }, { key: 'B', text: '40 cm²' }, { key: 'C', text: '13 cm²' }, { key: 'D', text: '35 cm²' }],
+    options: [
+      { key: 'A', text: '36 apples' },
+      { key: 'B', text: '40 apples' },
+      { key: 'C', text: '44 apples' },
+      { key: 'D', text: '48 apples' }
+    ],
     correctAnswer: 'B',
-    explanation: 'Luas persegi panjang = panjang x lebar = 8 cm x 5 cm = 40 cm².'
+    explanation: 'The remaining portion is 1 - 2/5 = 3/5. 3 units = 24 apples, so 1 unit = 24 / 3 = 8 apples. Total apples at first = 5 units = 5 × 8 = 40 apples.'
   },
+
+  // --- INTERNATIONAL BACCALAUREATE (IB PYP) (Soal 16 - 20) ---
   {
     id: 'PENY-B-MAT-16',
     number: 16,
@@ -297,17 +508,31 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Hasil dari 150 + 75 - 25 adalah ...',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'An inquiry team plans a class hydroponic garden with a budget of Rp 500.000. They spend 40% on nutrient kits, 35% on seed packets, and save the remainder. How much money is saved?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Operasi Campuran', '#F59E0B',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2"/><text x="105" y="45" font-size="18" font-weight="900" fill="#B45309" text-anchor="middle">150 + 50 = 200</text><text x="105" y="70" font-size="11" font-weight="bold" fill="#D97706" text-anchor="middle">Hitung Urut dari Kiri</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Real-world Budget', 'Budget Allocation Pie Chart', '#047857',
+        `<g transform="translate(60, 20)">
+          <!-- Circular budget representation -->
+          <circle cx="70" cy="50" r="35" fill="#ECFDF5" stroke="#047857" stroke-width="2"/>
+          <text x="70" y="45" font-size="10" font-weight="bold" fill="#065F46" text-anchor="middle">Nutrient 40%</text>
+          <text x="70" y="60" font-size="10" font-weight="bold" fill="#047857" text-anchor="middle">Seeds 35%</text>
+          
+          <rect x="130" y="25" width="130" height="50" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="195" y="45" font-size="11" font-weight="bold" fill="#15803D" text-anchor="middle">Saved = 25%</text>
+          <text x="195" y="62" font-size="10" font-weight="bold" fill="#16A34A" text-anchor="middle">Budget: Rp 500.000</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '190' }, { key: 'B', text: '195' }, { key: 'C', text: '200' }, { key: 'D', text: '205' }],
-    correctAnswer: 'C',
-    explanation: '150 + 75 = 225. Kemudian 225 - 25 = 200.'
+    options: [
+      { key: 'A', text: 'Rp 100.000' },
+      { key: 'B', text: 'Rp 125.000' },
+      { key: 'C', text: 'Rp 150.000' },
+      { key: 'D', text: 'Rp 175.000' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Remainder percentage = 100% - (40% + 35%) = 25%. Money saved = 25% × Rp 500.000 = 1/4 × Rp 500.000 = Rp 125.000.'
   },
   {
     id: 'PENY-B-MAT-17',
@@ -316,17 +541,35 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Bangun ruang yang memiliki 6 sisi berbentuk persegi yang sama besar dan sebangun adalah ...',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Investigate the geometric tessellation pattern shown. Pattern 1 has 1 square, Pattern 2 has 4 squares, and Pattern 3 has 9 squares. How many small squares will Pattern 6 have?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Bangun Ruang Kubus', '#0284C7',
-        `<g transform="translate(125, 20)"><polygon points="40,25 80,25 60,65 20,65" fill="#BAE6FD" stroke="#0284C7" stroke-width="2"/><polygon points="80,25 95,45 75,85 60,65" fill="#7DD3FC" stroke="#0284C7" stroke-width="2"/><polygon points="20,65 60,65 75,85 35,85" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/><text x="55" y="110" font-size="12" font-weight="900" fill="#0369A1" text-anchor="middle">KUBUS</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Pattern Investigation', 'Square Number Patterns', '#6366F1',
+        `<g transform="translate(60, 20)">
+          <!-- Pattern 1 -->
+          <rect x="20" y="40" width="20" height="20" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="30" y="75" font-size="10" font-weight="bold" fill="#4338CA" text-anchor="middle">P1 = 1</text>
+          <!-- Pattern 2 -->
+          <rect x="70" y="30" width="30" height="30" fill="#C7D2FE" stroke="#4F46E5" stroke-width="1.5"/>
+          <line x1="85" y1="30" x2="85" y2="60" stroke="#4F46E5"/>
+          <line x1="70" y1="45" x2="100" y2="45" stroke="#4F46E5"/>
+          <text x="85" y="75" font-size="10" font-weight="bold" fill="#4338CA" text-anchor="middle">P2 = 4</text>
+          <!-- Pattern 3 -->
+          <rect x="130" y="20" width="40" height="40" fill="#A5B4FC" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="150" y="75" font-size="10" font-weight="bold" fill="#4338CA" text-anchor="middle">P3 = 9</text>
+          <text x="210" y="50" font-size="12" font-weight="bold" fill="#312E81">P6 = n² = ?</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Kubus' }, { key: 'B', text: 'Balok' }, { key: 'C', text: 'Kerucut' }, { key: 'D', text: 'Tabung' }],
-    correctAnswer: 'A',
-    explanation: 'Kubus memiliki 6 sisi bujursangkar (persegi) yang berukuran sama besar.'
+    options: [
+      { key: 'A', text: '25 kotak' },
+      { key: 'B', text: '30 kotak' },
+      { key: 'C', text: '36 kotak' },
+      { key: 'D', text: '42 kotak' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'The pattern represents square numbers (n²): P1 = 1² = 1; P2 = 2² = 4; P3 = 3² = 9. For Pattern 6: 6² = 36 small squares.'
   },
   {
     id: 'PENY-B-MAT-18',
@@ -335,17 +578,29 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Doni mempunyai 15 kelereng, lalu diberi oleh paman 10 kelereng. Kemudian Doni memberikan 5 kelereng kepada adiknya. Sisa kelereng Doni sekarang adalah ...',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'In an environmental science project, a map has a scale of 1 : 50.000. If the distance between two mangrove reserves on the map is 6 cm, what is the actual distance in kilometers?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Soal Cerita Kelereng', '#10B981',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><text x="105" y="42" font-size="14" font-weight="900" fill="#065F46" text-anchor="middle">15 + 10 - 5 = 20</text><text x="105" y="68" font-size="16" font-weight="900" fill="#059669" text-anchor="middle">20 Kelereng</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Scale & Mapping', 'Scale Ratio 1 : 50.000', '#B45309',
+        `<g transform="translate(60, 20)">
+          <rect x="20" y="20" width="240" height="50" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+          <line x1="40" y1="45" x2="160" y2="45" stroke="#B45309" stroke-width="3"/>
+          <circle cx="40" cy="45" r="4" fill="#92400E"/>
+          <circle cx="160" cy="45" r="4" fill="#92400E"/>
+          <text x="100" y="38" font-size="11" font-weight="bold" fill="#B45309" text-anchor="middle">6 cm on map</text>
+          <text x="210" y="48" font-size="11" font-weight="bold" fill="#92400E">Actual = ? km</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '18 kelereng' }, { key: 'B', text: '20 kelereng' }, { key: 'C', text: '25 kelereng' }, { key: 'D', text: '30 kelereng' }],
+    options: [
+      { key: 'A', text: '2,5 km' },
+      { key: 'B', text: '3,0 km' },
+      { key: 'C', text: '3,5 km' },
+      { key: 'D', text: '4,0 km' }
+    ],
     correctAnswer: 'B',
-    explanation: '15 + 10 = 25. Lalu 25 - 5 = 20 kelereng.'
+    explanation: 'Actual distance = 6 cm × 50.000 = 300.000 cm. Converting to kilometers: 300.000 cm / 100.000 = 3,0 km.'
   },
   {
     id: 'PENY-B-MAT-19',
@@ -354,17 +609,32 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Bilangan genap yang terletak di antara 11 dan 15 adalah ...',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'Students spin an 8-sector fair spinner where 2 sectors are Blue, 3 are Green, 2 are Yellow, and 1 is Red. What is the probability of the spinner landing on Green?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Bilangan Genap', '#EC4899',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FDF2F8" stroke="#EC4899" stroke-width="2"/><text x="105" y="45" font-size="18" font-weight="900" fill="#9D174D" text-anchor="middle">12 dan 14</text><text x="105" y="70" font-size="11" font-weight="bold" fill="#DB2777" text-anchor="middle">Dapat Dibagi 2 Habis</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Probability Inquiry', 'Fair Probability Spinner', '#0D9488',
+        `<g transform="translate(60, 15)">
+          <circle cx="80" cy="50" r="35" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+          <line x1="80" y1="15" x2="80" y2="85" stroke="#0D9488"/>
+          <line x1="45" y1="50" x2="115" y2="50" stroke="#0D9488"/>
+          <line x1="55" y1="25" x2="105" y2="75" stroke="#0D9488"/>
+          <line x1="55" y1="75" x2="105" y2="25" stroke="#0D9488"/>
+          
+          <rect x="140" y="25" width="120" height="50" rx="8" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5"/>
+          <text x="200" y="45" font-size="11" font-weight="bold" fill="#0F766E" text-anchor="middle">Total sectors = 8</text>
+          <text x="200" y="62" font-size="11" font-weight="bold" fill="#115E59" text-anchor="middle">Green sectors = 3</text>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: '12 dan 13' }, { key: 'B', text: '12 dan 14' }, { key: 'C', text: '13 dan 14' }, { key: 'D', text: '13 dan 15' }],
-    correctAnswer: 'B',
-    explanation: 'Bilangan antara 11 dan 15 adalah 12, 13, 14. Dari bilangan tersebut, yang merupakan bilangan genap adalah 12 dan 14.'
+    options: [
+      { key: 'A', text: '1/8' },
+      { key: 'B', text: '2/8 atau 1/4' },
+      { key: 'C', text: '3/8' },
+      { key: 'D', text: '1/2' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Probability P(Green) = (Number of favorable outcomes) / (Total outcomes) = 3 / 8.'
   },
   {
     id: 'PENY-B-MAT-20',
@@ -373,16 +643,34 @@ export const PENYISIHAN_B_MATEMATIKA: QuestionItem[] = [
     subject: 'Matematika',
     level: 'SD/MI',
     stage: 'penyisihan',
-    curriculum: 'Kurikulum Merdeka',
-    difficulty: 'Mudah',
-    questionText: 'Dalam sebuah lomba lari, Andi membutuhkan waktu 45 detik, sedangkan Budi membutuhkan waktu 38 detik. Siapakah yang berlari lebih cepat?',
+    curriculum: 'International Baccalaureate (IB)',
+    difficulty: 'Menengah',
+    questionText: 'A science club conducted an experiment measuring plant height over 4 weeks: Week 1 (5 cm), Week 2 (9 cm), Week 3 (14 cm), Week 4 (20 cm). What was the greatest weekly growth in height?',
     ...(() => {
-      const { svg, dataUri } = createSimulasiSvg('Penyisihan SD', 'Perbandingan Waktu Lari', '#EAB308',
-        `<g transform="translate(100, 20)"><rect x="15" y="15" width="180" height="70" rx="10" fill="#FEFCE8" stroke="#EAB308" stroke-width="2"/><text x="105" y="42" font-size="14" font-weight="900" fill="#713F12" text-anchor="middle">Budi: 38 detik &lt; 45 detik</text><text x="105" y="68" font-size="16" font-weight="900" fill="#A16207" text-anchor="middle">Budi Lebih Cepat ⚡</text></g>`);
+      const { svg, dataUri } = createPenyisihanSvg('IB · Data Analysis', 'Weekly Growth Line Graph', '#15803D',
+        `<g transform="translate(60, 15)">
+          <line x1="20" y1="85" x2="240" y2="85" stroke="#64748B" stroke-width="2"/>
+          <line x1="20" y1="15" x2="20" y2="85" stroke="#64748B" stroke-width="2"/>
+          <!-- Points -->
+          <circle cx="50" cy="70" r="4" fill="#16A34A"/>
+          <text x="50" y="98" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">W1 (5cm)</text>
+          <circle cx="100" cy="55" r="4" fill="#16A34A"/>
+          <text x="100" y="98" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">W2 (9cm)</text>
+          <circle cx="150" cy="40" r="4" fill="#16A34A"/>
+          <text x="150" y="98" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">W3 (14cm)</text>
+          <circle cx="200" cy="20" r="4" fill="#16A34A"/>
+          <text x="200" y="98" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">W4 (20cm)</text>
+          <polyline points="50,70 100,55 150,40 200,20" fill="none" stroke="#16A34A" stroke-width="2"/>
+        </g>`);
       return { imageSvg: svg, imageUrl: dataUri };
     })(),
-    options: [{ key: 'A', text: 'Andi' }, { key: 'B', text: 'Budi' }, { key: 'C', text: 'Keduanya sama cepat' }, { key: 'D', text: 'Tidak dapat ditentukan' }],
-    correctAnswer: 'B',
-    explanation: 'Dalam lomba lari, pelari yang membutuhkan waktu lebih sedikit (38 detik < 45 detik) adalah yang berlari lebih cepat. Maka Budi yang lebih cepat.'
+    options: [
+      { key: 'A', text: '4 cm (W1 ke W2)' },
+      { key: 'B', text: '5 cm (W2 ke W3)' },
+      { key: 'C', text: '6 cm (W3 ke W4)' },
+      { key: 'D', text: '7 cm (W2 ke W4)' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Weekly growths: Week 1 to 2 = 9 - 5 = 4 cm; Week 2 to 3 = 14 - 9 = 5 cm; Week 3 to 4 = 20 - 14 = 6 cm. The greatest weekly growth was 6 cm.'
   }
 ];
