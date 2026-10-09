@@ -112,7 +112,7 @@ export const signInWithGoogleWorkspace = async (): Promise<{ user: User | any; a
     } else if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') {
       throw new Error('Proses login Google dibatalkan oleh pengguna.');
     } else if (code === 'auth/unauthorized-domain') {
-      throw new Error('Domain saat ini belum diizinkan pada Google Cloud Console / Firebase Auth. Silakan gunakan opsi token atau unduh format Google Sheets.');
+      throw new Error('Domain https://osn-one.vercel.app perlu ditambahkan ke Firebase Console > Authentication > Settings > Authorized Domains (atau Google Cloud Console OAuth Authorized JavaScript Origins: https://osn-one.vercel.app). Anda juga dapat langsung menggunakan opsi tempel Access Token Google Workspace di bawah.');
     }
     throw error;
   } finally {

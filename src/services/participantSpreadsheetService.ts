@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { ParticipantRecord, getAllParticipants, saveAllParticipants } from './participantDb';
+import { getAccessToken } from './googleWorkspaceService';
 
 export interface ParseResult {
   success: boolean;
@@ -343,29 +344,172 @@ export async function fetchAndParseSpreadsheetUrl(url: string): Promise<ParseRes
       };
     }
 
-    // Call server proxy to bypass CORS
-    const response = await fetch('/api/participants/fetch-spreadsheet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: trimmed })
-    });
+    let rows: any[] | null = null;
 
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || `Server merespon dengan status ${response.status}`);
+    // 1. Check if it's a Google Sheets link
+    const gSheetMatch = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    if (gSheetMatch) {
+      const sheetId = gSheetMatch[1];
+      const gidMatch = trimmed.match(/[#&?]gid=([0-9]+)/);
+      const gid = gidMatch ? gidMatch[1] : '0';
+
+      // 1A. Try Google Workspace OAuth API if user has connected Google account
+      try {
+        const token = await getAccessToken();
+        if (token) {
+          const apiRes = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:ZZ5000`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          if (apiRes.ok) {
+            const apiJson = await apiRes.json();
+            const values: any[][] = apiJson.values || [];
+            if (values.length > 1) {
+              const headers = values[0];
+              const parsedList = values.slice(1).map(row => {
+                const obj: Record<string, any> = {};
+                headers.forEach((h: string, colIdx: number) => {
+                  obj[h] = row[colIdx] ?? '';
+                });
+                return obj;
+              });
+              if (parsedList.length > 0) {
+                rows = parsedList;
+              }
+            }
+          }
+        }
+      } catch {
+        // Fallback to public methods
+      }
+
+      // 1B. Direct Google Visualization API (CSV format) - Official CORS support
+      if (!rows) {
+        try {
+          const gvizCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
+          const directRes = await fetch(gvizCsvUrl);
+          if (directRes.ok) {
+            const csvText = await directRes.text();
+            if (csvText && csvText.trim().length > 15 && !csvText.includes('<!DOCTYPE html>')) {
+              const workbook = XLSX.read(csvText, { type: 'string' });
+              if (workbook.SheetNames && workbook.SheetNames.length > 0) {
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const parsed = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: '' });
+                if (parsed.length > 0) {
+                  rows = parsed;
+                }
+              }
+            }
+          }
+        } catch {
+          // Proceed to next fallback
+        }
+      }
+
+      // 1C. Google Visualization API (JSON format)
+      if (!rows) {
+        try {
+          const gvizJsonUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+          const gvizRes = await fetch(gvizJsonUrl);
+          if (gvizRes.ok) {
+            const rawText = await gvizRes.text();
+            // Match json inside /*O_o*/ google.visualization.Query.setResponse({...});
+            const match = rawText.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+            if (match && match[1]) {
+              const parsedGviz = JSON.parse(match[1]);
+              const table = parsedGviz?.table;
+              if (table && Array.isArray(table.cols) && Array.isArray(table.rows)) {
+                const colNames = table.cols.map((c: any, idx: number) => c.label || c.id || `Col_${idx}`);
+                const parsedRows = table.rows.map((r: any) => {
+                  const rowObj: Record<string, any> = {};
+                  r.c.forEach((cell: any, cIdx: number) => {
+                    const colName = colNames[cIdx] || `Col_${cIdx}`;
+                    rowObj[colName] = cell?.v ?? cell?.f ?? '';
+                  });
+                  return rowObj;
+                });
+                if (parsedRows.length > 0) {
+                  rows = parsedRows;
+                }
+              }
+            }
+          }
+        } catch {
+          // Fallback below
+        }
+      }
     }
 
-    const resJson = await response.json();
-    if (!resJson.success || !Array.isArray(resJson.rows)) {
-      throw new Error(resJson.error || 'Gagal memproses data dari spreadsheet URL.');
+    // 2. Try server-side endpoints (/api/fetch-spreadsheet or /api/participants/fetch-spreadsheet)
+    if (!rows) {
+      const serverEndpoints = ['/api/fetch-spreadsheet', '/api/participants/fetch-spreadsheet'];
+      for (const endpoint of serverEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: trimmed })
+          });
+
+          // Check if response is JSON and ok
+          if (response.ok) {
+            const resJson = await response.json().catch(() => null);
+            if (resJson && resJson.success && Array.isArray(resJson.rows) && resJson.rows.length > 0) {
+              rows = resJson.rows;
+              break;
+            }
+          }
+        } catch {
+          // Silent fallback, do NOT expose 405 or internal network codes
+        }
+      }
     }
 
-    const { participants, warnings } = mapRowsToParticipants(resJson.rows);
+    // 3. Fallback to public CORS proxies
+    if (!rows) {
+      const proxyCandidates = [
+        `https://corsproxy.io/?url=${encodeURIComponent(trimmed)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(trimmed)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(trimmed)}`
+      ];
+
+      for (const proxyUrl of proxyCandidates) {
+        try {
+          const proxyRes = await fetch(proxyUrl);
+          if (proxyRes.ok) {
+            const text = await proxyRes.text();
+            if (text && text.trim().length > 20 && !text.includes('<!DOCTYPE html>')) {
+              const workbook = XLSX.read(text, { type: 'string' });
+              if (workbook.SheetNames && workbook.SheetNames.length > 0) {
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const parsed = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: '' });
+                if (parsed.length > 0) {
+                  rows = parsed;
+                  break;
+                }
+              }
+            }
+          }
+        } catch {
+          // Next candidate
+        }
+      }
+    }
+
+    if (!rows || rows.length === 0) {
+      throw new Error(
+        'Tidak dapat membaca spreadsheet dari link yang diberikan. Pastikan link Google Sheet disetel ke "Siapa saja yang memiliki link dapat melihat" (Anyone with the link can view), atau gunakan tab "Upload File Excel/CSV (.xlsx, .csv)" di samping untuk memproses file langsung.'
+      );
+    }
+
+    const { participants, warnings } = mapRowsToParticipants(rows);
 
     return {
       success: true,
       participants,
-      totalRawRows: resJson.rows.length,
+      totalRawRows: rows.length,
       validCount: participants.length,
       warnings,
       errors: []
@@ -391,22 +535,7 @@ export async function saveImportedParticipants(
   options: { mergeWithExisting: boolean } = { mergeWithExisting: true }
 ): Promise<{ success: boolean; total: number; inserted: number; updated: number; message: string }> {
   try {
-    // 1. Send to server bulk endpoint for permanent storage
-    const serverRes = await fetch('/api/participants/bulk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        participants: newParticipants,
-        mode: options.mergeWithExisting ? 'merge' : 'replace'
-      })
-    });
-
-    let serverData: any = null;
-    if (serverRes.ok) {
-      serverData = await serverRes.json();
-    }
-
-    // 2. Also update local storage immediately
+    // 1. Update local storage immediately first so participants can login immediately
     const existing = getAllParticipants();
     const map = new Map<string, ParticipantRecord>();
 
@@ -439,6 +568,24 @@ export async function saveImportedParticipants(
 
     const finalMerged = Array.from(map.values());
     saveAllParticipants(finalMerged);
+
+    // 2. Also sync to server in background (safe against 405 or network offline)
+    let serverData: any = null;
+    try {
+      const serverRes = await fetch('/api/participants/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participants: newParticipants,
+          mode: options.mergeWithExisting ? 'merge' : 'replace'
+        })
+      });
+      if (serverRes.ok) {
+        serverData = await serverRes.json().catch(() => null);
+      }
+    } catch {
+      // Ignored: local storage is already safely populated
+    }
 
     return {
       success: true,

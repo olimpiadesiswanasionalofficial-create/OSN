@@ -57,189 +57,8 @@ export interface ParticipantRecord {
 
 const STORAGE_KEY = 'osn_participants_database_2026';
 
-// Initial pre-registered mock data for demonstration
-export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
-  {
-    id: "OSN-2026-B-89102",
-    fullName: "Dzaliqa Assyafa N",
-    level: "SD / MI (Kategori B: Usia 7-12 Tahun)",
-    schoolName: "SDN Teladan Bangsa (Kelas 5)",
-    cityProvince: "DKI Jakarta",
-    whatsapp: "08123456781",
-    email: "dzaliqa.assyafa@gmail.com",
-    parentName: "H. Nurhadi Santoso",
-    fullAddress: "Jl. Tebet Barat Dalam No. 14, Tebet, Jakarta Selatan",
-    subjects: ["Matematika", "IPA / Sains"],
-    registeredAt: "2026-09-20T08:30:00.000Z",
-    cbtStatus: "Tiket Final Lunas (Closing BCA Rp 99.000)",
-    qualificationStatus: 'lolos',
-    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
-    finalTicketPaymentStatus: 'paid_closing',
-    finalTicketPaidAt: "2026-09-22T13:10:00.000Z",
-    finalTicketAmount: 99000,
-    championRank: 'Juara 2',
-    certificateIssuedDate: "2026-09-23T16:00:00.000Z",
-    simulatedAttempts: 1,
-    penyisihanAttempts: 1,
-    finalAttempts: 1,
-    simulatedExam: {
-      subject: "Matematika",
-      score: 90,
-      totalQuestions: 20,
-      completedAt: "2026-09-21T11:20:00.000Z",
-      status: "Selesai Simulasi (Lulus)"
-    },
-    penyisihanExam: {
-      subject: "Matematika",
-      score: 92,
-      totalQuestions: 20,
-      completedAt: "2026-09-22T10:15:00.000Z",
-      status: "Selesai Babak Penyisihan (Lolos ke Final)"
-    },
-    finalExam: {
-      subject: "Matematika",
-      score: 95,
-      totalQuestions: 20,
-      completedAt: "2026-09-23T14:45:00.000Z",
-      status: "Selesai Mengerjakan Babak Final"
-    }
-  },
-  {
-    id: "OSN-2026-A-89103",
-    fullName: "Muhammad Rayhan Santoso",
-    level: "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
-    schoolName: "TK Teladan Bangsa",
-    cityProvince: "DKI Jakarta",
-    whatsapp: "08123456781",
-    email: "dzaliqa.assyafa@gmail.com",
-    parentName: "H. Nurhadi Santoso",
-    fullAddress: "Jl. Tebet Barat Dalam No. 14, Tebet, Jakarta Selatan",
-    subjects: ["Matematika", "Bahasa Indonesia"],
-    registeredAt: "2026-09-20T08:35:00.000Z",
-    cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)",
-    qualificationStatus: 'lolos',
-    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
-    finalTicketPaymentStatus: 'unpaid',
-    simulatedAttempts: 1,
-    penyisihanAttempts: 1,
-    simulatedExam: {
-      subject: "Matematika",
-      score: 95,
-      totalQuestions: 20,
-      completedAt: "2026-09-21T14:15:00.000Z",
-      status: "Selesai Simulasi (Lulus)"
-    },
-    penyisihanExam: {
-      subject: "Matematika",
-      score: 90,
-      totalQuestions: 20,
-      completedAt: "2026-09-22T11:20:00.000Z",
-      status: "Selesai Babak Penyisihan (Lolos ke Final)"
-    }
-  },
-  {
-    id: "OSN-2026-C-99214",
-    fullName: "Annora Geraldqueen S.R",
-    level: "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
-    schoolName: "SMP Negeri 1 Nusantara",
-    cityProvince: "Jawa Timur",
-    whatsapp: "08123456782",
-    email: "annora.gerald@gmail.com",
-    parentName: "Bambang Wijaya",
-    fullAddress: "Jl. Pemuda No. 45, Gubeng, Surabaya",
-    subjects: ["Bahasa Indonesia", "Bahasa Inggris"],
-    registeredAt: "2026-09-21T10:15:00.000Z",
-    cbtStatus: "Selesai Babak Penyisihan (Lolos Final)",
-    qualificationStatus: 'lolos',
-    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
-    finalTicketPaymentStatus: 'unpaid',
-    simulatedAttempts: 1,
-    penyisihanAttempts: 1,
-    simulatedExam: {
-      subject: "Bahasa Inggris",
-      score: 85,
-      totalQuestions: 20,
-      completedAt: "2026-09-22T09:40:00.000Z",
-      status: "Selesai Simulasi (Lulus)"
-    },
-    penyisihanExam: {
-      subject: "Bahasa Inggris",
-      score: 88,
-      totalQuestions: 20,
-      completedAt: "2026-09-22T14:30:00.000Z",
-      status: "Selesai Babak Penyisihan (Lolos ke Final)"
-    }
-  },
-  {
-    id: "OSN-2026-A-77123",
-    fullName: "Kenzo Alvaro Pratama",
-    level: "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
-    schoolName: "TK Bintang Ceria",
-    cityProvince: "Jawa Barat",
-    whatsapp: "08123456783",
-    email: "kenzo.alvaro@gmail.com",
-    parentName: "Dr. Hendra Gunawan",
-    fullAddress: "Komp. Dago Asri No. 8, Coblong, Bandung",
-    subjects: ["Matematika", "IPA / Sains"],
-    registeredAt: "2026-09-22T14:00:00.000Z",
-    qualificationStatus: 'pending',
-    finalTicketPaymentStatus: 'unpaid',
-    cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)",
-    simulatedAttempts: 1,
-    simulatedExam: {
-      subject: "Matematika",
-      score: 80,
-      totalQuestions: 20,
-      completedAt: "2026-09-22T15:20:00.000Z",
-      status: "Selesai Simulasi (Lulus)"
-    }
-  },
-  {
-    id: "OSN-2026-B-88391",
-    fullName: "Muhammad Rizky Pratama",
-    level: "SD / MI (Kategori B: Usia 7-12 Tahun)",
-    schoolName: "Madrasah Ibtidaiyah Al-Fikri",
-    cityProvince: "Sumatera Barat",
-    whatsapp: "08123456784",
-    email: "rizky.pratama@gmail.com",
-    parentName: "Syamsul Bahri",
-    fullAddress: "Jl. Khatib Sulaiman No. 22, Padang Barat, Padang",
-    subjects: ["Matematika", "IPA / Sains", "Bahasa Inggris"],
-    registeredAt: "2026-09-23T09:45:00.000Z",
-    cbtStatus: "Tiket Final Lunas (Closing BCA Rp 99.000)",
-    qualificationStatus: 'lolos',
-    qualificationNote: 'Dinyatakan Lolos ke Babak Final',
-    finalTicketPaymentStatus: 'paid_closing',
-    finalTicketPaidAt: "2026-09-23T11:00:00.000Z",
-    finalTicketAmount: 99000,
-    championRank: 'Juara 1',
-    certificateIssuedDate: "2026-09-23T16:00:00.000Z",
-    simulatedAttempts: 1,
-    penyisihanAttempts: 1,
-    finalAttempts: 1,
-    simulatedExam: {
-      subject: "IPA / Sains",
-      score: 95,
-      totalQuestions: 20,
-      completedAt: "2026-09-23T10:30:00.000Z",
-      status: "Selesai Simulasi (Lulus)"
-    },
-    penyisihanExam: {
-      subject: "IPA / Sains",
-      score: 96,
-      totalQuestions: 20,
-      completedAt: "2026-09-23T13:00:00.000Z",
-      status: "Selesai Babak Penyisihan (Lolos ke Final)"
-    },
-    finalExam: {
-      subject: "IPA / Sains",
-      score: 100,
-      totalQuestions: 20,
-      completedAt: "2026-09-23T15:10:00.000Z",
-      status: "Selesai Mengerjakan Babak Final"
-    }
-  }
-];
+// Seluruh data peserta dan riwayat ujian telah dikosongkan sesuai instruksi
+export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [];
 
 export function normalizePhone(phone: string): string {
   if (!phone) return '';
@@ -260,21 +79,31 @@ function normalizeName(name: string): string {
 export function getAllParticipants(): ParticipantRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const customList: ParticipantRecord[] = raw ? JSON.parse(raw) : INITIAL_PARTICIPANTS;
-    
-    // Efficiently combine custom saved participants with 2,000 dummy records
-    const map = new Map<string, ParticipantRecord>();
-    for (const d of DUMMY_PARTICIPANTS_2000) {
-      map.set(d.id, d);
-    }
-    // Custom registrations & edits take precedence
-    for (const c of customList) {
-      map.set(c.id, c);
-    }
-    return Array.from(map.values());
+    if (!raw) return [];
+    const parsed: ParticipantRecord[] = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     console.error('Failed to read participants database:', err);
-    return [...INITIAL_PARTICIPANTS, ...DUMMY_PARTICIPANTS_2000];
+    return [];
+  }
+}
+
+/**
+ * Hapus seluruh data peserta dan riwayat ujian secara permanen (Reset Total Database)
+ */
+export function clearAllParticipantsAndHistory(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    safeDispatchParticipantsUpdated();
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/participants/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(err => console.warn('Clear server sync error:', err));
+    }
+  } catch (err) {
+    console.error('Failed to clear participants and history:', err);
   }
 }
 

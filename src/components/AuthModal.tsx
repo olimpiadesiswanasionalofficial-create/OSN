@@ -77,6 +77,7 @@ import {
   bulkResetParticipantAttempts,
   getOrGenerateParticipantExamQuestions,
   syncParticipantsWithServer,
+  clearAllParticipantsAndHistory,
   ParticipantRecord
 } from '../services/participantDb';
 import {
@@ -331,6 +332,7 @@ export const AuthModal = ({
   const [resetQuotaParticipant, setResetQuotaParticipant] = useState<ParticipantRecord | null>(null);
   const [resetQuotaClearHistory, setResetQuotaClearHistory] = useState<boolean>(false);
   const [showBulkResetModal, setShowBulkResetModal] = useState<boolean>(false);
+  const [showClearAllParticipantsModal, setShowClearAllParticipantsModal] = useState<boolean>(false);
   const [deleteConfirmParticipant, setDeleteConfirmParticipant] = useState<ParticipantRecord | null>(null);
   const [isSyncingSingleContact, setIsSyncingSingleContact] = useState(false);
   const [viewDetailParticipant, setViewDetailParticipant] = useState<ParticipantRecord | null>(null);
@@ -816,6 +818,19 @@ export const AuthModal = ({
     // Pilih kata-kata motivasi unik yang berbeda secara acak untuk peserta
     setExamMotivation(prev => getRandomMotivation(prev?.id));
     setExamCompleted(true);
+
+    // Otomatis scroll ke atas ke kata-kata motivasi setelah ujian selesai
+    setTimeout(() => {
+      try {
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        const modalContainer = document.querySelector('.exam-scroll-area');
+        if (modalContainer) {
+          modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch {}
+    }, 50);
 
     if (activeStudent) {
       const statusText = violation
@@ -2678,34 +2693,7 @@ export const AuthModal = ({
                         </p>
                       </div>
 
-                      {/* Kartu Skor Nilai Ujian */}
-                      <div className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-emerald-500/50 shadow-sm flex items-center justify-between text-left">
-                        <div className="space-y-0.5">
-                          <span className="text-[11px] font-bold text-[#756F68] uppercase tracking-wider block">
-                            {examTypeMode === 'final'
-                              ? 'Skor Nilai Babak Final'
-                              : examTypeMode === 'penyisihan'
-                              ? 'Skor Nilai Babak Penyisihan'
-                              : 'Skor Nilai Simulasi CBT'}
-                          </span>
-                          <span className="text-sm font-black text-[#1A1615]">
-                            {selectedSubjectForExam}
-                          </span>
-                          <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Tercatat Otomatis pada Dashboard Admin Panitia
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <span className={`px-4 py-2 rounded-2xl font-black text-2xl font-mono shadow-sm inline-block ${
-                            (finalScore ?? 0) >= 70 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
-                          }`}>
-                            {finalScore !== null ? finalScore : '-'} / 100
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Kartu Motivasi Inspiratif dengan Desain Keren & Emoji Menarik */}
+                      {/* KARTU KATA-KATA MOTIVASI INSPIRATIF RESMI DI BAGIAN PALING ATAS */}
                       <div className={`p-6 sm:p-7 rounded-3xl bg-gradient-to-br ${examMotivation.bgGradient} border-2 ${examMotivation.borderAccent} shadow-sm text-left relative overflow-hidden`}>
                         <div className="flex items-center justify-between gap-3 mb-3">
                           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/90 shadow-sm border border-neutral-200/80 text-[#1A1615]">
@@ -2736,7 +2724,7 @@ export const AuthModal = ({
                         </p>
                       </div>
 
-                      {/* Pemberitahuan Resmi Peninjauan Tim Panitia Olimpiade Pusat */}
+                      {/* PEMBERITAHUAN RESMI PENILAIAN JURI (NILAI & SKOR HANYA UNTUK ADMIN) */}
                       <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-300/80 text-left flex items-start gap-3.5 shadow-xs">
                         <div className="p-2.5 rounded-xl bg-amber-500 text-white shrink-0 mt-0.5 shadow-sm">
                           <ShieldCheck className="w-5 h-5 text-white" />
@@ -2747,19 +2735,19 @@ export const AuthModal = ({
                               Pemberitahuan Panitia Pusat OSN 2026
                             </span>
                             <span className="text-[10px] font-bold bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-md">
-                              Proses Verifikasi
+                              Penilaian Khusus Admin
                             </span>
                           </div>
                           <p className="text-xs text-amber-900 leading-relaxed font-semibold">
-                            Hasil jawaban ujian Anda akan <strong>ditinjau dan dinilai langsung oleh Tim Panitia Olimpiade Pusat (Dewan Juri Akademik)</strong> sesuai dengan standar validasi dan integritas kompetisi.
+                            Seluruh lembar jawaban Anda telah aman terkunci di server pusat. <strong>Skor dan nilai hasil ujian dievaluasi secara independen oleh Tim Panitia Pusat & Dewan Juri Akademik</strong> dan hanya dapat diakses melalui Dasbor Admin untuk menjaga objektivitas kompetisi.
                           </p>
                           <p className="text-[11px] text-amber-800/90 leading-normal">
-                            Pengumuman resmi kelulusan babak penyisihan dan peraih penghargaan medali akan dipublikasikan secara serentak di portal resmi ini sesuai jadwal kalender kegiatan.
+                            Pengumuman resmi kelulusan, peraih medali, dan sertifikat prestasi akan diumumkan secara serentak di portal resmi ini sesuai jadwal kegiatan.
                           </p>
                         </div>
                       </div>
 
-                      {/* Tombol Aksi */}
+                      {/* Tombol Aksi Peserta */}
                       <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
                         <button
                           onClick={() => {
@@ -2769,14 +2757,14 @@ export const AuthModal = ({
                           className="flex-1 py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all cursor-pointer flex items-center justify-center gap-2 border border-[#D4AF37]/50 shadow-md"
                         >
                           <RotateCcw className="w-4 h-4" />
-                          <span>Pilih Mata Pelajaran Lain</span>
+                          <span>Pilih / Kerjakan Mapel Lain</span>
                         </button>
                         <button
-                          onClick={() => setShowSimulatedExam(false)}
-                          className="flex-1 py-3.5 rounded-xl text-xs font-bold border border-[#E8E2D9] bg-white text-[#1A1615] hover:bg-neutral-50 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+                          onClick={() => setExamMotivation(prev => getRandomMotivation(prev?.id))}
+                          className="flex-1 py-3.5 rounded-xl text-xs font-bold border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
                         >
-                          <span>Kembali ke Kartu Peserta</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Baca Kata Motivasi Baru</span>
                         </button>
                       </div>
                     </div>
@@ -4125,6 +4113,16 @@ export const AuthModal = ({
                         >
                           <RotateCcw className="w-3.5 h-3.5 text-purple-700" />
                           <span>Reset Kuota Massal ({filteredParticipants.length})</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setShowClearAllParticipantsModal(true)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          title="Hapus semua data peserta dan data riwayat ujian dari sistem"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-rose-700" />
+                          <span>Hapus Semua Data ({participantsList.length})</span>
                         </button>
                       </div>
                     </div>
@@ -7388,6 +7386,59 @@ export const AuthModal = ({
                   className="w-full py-2 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-700 transition-colors cursor-pointer"
                 >
                   Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL AKSI 2C: HAPUS SEMUA DATA PESERTA & RIWAYAT UJIAN */}
+        {showClearAllParticipantsModal && (
+          <div className="fixed inset-0 z-70 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl border-2 border-rose-500 p-6 sm:p-7 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E8E2D9]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                    <Trash2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm sm:text-base font-extrabold text-[#1A1615]">Hapus Semua Data Peserta & Riwayat</h4>
+                    <p className="text-[11px] text-[#756F68]">Tindakan Permanen Database</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowClearAllParticipantsModal(false)}
+                  className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 leading-relaxed font-semibold">
+                Apakah Anda yakin ingin <strong>menghapus seluruh {participantsList.length} data peserta dan seluruh riwayat ujian</strong> dari database? Database akan dikosongkan bersih dan seluruh riwayat simulasi, penyisihan, maupun final akan dihapus permanen.
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowClearAllParticipantsModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-neutral-300 bg-neutral-100 hover:bg-neutral-200 text-[#1A1615] text-xs font-bold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearAllParticipantsAndHistory();
+                    setParticipantsList([]);
+                    setSelectedParticipantIds([]);
+                    setShowClearAllParticipantsModal(false);
+                    showToast('success', 'Database Bersih', 'Seluruh data peserta dan data riwayat ujian telah berhasil dihapus permanen.');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black cursor-pointer shadow-md"
+                >
+                  Ya, Hapus Semua Bersih
                 </button>
               </div>
             </div>

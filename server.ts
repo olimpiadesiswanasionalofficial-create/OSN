@@ -18,6 +18,17 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Enable CORS allowing https://osn-one.vercel.app and all production origins
+app.use((req: Request, res: Response, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // Initialize Google Gen AI client with telemetry header
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || '',
@@ -154,32 +165,7 @@ function getStoredParticipants(): any[] {
       fs.mkdirSync(dataDir, { recursive: true });
     }
     if (!fs.existsSync(participantsFile)) {
-      const initialData = [
-        {
-          id: "OSN-2026-B-89102",
-          fullName: "Dzaliqa Assyafa N",
-          level: "SD / MI (Kategori B: Usia 7-12 Tahun)",
-          schoolName: "SDN Teladan Bangsa (Kelas 5)",
-          cityProvince: "DKI Jakarta",
-          whatsapp: "08123456781",
-          email: "dzaliqa.assyafa@gmail.com",
-          subjects: ["Matematika", "IPA / Sains"],
-          registeredAt: "2026-09-20T08:30:00.000Z",
-          cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)"
-        },
-        {
-          id: "OSN-2026-C-99214",
-          fullName: "Annora Geraldqueen S.R",
-          level: "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
-          schoolName: "SMP Negeri 1 Nusantara",
-          cityProvince: "Jawa Timur",
-          whatsapp: "08123456782",
-          email: "annora.gerald@gmail.com",
-          subjects: ["Bahasa Indonesia", "Bahasa Inggris"],
-          registeredAt: "2026-09-21T10:15:00.000Z",
-          cbtStatus: "Aktif & Siap Ujian (Tercatat di Database)"
-        }
-      ];
+      const initialData: any[] = [];
       fs.writeFileSync(participantsFile, JSON.stringify(initialData, null, 2), 'utf-8');
       return initialData;
     }
@@ -273,6 +259,21 @@ app.post('/api/participants', (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Error in POST /api/participants:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal menyimpan data ke database.' });
+  }
+});
+
+// Endpoint to completely clear all participants and exam histories
+app.post('/api/participants/clear', (_req: Request, res: Response) => {
+  try {
+    saveStoredParticipants([]);
+    return res.json({
+      success: true,
+      message: 'Seluruh data peserta dan riwayat ujian berhasil dihapus permanen dari sistem.',
+      total: 0
+    });
+  } catch (error: any) {
+    console.error('Error in POST /api/participants/clear:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal menghapus data peserta.' });
   }
 });
 
@@ -882,3 +883,5 @@ async function startServer() {
 }
 
 startServer();
+
+export default app;
