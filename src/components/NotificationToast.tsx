@@ -3,7 +3,7 @@ import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export interface ToastItem {
   id: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
   title: string;
   message?: string;
   duration?: number;
@@ -12,7 +12,7 @@ export interface ToastItem {
 /**
  * Global helper untuk memunculkan notifikasi berhasil / gagal pada setiap tombol fungsi
  */
-export function showToast(type: 'success' | 'error' | 'info', title: string, message?: string, duration: number = 4500) {
+export function showToast(type: 'success' | 'error' | 'info' | 'warning', title: string, message?: string, duration: number = 4500) {
   if (typeof window === 'undefined') return;
   const event = new CustomEvent('osn_toast_show', {
     detail: {
@@ -65,6 +65,7 @@ export const NotificationToastContainer: React.FC = () => {
       {toasts.map((toast) => {
         const isSuccess = toast.type === 'success';
         const isError = toast.type === 'error';
+        const isWarning = toast.type === 'warning';
 
         return (
           <div
@@ -74,6 +75,8 @@ export const NotificationToastContainer: React.FC = () => {
                 ? 'bg-emerald-900/95 text-white border-emerald-400/60 ring-2 ring-emerald-500/20'
                 : isError
                 ? 'bg-rose-950/95 text-white border-rose-400/60 ring-2 ring-rose-500/20'
+                : isWarning
+                ? 'bg-amber-950/95 text-white border-amber-400/60 ring-2 ring-amber-500/20'
                 : 'bg-[#1A1615]/95 text-white border-[#D4AF37]/60 ring-2 ring-[#D4AF37]/20'
             }`}
           >
@@ -88,7 +91,12 @@ export const NotificationToastContainer: React.FC = () => {
                   <AlertCircle className="w-5 h-5" />
                 </div>
               )}
-              {!isSuccess && !isError && (
+              {isWarning && (
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+              )}
+              {!isSuccess && !isError && !isWarning && (
                 <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-[#D4AF37]">
                   <Info className="w-5 h-5" />
                 </div>

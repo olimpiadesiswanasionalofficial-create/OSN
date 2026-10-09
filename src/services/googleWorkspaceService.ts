@@ -26,8 +26,41 @@ const provider = new GoogleAuthProvider();
 WORKSPACE_SCOPES.forEach(scope => provider.addScope(scope));
 provider.setCustomParameters({ prompt: 'select_account' });
 
-let cachedAccessToken: string | null = null;
+const STORAGE_TOKEN_KEY = 'osn_google_workspace_access_token';
+const STORAGE_USER_KEY = 'osn_google_workspace_user_profile';
+
+let cachedAccessToken: string | null = (typeof window !== 'undefined' ? sessionStorage.getItem(STORAGE_TOKEN_KEY) || localStorage.getItem(STORAGE_TOKEN_KEY) : null);
 let isSigningIn = false;
+
+export function getStoredGoogleSession(): { user: any; token: string } | null {
+  if (typeof window === 'undefined') return null;
+  const token = sessionStorage.getItem(STORAGE_TOKEN_KEY) || localStorage.getItem(STORAGE_TOKEN_KEY);
+  const userRaw = sessionStorage.getItem(STORAGE_USER_KEY) || localStorage.getItem(STORAGE_USER_KEY);
+  if (token && userRaw) {
+    try {
+      return { user: JSON.parse(userRaw), token };
+    } catch {}
+  }
+  return null;
+}
+
+export function saveStoredGoogleSession(user: any, token: string): void {
+  if (typeof window === 'undefined') return;
+  cachedAccessToken = token;
+  sessionStorage.setItem(STORAGE_TOKEN_KEY, token);
+  sessionStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
+  localStorage.setItem(STORAGE_TOKEN_KEY, token);
+  localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
+}
+
+export function clearStoredGoogleSession(): void {
+  if (typeof window === 'undefined') return;
+  cachedAccessToken = null;
+  sessionStorage.removeItem(STORAGE_TOKEN_KEY);
+  sessionStorage.removeItem(STORAGE_USER_KEY);
+  localStorage.removeItem(STORAGE_TOKEN_KEY);
+  localStorage.removeItem(STORAGE_USER_KEY);
+}
 
 // Initialize Auth listener
 export const initAuth = (
@@ -38,24 +71,49 @@ export const initAuth = (
     if (user && cachedAccessToken) {
       if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
     } else if (!user) {
-      cachedAccessToken = null;
-      if (onAuthFailure) onAuthFailure();
+      const stored = getStoredGoogleSession();
+      if (!stored && onAuthFailure) {
+        onAuthFailure();
+      }
     }
   });
 };
 
-export const signInWithGoogleWorkspace = async (): Promise<{ user: User; accessToken: string } | null> => {
+export const setCustomAccessToken = (token: string, profile?: { displayName: string; email: string }): { user: any; accessToken: string } => {
+  const dummyUser = {
+    displayName: profile?.displayName || 'Admin Panitia Google',
+    email: profile?.email || 'admin.workspace@osn-pusat.org',
+    photoURL: ''
+  };
+  saveStoredGoogleSession(dummyUser, token);
+  return { user: dummyUser, accessToken: token };
+};
+
+export const signInWithGoogleWorkspace = async (): Promise<{ user: User | any; accessToken: string } | null> => {
   try {
     isSigningIn = true;
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (!credential?.accessToken) {
-      throw new Error('Gagal mendapatkan access token Google Workspace.');
+      throw new Error('Gagal mendapatkan access token Google Workspace dari penyedia otentikasi.');
     }
-    cachedAccessToken = credential.accessToken;
-    return { user: result.user, accessToken: cachedAccessToken };
+    const token = credential.accessToken;
+    saveStoredGoogleSession({
+      displayName: result.user.displayName || result.user.email,
+      email: result.user.email,
+      photoURL: result.user.photoURL
+    }, token);
+    return { user: result.user, accessToken: token };
   } catch (error: any) {
     console.error('Google Workspace sign in error:', error);
+    const code = error?.code || '';
+    if (code === 'auth/popup-blocked') {
+      throw new Error('Jendela popup otorisasi Google diblokir peramban. Mohon izinkan popup untuk situs ini atau gunakan token akses.');
+    } else if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') {
+      throw new Error('Proses login Google dibatalkan oleh pengguna.');
+    } else if (code === 'auth/unauthorized-domain') {
+      throw new Error('Domain saat ini belum diizinkan pada Google Cloud Console / Firebase Auth. Silakan gunakan opsi token atau unduh format Google Sheets.');
+    }
     throw error;
   } finally {
     isSigningIn = false;
@@ -63,12 +121,20 @@ export const signInWithGoogleWorkspace = async (): Promise<{ user: User; accessT
 };
 
 export const getAccessToken = async (): Promise<string | null> => {
-  return cachedAccessToken;
+  if (cachedAccessToken) return cachedAccessToken;
+  const stored = getStoredGoogleSession();
+  if (stored) {
+    cachedAccessToken = stored.token;
+    return stored.token;
+  }
+  return null;
 };
 
 export const logoutGoogleWorkspace = async () => {
-  await signOut(auth);
-  cachedAccessToken = null;
+  try {
+    await signOut(auth);
+  } catch {}
+  clearStoredGoogleSession();
 };
 
 // ---------------- Google Sheets Integration ----------------
@@ -307,3 +373,73 @@ export async function syncParticipantToGoogleContacts(p: ParticipantRecord): Pro
     throw new Error(err.error?.message || 'Gagal menambahkan kontak ke Google Contacts.');
   }
 }
+
+/**
+ * Unduh langsung data peserta dalam format CSV berstandar Google Sheets / Excel
+ * dengan UTF-8 BOM agar langsung rapi saat dibuka di Google Drive / Google Sheets.
+ */
+export function exportParticipantsToGoogleSheetsCsv(
+  participants: ParticipantRecord[],
+  filenamePrefix: string = 'Data_Peserta_GoogleSheets_OSN2026'
+): void {
+  const headers = [
+    'No',
+    'No Peserta',
+    'Nama Lengkap',
+    'Nomor WhatsApp',
+    'Jenjang Kategori',
+    'Mata Pelajaran',
+    'Asal Sekolah',
+    'Kabupaten / Kota',
+    'Alamat Lengkap',
+    'Nama Wali Murid',
+    'Email Wali',
+    'Status CBT',
+    'Nilai Simulasi',
+    'Nilai Penyisihan',
+    'Nilai Final',
+    'Status Kelulusan',
+    'Status Tiket Final (Closing)',
+    'Juara / Medali',
+    'Tanggal Terdaftar'
+  ];
+
+  const rows = participants.map((p, idx) => [
+    idx + 1,
+    p.id || '',
+    p.fullName || '',
+    p.whatsapp ? `'${p.whatsapp}` : '', // prefix single quote so Sheets keeps 0 / +62
+    p.level || '',
+    p.subjects ? p.subjects.join('; ') : 'Matematika',
+    p.schoolName || '',
+    p.cityProvince || '',
+    p.fullAddress || '',
+    p.parentName || '',
+    p.email || '',
+    p.cbtStatus || '',
+    p.simulatedExam ? p.simulatedExam.score : '',
+    p.penyisihanExam ? p.penyisihanExam.score : '',
+    p.finalExam ? p.finalExam.score : '',
+    p.qualificationStatus === 'lolos' ? 'LOLOS FINAL' : (p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'MENUNGGU HASIL'),
+    p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS (RP 99.000)' : 'BELUM BAYAR',
+    p.championRank || 'Belum Ditetapkan',
+    p.registeredAt ? new Date(p.registeredAt).toLocaleString('id-ID') : ''
+  ]);
+
+  const csvContent = [
+    headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(','),
+    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+  ].join('\r\n');
+
+  // Add UTF-8 BOM so Google Sheets and Excel detect UTF-8 characters automatically
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filenamePrefix}_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+

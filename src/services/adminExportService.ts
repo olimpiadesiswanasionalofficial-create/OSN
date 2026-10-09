@@ -4,6 +4,77 @@ import { APP_CONFIG } from '../../appConfig.js';
 import { getOfficialLogosForPdf } from './pdfLogosHelper';
 
 // 1. Export Participants List to Excel (.xlsx or clean compatible .csv/spreadsheet format)
+export function exportParticipantsToCsv(participants: ParticipantRecord[], titleSuffix: string = ''): void {
+  const headers = [
+    'No',
+    'ID Peserta',
+    'Nama Lengkap Siswa',
+    'Nama Orang Tua / Wali',
+    'Alamat Lengkap / Domisili',
+    'Nomor WhatsApp',
+    'Email',
+    'Jenjang Kategori',
+    'Asal Sekolah',
+    'Kota/Provinsi',
+    'Mata Pelajaran',
+    'Tanggal Pendaftaran',
+    'Status CBT',
+    'Status Penyisihan/Simulasi',
+    'Skor Penyisihan',
+    'Tanggal Selesai Penyisihan',
+    'Status Kelulusan Final',
+    'Status Closing Tiket Final',
+    'Nominal Closing (Rp)',
+    'Status Juara / Medali',
+    'Status Babak Final',
+    'Skor Babak Final',
+    'Tanggal Selesai Final'
+  ];
+
+  const escapeCsv = (val: any) => {
+    const s = String(val ?? '').replace(/"/g, '""');
+    return `"${s}"`;
+  };
+
+  const rows = participants.map((p, idx) => [
+    idx + 1,
+    p.id,
+    p.fullName,
+    p.parentName || '-',
+    p.fullAddress || '-',
+    p.whatsapp,
+    p.email || '-',
+    p.level,
+    p.schoolName || '-',
+    p.cityProvince || 'Indonesia',
+    (p.subjects || []).join('; '),
+    new Date(p.registeredAt).toLocaleString('id-ID'),
+    p.cbtStatus || '-',
+    p.simulatedExam ? p.simulatedExam.status : 'Belum Mengerjakan',
+    p.simulatedExam ? p.simulatedExam.score : '-',
+    p.simulatedExam ? new Date(p.simulatedExam.completedAt).toLocaleString('id-ID') : '-',
+    p.qualificationStatus === 'lolos' ? 'LOLOS FINAL' : p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'PENDING',
+    p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS (CLOSING)' : 'BELUM BAYAR',
+    p.finalTicketPaymentStatus === 'paid_closing' ? (p.finalTicketAmount || 99000) : 0,
+    p.championRank || 'Belum Dinilai',
+    p.finalExam ? p.finalExam.status : 'Menunggu Jadwal',
+    p.finalExam ? p.finalExam.score : '-',
+    p.finalExam ? new Date(p.finalExam.completedAt).toLocaleString('id-ID') : '-'
+  ]);
+
+  const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const dateStr = new Date().toISOString().split('T')[0];
+  link.href = url;
+  link.setAttribute('download', `Daftar_Peserta_OSN_2026_${titleSuffix || dateStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export function exportParticipantsToExcel(participants: ParticipantRecord[], titleSuffix: string = ''): void {
   const headers = [
     'No',
@@ -279,7 +350,6 @@ export async function exportParticipantsToPdf(participants: ParticipantRecord[],
 // 3. Export WhatsApp Contacts as VCF (vCard file for direct 1-click import into Android/iPhone Google Contacts)
 export function exportParticipantsToVcf(participants: ParticipantRecord[], customGroup: string = 'OSN 2026'): void {
   if (!participants || participants.length === 0) {
-    alert('Tidak ada kontak peserta yang dipilih untuk diexport.');
     return;
   }
 

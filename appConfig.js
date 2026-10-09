@@ -478,31 +478,47 @@ export const APP_CONFIG = {
   faq: [
     {
       q: "Apakah benar babak penyisihan Olimpiade Siswa Nasional ini GRATIS?",
-      a: "Ya, betul sekali! Sesuai komitmen LKP Prestasi Nusantara, babak penyisihan dapat diikuti secara GRATIS oleh seluruh siswa di Indonesia untuk memberikan kesempatan seluas-luasnya bagi semua anak dalam menguji kemampuan akademiknya."
+      a: "Ya, betul sekali! Sesuai komitmen resmi LKP Prestasi Nusantara, babak penyisihan dapat diikuti secara 100% GRATIS (Bebas Biaya Pendaftaran) oleh seluruh siswa di Indonesia tanpa pungutan biaya apapun untuk memberikan kesempatan seluas-luasnya bagi semua generasi bangsa dalam menguji kemampuan akademiknya."
     },
     {
       q: "Bolehkah seorang peserta mengikuti lebih dari satu mata pelajaran?",
-      a: "Sangat boleh! Peserta diperbolehkan mendaftar di beberapa mata pelajaran sekaligus (misalnya Matematika, Sains/IPA, dan Bahasa Indonesia) selama jadwal sesi pengerjaan ujian CBT tidak bertabrakan."
+      a: "Sangat boleh! Peserta diperbolehkan mendaftar di beberapa mata pelajaran sekaligus (misalnya Matematika, Sains/IPA, Bahasa Inggris, dan Bahasa Indonesia). Sistem CBT kami mendukung pemilihan multi-mapel secara fleksibel."
     },
     {
       q: "Jenjang pendidikan apa saja yang dapat mendaftar?",
-      a: "Kompetisi terbuka untuk 3 kategori: Kategori A (PAUD/TK Usia 4-6 Tahun), Kategori B (SD/MI Usia 7-12 Tahun), dan Kategori C (SMP/MTs Usia 13-15 Tahun)."
+      a: "Kompetisi terbuka untuk 3 kategori resmi: Kategori A (PAUD / TK Usia 4-6 Tahun), Kategori B (SD / MI Usia 7-12 Tahun: Kelas 1 s/d 6), dan Kategori C (SMP / MTs Usia 13-15 Tahun: Kelas 7 s/d 9) dari sekolah negeri, swasta, maupun homeschooling di seluruh Indonesia."
     },
     {
       q: "Bagaimana cara pelaksanaan ujian secara online dari rumah?",
-      a: "Ujian dilaksanakan menggunakan sistem Computer-Based Test (CBT) resmi kami yang dapat diakses melalui laptop, komputer, tablet, maupun smartphone Android/iPhone. Peserta cukup login ke portal ujian pada waktu yang telah dijadwalkan."
+      a: "Ujian dilaksanakan menggunakan sistem Computer-Based Test (CBT) resmi responsif yang dapat diakses melalui laptop, komputer, tablet, maupun smartphone Android/iPhone. Peserta cukup memasukkan Nomor WhatsApp terdaftar pada saat jam ujian (tanpa repot mengetik nama). Ujian simulasi latihan dapat dicoba sepuasnya (unlimited)."
+    },
+    {
+      q: "Berapa kuota pengerjaan untuk masing-masing babak ujian?",
+      a: "Khusus untuk Ujian Simulasi latihan, peserta diberikan kuota TANPA BATAS (Unlimited) agar dapat berlatih soal bergambar sesering mungkin. Untuk Ujian Babak Penyisihan Resmi dan Babak Final Resmi, kuota pengerjaan adalah tepat 1 kali kesempatan agar hasil murni dan berintegritas tinggi."
+    },
+    {
+      q: "Bagaimana cara penentuan Juara 1, 2, 3 dan Medali di Babak Final?",
+      a: "Penetapan Juara 1 (Medali Emas), Juara 2 (Medali Perak), Juara 3 (Medali Perunggu), dan Finalis Nasional ditetapkan secara langsung dan diverifikasi oleh Dewan Juri Panitia Pusat (Admin Resmi). Sistem CBT hanya memberikan rekomendasi nilai, sedangkan keputusan akhir gelar juara disahkan oleh Panitia Pelaksana Pusat demi menjaga objektivitas dan keabsahan kompetisi."
     },
     {
       q: "Apakah sertifikat yang diterbitkan resmi dan ber-QR code?",
-      a: "Ya! Setiap sertifikat diterbitkan resmi oleh LKP PRESTASI NUSANTARA dan dilengkapi dengan nomor registrasi unik serta QR Code verifikasi keaslian digital yang dapat dipindai langsung untuk keperluan pendaftaran jalur prestasi sekolah (PPDB/SNBP)."
+      a: "Ya! Setiap sertifikat diterbitkan resmi oleh LKP PRESTASI NUSANTARA dan disahkan oleh Direktur LKP Prestasi Nusantara serta Panitia Pelaksana Pusat. Dilengkapi nomor registrasi digital dan QR Code validasi yang dapat dipindai langsung untuk keperluan pendaftaran jalur prestasi sekolah (PPDB / SNBP)."
+    },
+    {
+      q: "Bagaimana fitur Pratinjau PDF (Print to PDF) pada sertifikat peserta?",
+      a: "Peserta dapat melihat pratinjau sertifikat digital secara langsung di dalam browser menggunakan teknologi React-PDF sebelum mengunduhnya. Sertifikat juga dapat langsung dicetak atau disimpan dalam format PDF berkualitas cetak A4 Landscape dengan 3 logo resmi."
     },
     {
       q: "Bagaimana cara pengiriman piala juara, medali, dan piagam fisik?",
       a: "Bagi para pemenang (Juara 1, 2, 3, Juara Umum, dan Medalis), paket piala trofi berlapis emas, medali logam kuningan berukir, dan piagam cetak resmi akan dikemas aman menggunakan bubble wrap tebal lalu dikirimkan langsung ke alamat rumah peserta di 38 provinsi di seluruh Indonesia."
     },
     {
-      q: "Kemana saya bisa menghubungi panitia jika ada kendala?",
-      a: "Panitia resmi OSN dapat dihubungi setiap hari kerja melalui WhatsApp Call Center resmi di nomor 0895-4286-87813."
+      q: "Apakah pendaftaran mewajibkan verifikasi email dengan OTP?",
+      a: "Ya, demi menjaga keamanan data peserta dan mencegah pendaftaran fiktif, setiap peserta/wali murid dapat memverifikasi alamat email aktif menggunakan kode 6 digit OTP (One-Time Password) saat registrasi."
+    },
+    {
+      q: "Kemana saya bisa berkonsultasi atau menghubungi panitia jika ada kendala?",
+      a: "Panitia resmi OSN 2026 dapat dihubungi setiap hari kerja melalui WhatsApp Call Center resmi di nomor 0895-4286-87813 atau melalui Konsultan Akademik AI di website ini."
     }
   ]
 };

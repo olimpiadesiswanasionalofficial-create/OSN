@@ -19,6 +19,8 @@ import {
   Zap
 } from 'lucide-react';
 import { ParticipantRecord } from '../services/participantDb';
+import { showToast } from './NotificationToast';
+import { exportSimulasiReportPdf } from '../services/officialReportsGenerator';
 
 interface ReportSimulasiTableProps {
   participantsList: ParticipantRecord[];
@@ -154,19 +156,31 @@ export const ReportSimulasiTable: React.FC<ReportSimulasiTableProps> = ({
       p.simulatedExam?.completedAt ? new Date(p.simulatedExam.completedAt).toLocaleString('id-ID') : '-'
     ]);
 
-    const csvContent = [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\r\n');
-    const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Laporan_Pengerjaan_Simulasi_CBT_OSN_2026_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const csvContent = [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\r\n');
+      const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Laporan_Pengerjaan_Simulasi_CBT_OSN_2026_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('success', 'Ekspor CSV Berhasil', `Data simulasi (${filteredData.length} peserta) berhasil diunduh dalam format .csv`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor CSV', err?.message || 'Terjadi kesalahan saat mengekspor CSV.');
+    }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    try {
+      showToast('info', 'Menyiapkan Laporan', 'Sedang memproses Laporan Hasil Pengerjaan Simulasi CBT (PDF)...');
+      await exportSimulasiReportPdf(filteredData.length > 0 ? filteredData : participantsList);
+      showToast('success', 'Laporan Berhasil Dicetak', 'Laporan Resmi Simulasi CBT (PDF) lengkap dengan 3 logo resmi berhasil diunduh.');
+    } catch (err: any) {
+      console.error('Failed to generate simulasi report PDF:', err);
+      showToast('error', 'Gagal Mencetak Laporan', err?.message || 'Terjadi kesalahan saat memproses dokumen PDF.');
+    }
   };
 
   return (
@@ -512,7 +526,10 @@ export const ReportSimulasiTable: React.FC<ReportSimulasiTableProps> = ({
                             href={generateFollowUpWhatsAppUrl(p, 'simulasi')}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
+                            onClick={() => {
+                              showToast('success', 'Membuka WhatsApp', `Menghubungkan chat tindak lanjut simulasi untuk ${p.fullName}...`);
+                            }}
+                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                             title="Kirim pesan follow-up hasil simulasi via WhatsApp"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />

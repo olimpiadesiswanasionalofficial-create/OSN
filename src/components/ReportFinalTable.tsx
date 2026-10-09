@@ -19,9 +19,13 @@ import {
   Edit3,
   ChevronLeft,
   ChevronRight,
-  Zap
+  Zap,
+  Check
 } from 'lucide-react';
-import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
+import { ParticipantRecord, updateParticipantField, safeDispatchParticipantsUpdated } from '../services/participantDb';
+import { showToast } from './NotificationToast';
+import { exportLolosFinalDanJuaraReportPdf } from '../services/officialReportsGenerator';
+import { logAdminAction } from '../services/adminAuditLogService';
 
 interface ReportFinalTableProps {
   participantsList: ParticipantRecord[];
@@ -44,6 +48,22 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
   const [filterRank, setFilterRank] = useState('Semua');
   const [sortOption, setSortOption] = useState<'highest' | 'lowest' | 'latest' | 'name'>('highest');
 
+  const handleManualSetRank = (p: ParticipantRecord, newRank: string) => {
+    updateParticipantField(p.id, {
+      championRank: newRank,
+      certificateIssuedDate: new Date().toISOString()
+    });
+    logAdminAction(
+      'MANUAL_MEDAL_ASSIGNMENT',
+      `Penetapan Gelar ${newRank}`,
+      `Admin menetapkan status gelar/medali untuk ${p.fullName} (${p.id}) menjadi: ${newRank}`,
+      p.id,
+      p.fullName
+    );
+    safeDispatchParticipantsUpdated();
+    showToast('success', 'Gelar Juara Ditetapkan', `${p.fullName} berhasil ditetapkan sebagai: ${newRank}.`);
+  };
+
   const handleManualEditScoreFinal = (p: ParticipantRecord) => {
     const currentScore = p.finalExam?.score ?? 0;
     const input = window.prompt(
@@ -53,14 +73,11 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
     if (input === null) return;
     const parsed = parseInt(input.trim(), 10);
     if (isNaN(parsed) || parsed < 0 || parsed > 100) {
-      alert('Nilai harus berupa angka antara 0 hingga 100.');
+      showToast('error', 'Nilai Tidak Valid', 'Nilai harus berupa angka antara 0 hingga 100.');
       return;
     }
 
-    let championRank: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' = 'Peserta Final';
-    if (parsed >= 90) championRank = 'Juara 1';
-    else if (parsed >= 80) championRank = 'Juara 2';
-    else if (parsed >= 70) championRank = 'Juara 3';
+    const recRank = parsed >= 90 ? 'Juara 1' : parsed >= 80 ? 'Juara 2' : parsed >= 70 ? 'Juara 3' : 'Peserta Final';
 
     updateParticipantField(p.id, {
       finalExam: {
@@ -73,10 +90,19 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
         status: `Selesai Ujian Final (${parsed}/100)`,
         durationText: p.finalExam?.durationText || '19 Menit 10 Detik'
       },
-      championRank
+      recommendedChampionRank: recRank
     });
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    logAdminAction(
+      'MANUAL_SCORE_EDIT',
+      'Ubah Nilai Ujian Final',
+      `Nilai final ${p.fullName} diubah menjadi ${parsed}/100 (Rekomendasi: ${recRank})`,
+      p.id,
+      p.fullName
+    );
+
+    safeDispatchParticipantsUpdated();
+    showToast('success', 'Nilai Final Diperbarui', `Nilai ${p.fullName} berhasil diubah menjadi ${parsed}/100.`);
   };
 
   const handleManualEditDurationFinal = (p: ParticipantRecord) => {
@@ -100,7 +126,8 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
       }
     });
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
+    showToast('success', 'Durasi Diperbarui', `Waktu pengerjaan ${p.fullName} diubah menjadi: ${input.trim()}.`);
   };
 
   // Stats calculation
@@ -227,10 +254,19 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast('success', 'Ekspor CSV Berhasil', 'Data klasemen babak final (.csv) berhasil diunduh.');
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    try {
+      showToast('info', 'Menyiapkan Laporan Juara', 'Sedang memproses Laporan Resmi Pemenang Juara & Finalis PDF...');
+      await exportLolosFinalDanJuaraReportPdf(filteredData.length > 0 ? filteredData : participantsList);
+      logAdminAction('EXPORT_REPORT', 'Cetak Laporan Juara Babak Final (PDF)', `Export ${filteredData.length} data finalis`);
+      showToast('success', 'Laporan Juara Berhasil Dicetak', 'Laporan Resmi Pemenang Juara & Finalis (PDF) berhasil diunduh.');
+    } catch (err: any) {
+      console.error('Export error:', err);
+      showToast('error', 'Gagal Mencetak Laporan', err?.message || 'Terjadi kesalahan saat memproses laporan.');
+    }
   };
 
   return (
@@ -439,40 +475,15 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                   const attempts = p.finalAttempts || (hasFinal ? 1 : 0);
                   const isPaid = p.finalTicketPaymentStatus === 'paid_closing';
 
-                  let rankBadge = null;
-                  const rank = p.championRank || (hasFinal ? (score >= 90 ? 'Juara 1' : score >= 80 ? 'Juara 2' : score >= 70 ? 'Juara 3' : 'Peserta Final') : null);
+                  // Rekomendasi sistem berdasarkan perolehan skor
+                  const systemRecommendation = hasFinal
+                    ? (score >= 90 ? 'Juara 1 (Emas)' : score >= 80 ? 'Juara 2 (Perak)' : score >= 70 ? 'Juara 3 (Perunggu)' : 'Peserta Final')
+                    : null;
 
-                  if (rank === 'Juara 1') {
-                    rankBadge = (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 text-neutral-950 shadow-sm border border-amber-300">
-                        🥇 JUARA 1 (EMAS)
-                      </span>
-                    );
-                  } else if (rank === 'Juara 2') {
-                    rankBadge = (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-gradient-to-r from-slate-200 to-slate-300 text-slate-900 shadow-sm border border-slate-300">
-                        🥈 JUARA 2 (PERAK)
-                      </span>
-                    );
-                  } else if (rank === 'Juara 3') {
-                    rankBadge = (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-sm border border-amber-500">
-                        🥉 JUARA 3 (PERUNGGU)
-                      </span>
-                    );
-                  } else if (rank === 'Peserta Final') {
-                    rankBadge = (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
-                        🎖️ Peserta Final
-                      </span>
-                    );
-                  } else {
-                    rankBadge = (
-                      <span className="text-[10px] text-neutral-400 font-medium">
-                        Menunggu Ujian Final
-                      </span>
-                    );
-                  }
+                  // Status penetapan gelar resmi oleh Admin
+                  const rank = p.championRank && p.championRank !== 'Belum Dinilai' && p.championRank !== 'Belum Ditetapkan'
+                    ? p.championRank
+                    : null;
 
                   return (
                     <tr key={p.id} className="hover:bg-purple-50/40 transition-colors">
@@ -480,9 +491,60 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                         {globalIdx}
                       </td>
 
-                      {/* Gelar Juara */}
+                      {/* Gelar Juara: Ditentukan oleh Admin & Rekomendasi Sistem */}
                       <td className="py-3 px-3">
-                        {rankBadge}
+                        <div className="space-y-1">
+                          {rank ? (
+                            <div>
+                              {rank === 'Juara 1' && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 text-neutral-950 shadow-xs border border-amber-300">
+                                  🥇 JUARA 1 (EMAS)
+                                </span>
+                              )}
+                              {rank === 'Juara 2' && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-gradient-to-r from-slate-200 to-slate-300 text-slate-900 shadow-xs border border-slate-300">
+                                  🥈 JUARA 2 (PERAK)
+                                </span>
+                              )}
+                              {rank === 'Juara 3' && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-xs border border-amber-500">
+                                  🥉 JUARA 3 (PERUNGGU)
+                                </span>
+                              )}
+                              {rank === 'Peserta Final' && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
+                                  🎖️ Peserta Final
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-[10px] font-bold text-neutral-400 block">
+                              ⏳ Belum Ditetapkan Admin
+                            </span>
+                          )}
+
+                          {systemRecommendation && (
+                            <div className="text-[9.5px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                              🤖 Rekomendasi Sistem: <strong>{systemRecommendation}</strong>
+                            </div>
+                          )}
+
+                          {/* Dropdown Penetapan Juara oleh Admin */}
+                          <div className="pt-0.5">
+                            <select
+                              value={p.championRank || 'Belum Ditetapkan'}
+                              onChange={(e) => handleManualSetRank(p, e.target.value)}
+                              className="text-[10px] font-bold px-2 py-1 rounded-lg border border-purple-200 bg-white text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer shadow-2xs w-full"
+                              title="Pilih dan tetapkan gelar juara resmi untuk peserta ini"
+                            >
+                              <option value="Belum Ditetapkan">-- Tetapkan Juara (Admin) --</option>
+                              <option value="Juara 1">🥇 Juara 1 (Medali Emas)</option>
+                              <option value="Juara 2">🥈 Juara 2 (Medali Perak)</option>
+                              <option value="Juara 3">🥉 Juara 3 (Medali Perunggu)</option>
+                              <option value="Peserta Final">🎖️ Peserta Finalis</option>
+                            </select>
+                          </div>
+                        </div>
                       </td>
 
                       {/* Identitas Siswa */}
@@ -618,7 +680,15 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                           {(hasFinal || isPaid) && (
                             <button
                               type="button"
-                              onClick={() => generateFinalCertificatePdf({ student: p, rankTitle: rank || 'Peserta Final' })}
+                              onClick={async () => {
+                                try {
+                                  showToast('info', 'Menyiapkan Sertifikat', `Sedang memproses Sertifikat Juara Resmi untuk ${p.fullName}...`);
+                                  await generateFinalCertificatePdf({ student: p, rankTitle: rank || 'Peserta Final' });
+                                  showToast('success', 'Sertifikat Berhasil Diunduh', `Sertifikat Juara untuk ${p.fullName} berhasil dicetak.`);
+                                } catch (e: any) {
+                                  showToast('error', 'Gagal Mengunduh Sertifikat', e?.message || 'Terjadi kesalahan saat memproses sertifikat PDF.');
+                                }
+                              }}
                               className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] flex items-center gap-1 transition-all shadow-xs cursor-pointer"
                               title="Unduh Sertifikat Penghargaan Babak Final OSN 2026 Resmi (PDF)"
                             >
@@ -632,7 +702,10 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                             href={generateFollowUpWhatsAppUrl(p, 'final')}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition-colors"
+                            onClick={() => {
+                              showToast('success', 'Membuka WhatsApp', `Menghubungkan chat tindak lanjut finalis untuk ${p.fullName}...`);
+                            }}
+                            className="p-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition-colors cursor-pointer"
                             title="Kirim pesan ucapan selamat & sertifikat via WhatsApp"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -642,8 +715,11 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                           {attempts >= 2 && (
                             <button
                               type="button"
-                              onClick={() => onResetQuota(p)}
-                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors"
+                              onClick={() => {
+                                onResetQuota(p);
+                                showToast('info', 'Reset Kuota Dipilih', `Membuka pengaturan reset kuota final untuk ${p.fullName}.`);
+                              }}
+                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
                               title="Reset kuota ujian babak final"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />

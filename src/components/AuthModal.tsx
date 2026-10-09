@@ -55,7 +55,9 @@ import {
   ShieldAlert,
   Upload,
   Zap,
-  Send
+  Send,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { LogoOSN, LogoLKP, StempelLKP } from './BrandLogos';
 import { APP_CONFIG } from '../../appConfig.js';
@@ -65,6 +67,7 @@ import {
   findParticipantsByPhone,
   normalizePhone,
   saveParticipant,
+  saveAllParticipants,
   updateParticipantExamResult,
   deleteParticipant,
   confirmFinalTicketPayment,
@@ -81,6 +84,7 @@ import {
   saveAllQuestions,
   updateQuestion,
   getFilteredQuestions,
+  syncQuestionsWithServer,
   QuestionItem,
   ExamTier
 } from '../services/cbtQuestionsDb';
@@ -94,11 +98,14 @@ import {
   signInWithGoogleWorkspace,
   logoutGoogleWorkspace,
   exportParticipantsToGoogleSheet,
+  exportParticipantsToGoogleSheetsCsv,
   listDriveFiles,
   uploadTextFileToDrive,
   listGoogleContacts,
   syncParticipantToGoogleContacts,
   getAccessToken,
+  getStoredGoogleSession,
+  setCustomAccessToken,
   GoogleDriveFile,
   GoogleContactPerson,
   GoogleSheetInfo
@@ -111,6 +118,8 @@ import {
   broadcastQualificationAnnouncements,
   broadcastChampionAnnouncements,
   broadcastExamReminder,
+  broadcastClosingPaymentReminder,
+  clearWhatsAppLogs,
   sendWhatsAppApiNotification,
   getStoredWhatsAppLogs,
   getWhatsAppApiSettings,
@@ -128,19 +137,29 @@ import { showToast } from './NotificationToast';
 import {
   getMetaPixelConfig,
   saveMetaPixelConfig,
+  trackPixelEvent,
   MetaPixelConfig
 } from '../services/metaPixelService';
 import { ReportSimulasiTable } from './ReportSimulasiTable';
 import { ReportPenyisihanTable } from './ReportPenyisihanTable';
 import { ReportFinalTable } from './ReportFinalTable';
+import { ImportParticipantsModal } from './ImportParticipantsModal';
 
 
 import {
+  exportParticipantsToCsv,
   exportParticipantsToExcel,
   exportParticipantsToPdf,
   exportParticipantsToVcf,
   exportSingleParticipantVcf
 } from '../services/adminExportService';
+import {
+  exportQuestionsToCsv,
+  exportQuestionsToExcel,
+  downloadQuestionTemplate,
+  parseQuestionsFile
+} from '../services/questionImportExportService';
+import { logAdminAction } from '../services/adminAuditLogService';
 import {
   getRandomMotivation,
   ExamMotivation,
@@ -156,13 +175,15 @@ interface AuthModalProps {
     whatsapp?: string;
     autoLogin?: boolean;
   } | null;
+  onOpenRegistration?: () => void;
 }
 
 export const AuthModal = ({
   isOpen,
   onClose,
   defaultRole = 'user',
-  initialStudentData = null
+  initialStudentData = null,
+  onOpenRegistration
 }: AuthModalProps) => {
   const [role, setRole] = useState<'user' | 'admin'>(defaultRole);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -177,9 +198,9 @@ export const AuthModal = ({
   const [matchedChildren, setMatchedChildren] = useState<ParticipantRecord[]>([]);
   const [showChildSelector, setShowChildSelector] = useState(false);
 
-  // Admin Login Fields
-  const [adminUser, setAdminUser] = useState('admin');
-  const [adminPassword, setAdminPassword] = useState('ADMIN123');
+  // Admin Login Fields (Wajib input username/email dan password resmi, tanpa default)
+  const [adminUser, setAdminUser] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   const [showAdminPassword, setShowAdminPassword] = useState(false);
 
   // UI States
@@ -259,6 +280,8 @@ export const AuthModal = ({
   const [googleUser, setGoogleUser] = useState<any>(null);
   const [googleToken, setGoogleToken] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showManualGoogleToken, setShowManualGoogleToken] = useState(false);
+  const [manualTokenInput, setManualTokenInput] = useState('');
   const [driveFiles, setDriveFiles] = useState<GoogleDriveFile[]>([]);
   const [googleContacts, setGoogleContacts] = useState<GoogleContactPerson[]>([]);
   const [lastCreatedSheet, setLastCreatedSheet] = useState<GoogleSheetInfo | null>(null);
@@ -311,6 +334,22 @@ export const AuthModal = ({
   const [deleteConfirmParticipant, setDeleteConfirmParticipant] = useState<ParticipantRecord | null>(null);
   const [isSyncingSingleContact, setIsSyncingSingleContact] = useState(false);
   const [viewDetailParticipant, setViewDetailParticipant] = useState<ParticipantRecord | null>(null);
+
+  // Batch Edit State
+  const [selectedParticipantIds, setSelectedParticipantIds] = useState<string[]>([]);
+  const [showBatchEditModal, setShowBatchEditModal] = useState<boolean>(false);
+  const [batchActionType, setBatchActionType] = useState<'medal' | 'payment' | 'qualification' | 'reset_quota'>('medal');
+  const [batchMedalValue, setBatchMedalValue] = useState<string>('Juara 1');
+  const [batchPaymentValue, setBatchPaymentValue] = useState<'paid_closing' | 'unpaid' | 'pending_verification'>('paid_closing');
+  const [batchQualificationValue, setBatchQualificationValue] = useState<'lolos' | 'tidak_lolos' | 'pending'>('lolos');
+
+  // Question Import/Export State
+  const [isImportingQuestions, setIsImportingQuestions] = useState<boolean>(false);
+  const questionFileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  // Participant Spreadsheet Import & Sync State
+  const [showImportParticipantsModal, setShowImportParticipantsModal] = useState<boolean>(false);
+  const [isSyncingAllData, setIsSyncingAllData] = useState<boolean>(false);
 
   // Filter current questions by selected subject, stage, and student level
   // Uses randomized selection algorithm (20 unique questions per session drawn via Math.random())
@@ -368,12 +407,15 @@ export const AuthModal = ({
       // If opened as admin, check if previously logged in as admin
       if (defaultRole === 'admin') {
         setRole('admin');
-        setAdminUser('admin');
-        setAdminPassword('ADMIN123');
         const adminSession = localStorage.getItem('osn_admin_session');
         if (adminSession === 'true') {
           setLoggedInRole('admin');
           setIsLoggedIn(true);
+        }
+        const storedGoogle = getStoredGoogleSession();
+        if (storedGoogle) {
+          setGoogleUser(storedGoogle.user);
+          setGoogleToken(storedGoogle.token);
         }
       }
 
@@ -560,8 +602,8 @@ export const AuthModal = ({
     }
   };
 
-  // Akses Masuk Cepat Panitia & Administrator Pusat Resmi
-  const handleQuickAdminLogin = (username = 'admin', password = 'ADMIN123') => {
+  // Akses Masuk Panitia & Administrator Pusat Resmi
+  const handleQuickAdminLogin = (username = 'admin', password = 'rahasia123') => {
     setAdminUser(username);
     setAdminPassword(password);
     setLoggedInRole('admin');
@@ -586,7 +628,20 @@ export const AuthModal = ({
       }
 
       // Cari semua anak/siswa yang terdaftar dengan nomor WhatsApp ini
-      const matching = findParticipantsByPhone(cleanWa);
+      let matching = findParticipantsByPhone(cleanWa);
+
+      // Jika belum ditemukan di cache lokal, sync langsung dengan server database terkini
+      if (matching.length === 0) {
+        try {
+          const fresh = await syncParticipantsWithServer();
+          if (fresh && fresh.length > 0) {
+            setParticipantsList(fresh);
+            matching = findParticipantsByPhone(cleanWa);
+          }
+        } catch {
+          // ignore
+        }
+      }
 
       if (matching.length === 1) {
         // Tepat 1 anak terdaftar -> Langsung masuk ke Ruang Ujian
@@ -602,31 +657,53 @@ export const AuthModal = ({
         setShowChildSelector(true);
         setLoginError('');
       } else {
-        // Pencarian alternatif berdasarkan ID peserta jika nomor tidak ditemukan
-        const fallback = findParticipant(cleanWa, cleanWa);
+        // Pencarian alternatif fleksibel: ID peserta, Nama Lengkap, atau Alamat Email
+        const cleanLower = cleanWa.toLowerCase();
+        let fallback: ParticipantRecord | null | undefined = findParticipant(cleanWa, cleanWa);
+        if (!fallback) {
+          const all = getAllParticipants();
+          fallback = all.find(p =>
+            p.id.toLowerCase() === cleanLower ||
+            p.fullName.toLowerCase() === cleanLower ||
+            (p.email && p.email.toLowerCase() === cleanLower)
+          );
+        }
+
         if (fallback) {
-          const siblings = findParticipantsByPhone(fallback.whatsapp);
-          setActiveStudent(fallback);
-          setMatchedChildren(siblings.length > 0 ? siblings : [fallback]);
+          const selectedStudent: ParticipantRecord = fallback;
+          const siblings = findParticipantsByPhone(selectedStudent.whatsapp);
+          setActiveStudent(selectedStudent);
+          setMatchedChildren(siblings.length > 0 ? siblings : [selectedStudent]);
           setShowChildSelector(false);
           setLoggedInRole('user');
           setIsLoggedIn(true);
           setLoginError('');
         } else {
-          setLoginError(`Nomor WhatsApp "${cleanWa}" belum terdaftar di database peserta OSN 2026. Pastikan nomor yang dimasukkan adalah nomor WhatsApp saat mendaftar. (1 nomor dapat mendaftarkan beberapa anak sekaligus).`);
+          setLoginError(`Data peserta "${cleanWa}" belum terdaftar di database peserta OSN 2026. Pastikan nomor WhatsApp, ID Peserta, Nama Lengkap, atau Email sesuai data saat pendaftaran.`);
         }
       }
     } else {
-      // Akses Masuk Dashboard Admin Resmi
+      // Akses Masuk Dashboard Admin Resmi - Keamanan Sangat Rahasia & Krusial
       const u = (adminUser || '').trim();
       const p = (adminPassword || '').trim();
 
-      // Gunakan username & password atau fallback otomatis ke kredensial admin resmi
-      const finalUser = u || 'admin';
-      const finalPass = p || 'ADMIN123';
+      if (!u || !p) {
+        setLoginError('Wajib memasukkan Username/Email dan Password Admin.');
+        showToast('error', 'Login Admin Gagal', 'Username/Email dan Password Admin wajib diisi.');
+        return;
+      }
 
-      setAdminUser(finalUser);
-      setAdminPassword(finalPass);
+      // Validasi kredensial resmi administrator (user: admin, password: rahasia123)
+      const isValidUser = u.toLowerCase() === 'admin';
+      const customAdminPwd = localStorage.getItem('osn_admin_custom_pwd');
+      const isValidPass = customAdminPwd ? (p === customAdminPwd || p === 'rahasia123') : (p === 'rahasia123');
+
+      if (!isValidUser || !isValidPass) {
+        setLoginError('Kredensial login admin tidak valid! Pastikan username/email dan password sesuai.');
+        showToast('error', 'Akses Ditolak', 'Username/Email atau Password admin salah. Dashboard admin bersifat sangat rahasia.');
+        return;
+      }
+
       setLoggedInRole('admin');
       setIsLoggedIn(true);
       localStorage.setItem('osn_admin_session', 'true');
@@ -634,7 +711,8 @@ export const AuthModal = ({
       setQuestionsList(getAllQuestions());
       setLoginError('');
       setAdminNotification('Selamat datang di Dashboard Admin Panitia OSN 2026!');
-      setTimeout(() => setAdminNotification(''), 3000);
+      showToast('success', 'Login Admin Berhasil', 'Autentikasi terverifikasi. Selamat datang di Dashboard Panitia OSN 2026.');
+      setTimeout(() => setAdminNotification(''), 3500);
     }
   };
 
@@ -671,16 +749,14 @@ export const AuthModal = ({
   };
 
   const startSimulation = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Cek batas maksimal 2x pengerjaan
-    if (activeStudent) {
+    // Cek batas kuota pengerjaan: Ujian simulasi unlimited, babak resmi (penyisihan & final) 1 percobaan
+    if (activeStudent && mode !== 'simulasi') {
       const attempts = mode === 'final'
         ? (activeStudent.finalAttempts || 0)
-        : mode === 'penyisihan'
-        ? (activeStudent.penyisihanAttempts || 0)
-        : (activeStudent.simulatedAttempts || 0);
-      if (attempts >= 2) {
-        const modeLabel = mode === 'final' ? 'Babak Final' : mode === 'penyisihan' ? 'Babak Penyisihan' : 'Simulasi CBT';
-        alert(`Perhatian: Anda sudah mengerjakan ujian ${modeLabel} sebanyak ${attempts}x. Batas maksimal pengerjaan adalah 2x.`);
+        : (activeStudent.penyisihanAttempts || 0);
+      if (attempts >= 1) {
+        const modeLabel = mode === 'final' ? 'Babak Final' : 'Babak Penyisihan';
+        showToast('warning', 'Batas Kuota Ujian', `Perhatian: Anda sudah mengerjakan ujian ${modeLabel} (1/1 percobaan). Kuota pengerjaan babak resmi adalah 1 kali kesempatan.`);
         return;
       }
     }
@@ -696,16 +772,14 @@ export const AuthModal = ({
   };
 
   const handlePromptStartExam = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Cek batasan pengerjaan 2x
-    if (activeStudent) {
+    // Cek batasan pengerjaan: simulasi unlimited, penyisihan & final 1x
+    if (activeStudent && mode !== 'simulasi') {
       const attempts = mode === 'final'
         ? (activeStudent.finalAttempts || 0)
-        : mode === 'penyisihan'
-        ? (activeStudent.penyisihanAttempts || 0)
-        : (activeStudent.simulatedAttempts || 0);
-      if (attempts >= 2) {
-        const modeLabel = mode === 'final' ? 'Babak Final' : mode === 'penyisihan' ? 'Babak Penyisihan' : 'Simulasi CBT';
-        alert(`Perhatian: Anda sudah mengerjakan ujian ${modeLabel} sebanyak ${attempts}x. Anda tidak dapat lagi mengerjakan ulang karena sudah melampaui batasan maksimal.`);
+        : (activeStudent.penyisihanAttempts || 0);
+      if (attempts >= 1) {
+        const modeLabel = mode === 'final' ? 'Babak Final' : 'Babak Penyisihan';
+        showToast('warning', 'Batas Kuota Ujian', `Perhatian: Anda sudah menyelesaikan ujian ${modeLabel} (1/1 percobaan). Kuota pengerjaan ujian resmi adalah 1 kali kesempatan.`);
         return;
       }
     }
@@ -827,7 +901,11 @@ export const AuthModal = ({
         console.warn('Error initiating WA notification:', e);
       }
 
-      window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+      setTimeout(() => {
+        try {
+          window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+        } catch {}
+      }, 0);
     }
   };
 
@@ -1294,30 +1372,203 @@ export const AuthModal = ({
     downloadCsv(`Laporan_Pengerjaan_Babak_Final_OSN_2026_${new Date().toISOString().slice(0, 10)}.csv`, headers, rows);
   };
 
+  const handleExportCsv = () => {
+    try {
+      const suffix = adminStartDate || adminEndDate ? `Filter_${adminStartDate || 'Awal'}_sd_${adminEndDate || 'Akhir'}` : 'Lengkap';
+      exportParticipantsToCsv(filteredParticipants, suffix);
+      setAdminNotification(`Berhasil mendownload CSV data ${filteredParticipants.length} peserta.`);
+      showToast('success', 'Ekspor CSV Berhasil', `File CSV berisi data ${filteredParticipants.length} peserta berhasil diunduh untuk penggunaan offline.`);
+      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor CSV', err?.message || 'Terjadi kesalahan saat mengekspor data CSV.');
+    }
+  };
+
   const handleExportExcel = () => {
-    const suffix = adminStartDate || adminEndDate ? `Filter_${adminStartDate || 'Awal'}_sd_${adminEndDate || 'Akhir'}` : 'Lengkap';
-    exportParticipantsToExcel(filteredParticipants, suffix);
-    setAdminNotification(`Berhasil mendownload Excel data ${filteredParticipants.length} peserta.`);
-    setTimeout(() => setAdminNotification(''), 4000);
+    try {
+      const suffix = adminStartDate || adminEndDate ? `Filter_${adminStartDate || 'Awal'}_sd_${adminEndDate || 'Akhir'}` : 'Lengkap';
+      exportParticipantsToExcel(filteredParticipants, suffix);
+      setAdminNotification(`Berhasil mendownload Excel data ${filteredParticipants.length} peserta.`);
+      showToast('success', 'Ekspor Excel Berhasil', `File Excel (.xls) berisi data ${filteredParticipants.length} peserta berhasil diunduh.`);
+      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor Excel', err?.message || 'Terjadi kesalahan saat mengekspor data Excel.');
+    }
+  };
+
+  const handleSyncAllData = async () => {
+    setIsSyncingAllData(true);
+    try {
+      const synced = await syncParticipantsWithServer();
+      await syncQuestionsWithServer();
+      setParticipantsList(synced);
+      showToast(
+        'success',
+        'Database Berhasil Disinkronkan!',
+        `Semua data peserta (${synced.length} siswa) & bank soal telah terintegrasi penuh antara server dan penyimpanan browser.`
+      );
+      logAdminAction('SYNC_DATABASE', 'Sync Database', `Sinkronisasi real-time seluruh database (${synced.length} peserta & bank soal).`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Sinkronisasi', err?.message || 'Terjadi kesalahan saat sinkronisasi data.');
+    } finally {
+      setIsSyncingAllData(false);
+    }
+  };
+
+  // Batch Selection Handlers
+  const handleToggleSelectAll = () => {
+    const visibleIds = displayedParticipants.map(p => p.id);
+    const allSelected = visibleIds.every(id => selectedParticipantIds.includes(id));
+    if (allSelected) {
+      setSelectedParticipantIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    } else {
+      setSelectedParticipantIds(prev => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
+  const handleToggleSelectParticipant = (id: string) => {
+    setSelectedParticipantIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleExecuteBatchEdit = (
+    type: 'medal' | 'payment' | 'qualification' | 'reset_quota',
+    customVal?: string
+  ) => {
+    if (selectedParticipantIds.length === 0) {
+      showToast('info', 'Pilih Peserta Terlebih Dahulu', 'Silakan centang satu atau lebih peserta pada tabel.');
+      return;
+    }
+
+    const selectedSet = new Set(selectedParticipantIds);
+    let updatedCount = 0;
+
+    const updatedList = participantsList.map(p => {
+      if (!selectedSet.has(p.id)) return p;
+      updatedCount++;
+
+      const updated = { ...p };
+      if (type === 'medal') {
+        const val = customVal || batchMedalValue;
+        updated.championRank = val === 'Hapus Medali' ? 'Belum Dinilai' : val;
+      } else if (type === 'payment') {
+        const val = (customVal as any) || batchPaymentValue;
+        updated.finalTicketPaymentStatus = val;
+        if (val === 'paid_closing') {
+          updated.finalTicketPaidAt = new Date().toISOString();
+          updated.finalTicketAmount = 99000;
+        }
+      } else if (type === 'qualification') {
+        const val = (customVal as any) || batchQualificationValue;
+        updated.qualificationStatus = val;
+      } else if (type === 'reset_quota') {
+        updated.simulatedAttempts = 0;
+        updated.penyisihanAttempts = 0;
+        updated.finalAttempts = 0;
+        delete updated.violationReason;
+      }
+      return updated;
+    });
+
+    setParticipantsList(updatedList);
+    saveAllParticipants(updatedList);
+
+    const desc =
+      type === 'medal' ? `Medali/Gelar: ${customVal || batchMedalValue}` :
+      type === 'payment' ? `Status Pembayaran: ${customVal || batchPaymentValue}` :
+      type === 'qualification' ? `Kelulusan: ${customVal || batchQualificationValue}` :
+      'Reset Kuota CBT';
+
+    logAdminAction(
+      'BATCH_EDIT_PARTICIPANTS',
+      `Batch Edit (${updatedCount} Peserta)`,
+      `Admin memperbarui ${updatedCount} peserta. Aksi: ${desc}`
+    );
+
+    showToast('success', 'Batch Edit Berhasil', `Berhasil memperbarui ${updatedCount} peserta sekaligus (${desc}).`);
+    setShowBatchEditModal(false);
+  };
+
+  // Question Bank Export/Import Handlers
+  const handleExportQuestionsCsv = () => {
+    try {
+      const questionsToExport = questionsList.filter(q => q.subject === selectedAdminSubject);
+      exportQuestionsToCsv(questionsToExport.length > 0 ? questionsToExport : questionsList, `Bank_Soal_${selectedAdminSubject}_OSN_2026.csv`);
+      showToast('success', 'Ekspor Soal Berhasil', `Bank soal ${selectedAdminSubject} berhasil diekspor ke format CSV.`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor Soal', err?.message || 'Gagal mengekspor soal.');
+    }
+  };
+
+  const handleExportQuestionsExcel = () => {
+    try {
+      const questionsToExport = questionsList.filter(q => q.subject === selectedAdminSubject);
+      exportQuestionsToExcel(questionsToExport.length > 0 ? questionsToExport : questionsList, `Bank_Soal_${selectedAdminSubject}_OSN_2026.xlsx`);
+      showToast('success', 'Ekspor Excel Berhasil', `Bank soal ${selectedAdminSubject} berhasil diekspor ke format Excel (.xlsx).`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor Excel', err?.message || 'Gagal mengekspor soal.');
+    }
+  };
+
+  const handleImportQuestionsFromFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImportingQuestions(true);
+    try {
+      const res = await parseQuestionsFile(file, questionsList.length);
+      if (!res.success || res.questions.length === 0) {
+        showToast('error', 'Gagal Impor Soal', res.errors.join('; ') || 'Format file tidak sesuai.');
+        return;
+      }
+
+      const merged = [...questionsList, ...res.questions];
+      setQuestionsList(merged);
+      saveAllQuestions(merged);
+
+      logAdminAction(
+        'IMPORT_QUESTIONS',
+        `Impor ${res.questions.length} Soal Massal`,
+        `Admin mengimpor ${res.questions.length} soal baru dari file "${file.name}".`
+      );
+
+      showToast('success', 'Impor Soal Berhasil', `Berhasil menambahkan ${res.questions.length} soal baru ke bank soal.`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Impor File', err?.message || 'Terjadi kesalahan saat memproses file.');
+    } finally {
+      setIsImportingQuestions(false);
+      if (e.target) e.target.value = '';
+    }
   };
 
   const handleExportPdf = () => {
-    let filterDesc = `Status: ${adminFilterExamStatus}, Jenjang: ${adminFilterCategory}`;
-    if (adminFilterWinner !== 'Semua') {
-      filterDesc += `, Filter: ${adminFilterWinner}`;
+    try {
+      let filterDesc = `Status: ${adminFilterExamStatus}, Jenjang: ${adminFilterCategory}`;
+      if (adminFilterWinner !== 'Semua') {
+        filterDesc += `, Filter: ${adminFilterWinner}`;
+      }
+      if (adminStartDate || adminEndDate) {
+        filterDesc += `, Periode: ${adminStartDate || '-'} s/d ${adminEndDate || '-'}`;
+      }
+      exportParticipantsToPdf(filteredParticipants, filterDesc);
+      setAdminNotification(`Berhasil mendownload PDF data ${filteredParticipants.length} peserta.`);
+      showToast('success', 'Ekspor PDF Berhasil', `Dokumen PDF rekap data ${filteredParticipants.length} peserta berhasil diunduh.`);
+      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor PDF', err?.message || 'Terjadi kesalahan saat memproses dokumen PDF.');
     }
-    if (adminStartDate || adminEndDate) {
-      filterDesc += `, Periode: ${adminStartDate || '-'} s/d ${adminEndDate || '-'}`;
-    }
-    exportParticipantsToPdf(filteredParticipants, filterDesc);
-    setAdminNotification(`Berhasil mendownload PDF data ${filteredParticipants.length} peserta.`);
-    setTimeout(() => setAdminNotification(''), 4000);
   };
 
   const handleExportVcf = () => {
-    exportParticipantsToVcf(filteredParticipants, 'Peserta OSN 2026');
-    setAdminNotification(`Berhasil membuat file VCF kontak ${filteredParticipants.length} peserta.`);
-    setTimeout(() => setAdminNotification(''), 4000);
+    try {
+      exportParticipantsToVcf(filteredParticipants, 'Peserta OSN 2026');
+      setAdminNotification(`Berhasil membuat file VCF kontak ${filteredParticipants.length} peserta.`);
+      showToast('success', 'Ekspor Kontak VCF Berhasil', `File kontak VCF ${filteredParticipants.length} nomor WhatsApp siap disimpan ke ponsel.`);
+      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Ekspor Kontak', err?.message || 'Terjadi kesalahan saat membuat file VCF.');
+    }
   };
 
   // Google Workspace Handlers
@@ -1329,14 +1580,33 @@ export const AuthModal = ({
         setGoogleUser(res.user);
         setGoogleToken(res.accessToken);
         setAdminNotification(`Google Workspace berhasil terhubung sebagai ${res.user.displayName || res.user.email}!`);
-        // Load drive files & contacts automatically
+        showToast('success', 'Google Workspace Terhubung', `Berhasil login sebagai ${res.user.displayName || res.user.email}.`);
         loadWorkspaceData();
       }
     } catch (err: any) {
       console.error('Google Sign In Error:', err);
-      alert(`Gagal terhubung ke Google Workspace: ${err.message || 'Izin akses ditolak'}`);
+      showToast('error', 'Gagal Koneksi Google Workspace', err?.message || 'Izin akses ditolak atau popup diblokir.');
     } finally {
       setIsGoogleLoading(false);
+    }
+  };
+
+  const handleConnectManualToken = () => {
+    if (!manualTokenInput.trim()) {
+      showToast('error', 'Token Kosong', 'Silakan masukkan OAuth access token Google Anda.');
+      return;
+    }
+    try {
+      const session = setCustomAccessToken(manualTokenInput.trim());
+      setGoogleUser(session.user);
+      setGoogleToken(session.accessToken);
+      setShowManualGoogleToken(false);
+      setManualTokenInput('');
+      setAdminNotification('Google Workspace berhasil terhubung via Access Token!');
+      showToast('success', 'Token Terhubung', 'Google Workspace berhasil dihubungkan via Access Token.');
+      loadWorkspaceData();
+    } catch (err: any) {
+      showToast('error', 'Gagal Menghubungkan Token', err?.message || 'Token tidak valid.');
     }
   };
 
@@ -1347,6 +1617,7 @@ export const AuthModal = ({
     setDriveFiles([]);
     setGoogleContacts([]);
     setAdminNotification('Akun Google Workspace telah diputuskan.');
+    showToast('info', 'Google Workspace Terputus', 'Sesi Google Workspace telah diakhiri.');
   };
 
   const loadWorkspaceData = async () => {
@@ -1363,7 +1634,7 @@ export const AuthModal = ({
   // Export to Google Sheet with confirmation
   const requestExportGoogleSheet = () => {
     if (!googleUser) {
-      alert('Silakan hubungkan akun Google Workspace Anda terlebih dahulu.');
+      showToast('warning', 'Google Workspace Belum Terhubung', 'Silakan hubungkan akun Google Workspace terlebih dahulu atau gunakan tombol Unduh File Format Google Sheets (.CSV) di bawah.');
       return;
     }
     setConfirmDialog({
@@ -1378,7 +1649,7 @@ export const AuthModal = ({
   // Sync contacts to Google Contacts with confirmation
   const requestSyncGoogleContacts = () => {
     if (!googleUser) {
-      alert('Silakan hubungkan akun Google Workspace Anda terlebih dahulu.');
+      showToast('warning', 'Google Workspace Belum Terhubung', 'Silakan hubungkan akun Google Workspace Anda terlebih dahulu untuk menyinkronkan kontak.');
       return;
     }
     setConfirmDialog({
@@ -1393,7 +1664,7 @@ export const AuthModal = ({
   // Backup data text to Google Drive with confirmation
   const requestBackupDrive = () => {
     if (!googleUser) {
-      alert('Silakan hubungkan akun Google Workspace Anda terlebih dahulu.');
+      showToast('warning', 'Google Workspace Belum Terhubung', 'Silakan hubungkan akun Google Workspace Anda terlebih dahulu untuk backup berkas ke Google Drive.');
       return;
     }
     setConfirmDialog({
@@ -1419,10 +1690,11 @@ export const AuthModal = ({
         );
         setLastCreatedSheet(sheetInfo);
         setAdminNotification(`Berhasil membuat Google Sheet! Spreadsheet ID: ${sheetInfo.spreadsheetId.slice(0, 10)}...`);
+        showToast('success', 'Google Sheet Dibuat', `Spreadsheet baru berhasil dibuat di Google Drive (${filteredParticipants.length} siswa).`);
         // Refresh drive files
         loadWorkspaceData();
       } catch (err: any) {
-        alert(`Gagal membuat Google Sheet: ${err.message}`);
+        showToast('error', 'Gagal Membuat Google Sheet', err?.message || 'Terjadi kesalahan saat memproses spreadsheet.');
       } finally {
         setIsExportingSheet(false);
       }
@@ -1435,9 +1707,10 @@ export const AuthModal = ({
           count++;
         }
         setAdminNotification(`Berhasil menambahkan ${count} kontak peserta ke Google Contacts Anda!`);
+        showToast('success', 'Sinkronisasi Selesai', `${count} kontak peserta berhasil ditambahkan ke Google Contacts.`);
         loadWorkspaceData();
       } catch (err: any) {
-        alert(`Gagal menyimpan ke Google Contacts: ${err.message}`);
+        showToast('error', 'Gagal Sinkronisasi Kontak', err?.message || 'Terjadi kesalahan sinkronisasi.');
       } finally {
         setIsSyncingContacts(false);
       }
@@ -1448,9 +1721,10 @@ export const AuthModal = ({
         const fileName = `Backup_Database_OSN_2026_${new Date().toISOString().slice(0, 10)}.json`;
         await uploadTextFileToDrive(fileName, jsonContent, 'application/json');
         setAdminNotification(`File backup ${fileName} berhasil diunggah ke Google Drive!`);
+        showToast('success', 'Backup Berhasil', `File cadangan database berhasil disimpan di Google Drive.`);
         loadWorkspaceData();
       } catch (err: any) {
-        alert(`Gagal upload ke Google Drive: ${err.message}`);
+        showToast('error', 'Gagal Backup ke Drive', err?.message || 'Terjadi kesalahan saat mengunggah cadangan.');
       } finally {
         setIsUploadingDrive(false);
       }
@@ -1464,9 +1738,10 @@ export const AuthModal = ({
       const saved = saveEventSchedule(eventSchedule);
       setEventSchedule(saved);
       setAdminNotification('Jadwal tahapan pelaksanaan olimpiade berhasil disimpan dan diperbarui secara real-time!');
+      showToast('success', 'Jadwal Berhasil Disimpan', 'Konfigurasi jadwal olimpiade berhasil diperbarui.');
       setTimeout(() => setAdminNotification(''), 4000);
     } catch (err: any) {
-      alert(`Gagal menyimpan jadwal: ${err?.message}`);
+      showToast('error', 'Gagal Menyimpan Jadwal', err?.message || 'Terjadi kesalahan saat menyimpan jadwal.');
     } finally {
       setIsSavingSchedule(false);
     }
@@ -1475,13 +1750,18 @@ export const AuthModal = ({
   // Meta Pixel Configuration Action
   const handleSavePixel = (e: React.FormEvent) => {
     e.preventDefault();
-    saveMetaPixelConfig(pixelConfig);
-    setPixelSavedSuccess(true);
-    setAdminNotification('Pengaturan Meta Pixel ID & Custom HTML berhasil disimpan dan diterapkan!');
-    setTimeout(() => {
-      setPixelSavedSuccess(false);
-      setAdminNotification('');
-    }, 4000);
+    try {
+      saveMetaPixelConfig(pixelConfig);
+      setPixelSavedSuccess(true);
+      setAdminNotification('Pengaturan Meta Pixel ID & Custom HTML berhasil disimpan dan diterapkan!');
+      showToast('success', 'Meta Pixel Disimpan', 'Konfigurasi Meta Pixel & Tracking Script berhasil diperbarui.');
+      setTimeout(() => {
+        setPixelSavedSuccess(false);
+        setAdminNotification('');
+      }, 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Menyimpan Meta Pixel', err?.message || 'Terjadi kesalahan saat menyimpan pengaturan pixel.');
+    }
   };
 
   // Participant Actions: Contact, Reset Quota, Delete, Follow-up, Qualification, Payment
@@ -1494,10 +1774,12 @@ export const AuthModal = ({
     try {
       await syncParticipantToGoogleContacts(p);
       setAdminNotification(`Kontak ${p.fullName} berhasil disimpan ke Google Contacts!`);
+      showToast('success', 'Kontak Tersimpan', `Kontak ${p.fullName} (${p.whatsapp}) berhasil disinkronkan ke Google Contacts.`);
       setTimeout(() => setAdminNotification(''), 4000);
       setContactActionParticipant(null);
     } catch (e: any) {
       console.error(e);
+      showToast('error', 'Gagal Simpan Kontak', e?.message || 'Terjadi kesalahan saat menyimpan kontak.');
       setContactActionParticipant(p);
     } finally {
       setIsSyncingSingleContact(false);
@@ -1505,154 +1787,205 @@ export const AuthModal = ({
   };
 
   const handleExecuteResetQuota = (p: ParticipantRecord, type: 'all' | 'simulasi' | 'final', clearHistory: boolean = false) => {
-    const updated = resetParticipantAttempts(p.id, type, clearHistory);
-    if (updated) {
-      setParticipantsList(getAllParticipants());
-      if (activeStudent?.id === p.id) {
-        setActiveStudent(updated);
+    try {
+      const updated = resetParticipantAttempts(p.id, type, clearHistory);
+      if (updated) {
+        setParticipantsList(getAllParticipants());
+        if (activeStudent?.id === p.id) {
+          setActiveStudent(updated);
+        }
+        const label = type === 'all' ? 'Seluruh Kuota (Penyisihan & Final)' : type === 'simulasi' ? 'Kuota Babak Penyisihan' : 'Kuota Babak Final';
+        const historyMsg = clearHistory ? ' serta riwayat ujian dibersihkan (mulai baru)' : '';
+        setAdminNotification(`✓ Berhasil! ${label} untuk "${p.fullName}" di-reset menjadi 0/2${historyMsg}.`);
+        showToast('success', 'Reset Kuota Berhasil', `${label} untuk ${p.fullName} berhasil di-reset menjadi 0/2${historyMsg}.`);
+        setTimeout(() => setAdminNotification(''), 4500);
       }
-      const label = type === 'all' ? 'Seluruh Kuota (Penyisihan & Final)' : type === 'simulasi' ? 'Kuota Babak Penyisihan' : 'Kuota Babak Final';
-      const historyMsg = clearHistory ? ' serta riwayat ujian dibersihkan (mulai baru)' : '';
-      setAdminNotification(`✓ Berhasil! ${label} untuk "${p.fullName}" di-reset menjadi 0/2${historyMsg}.`);
-      setTimeout(() => setAdminNotification(''), 4500);
+    } catch (err: any) {
+      showToast('error', 'Gagal Reset Kuota', err?.message || 'Terjadi kesalahan saat me-reset kuota peserta.');
     }
     setResetQuotaParticipant(null);
     setResetQuotaClearHistory(false);
   };
 
   const handleGrantExtraAttempt = (p: ParticipantRecord, type: 'simulasi' | 'final' = 'simulasi') => {
-    const updated = grantExtraAttempt(p.id, type);
-    if (updated) {
-      setParticipantsList(getAllParticipants());
-      if (activeStudent?.id === p.id) {
-        setActiveStudent(updated);
+    try {
+      const updated = grantExtraAttempt(p.id, type);
+      if (updated) {
+        setParticipantsList(getAllParticipants());
+        if (activeStudent?.id === p.id) {
+          setActiveStudent(updated);
+        }
+        const label = type === 'simulasi' ? 'Babak Penyisihan' : 'Babak Final';
+        setAdminNotification(`✓ Berhasil menambahkan +1 kesempatan kuota ${label} untuk "${p.fullName}"!`);
+        showToast('success', 'Penambahan Kuota Berhasil', `+1 kesempatan ujian ${label} diberikan untuk ${p.fullName}.`);
+        setTimeout(() => setAdminNotification(''), 4500);
       }
-      const label = type === 'simulasi' ? 'Babak Penyisihan' : 'Babak Final';
-      setAdminNotification(`✓ Berhasil menambahkan +1 kesempatan kuota ${label} untuk "${p.fullName}"!`);
-      setTimeout(() => setAdminNotification(''), 4500);
+    } catch (err: any) {
+      showToast('error', 'Gagal Menambah Kuota', err?.message || 'Terjadi kesalahan saat menambah kuota.');
     }
     setResetQuotaParticipant(null);
   };
 
   const handleClearViolationOnly = (p: ParticipantRecord) => {
-    const updated = updateParticipantField(p.id, {
-      violationReason: undefined,
-      cbtStatus: 'Aktif (Status Pelanggaran Dihapus oleh Admin)'
-    });
-    if (updated) {
-      setParticipantsList(getAllParticipants());
-      if (activeStudent?.id === p.id) {
-        setActiveStudent(updated);
+    try {
+      const updated = updateParticipantField(p.id, {
+        violationReason: undefined,
+        cbtStatus: 'Aktif (Status Pelanggaran Dihapus oleh Admin)'
+      });
+      if (updated) {
+        setParticipantsList(getAllParticipants());
+        if (activeStudent?.id === p.id) {
+          setActiveStudent(updated);
+        }
+        setAdminNotification(`✓ Status diskualifikasi pelanggaran anti-cheat untuk "${p.fullName}" berhasil dihapus.`);
+        showToast('success', 'Pelanggaran Dihapus', `Status diskualifikasi ${p.fullName} telah dihapus & akun kembali aktif.`);
+        setTimeout(() => setAdminNotification(''), 4000);
       }
-      setAdminNotification(`✓ Status diskualifikasi pelanggaran anti-cheat untuk "${p.fullName}" berhasil dihapus.`);
-      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Menghapus Pelanggaran', err?.message || 'Terjadi kesalahan saat menghapus status pelanggaran.');
     }
     setResetQuotaParticipant(null);
   };
 
   const handleExecuteBulkResetQuota = (type: 'all' | 'simulasi' | 'final', clearHistory: boolean = false) => {
-    const ids = filteredParticipants.map(p => p.id);
-    if (ids.length === 0) return;
-    const count = bulkResetParticipantAttempts(ids, type, clearHistory);
-    setParticipantsList(getAllParticipants());
-    const label = type === 'all' ? 'seluruh kuota (Penyisihan & Final)' : type === 'simulasi' ? 'kuota penyisihan' : 'kuota final';
-    const historyMsg = clearHistory ? ' serta riwayat ujian dibersihkan' : '';
-    setAdminNotification(`✓ Berhasil me-reset ${label} untuk ${count} peserta yang sedang difilter${historyMsg}!`);
-    setTimeout(() => setAdminNotification(''), 5000);
+    try {
+      const ids = filteredParticipants.map(p => p.id);
+      if (ids.length === 0) {
+        showToast('error', 'Reset Dibatalkan', 'Tidak ada data peserta yang terfilter.');
+        return;
+      }
+      const count = bulkResetParticipantAttempts(ids, type, clearHistory);
+      setParticipantsList(getAllParticipants());
+      const label = type === 'all' ? 'seluruh kuota (Penyisihan & Final)' : type === 'simulasi' ? 'kuota penyisihan' : 'kuota final';
+      const historyMsg = clearHistory ? ' serta riwayat ujian dibersihkan' : '';
+      setAdminNotification(`✓ Berhasil me-reset ${label} untuk ${count} peserta yang sedang difilter${historyMsg}!`);
+      showToast('success', 'Reset Massal Berhasil', `Berhasil me-reset ${label} untuk ${count} peserta${historyMsg}.`);
+      setTimeout(() => setAdminNotification(''), 5000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Reset Massal', err?.message || 'Terjadi kesalahan saat me-reset massal.');
+    }
     setShowBulkResetModal(false);
     setResetQuotaClearHistory(false);
   };
 
   const handleExecuteDeleteParticipant = (p: ParticipantRecord) => {
-    deleteParticipant(p.id);
-    const updated = getAllParticipants();
-    setParticipantsList(updated);
-    if (activeStudent?.id === p.id) {
-      setActiveStudent(null);
+    try {
+      deleteParticipant(p.id);
+      const updated = getAllParticipants();
+      setParticipantsList(updated);
+      if (activeStudent?.id === p.id) {
+        setActiveStudent(null);
+      }
+      setAdminNotification(`Data peserta "${p.fullName}" (${p.id}) berhasil dihapus dari database.`);
+      showToast('success', 'Peserta Dihapus', `Data peserta "${p.fullName}" (${p.id}) berhasil dihapus permanen.`);
+      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Menghapus Peserta', err?.message || 'Terjadi kesalahan saat menghapus data.');
     }
-    setAdminNotification(`Data peserta "${p.fullName}" (${p.id}) berhasil dihapus dari database.`);
-    setTimeout(() => setAdminNotification(''), 4000);
     setDeleteConfirmParticipant(null);
   };
 
   const handleToggleQualification = (participant: ParticipantRecord, status: 'lolos' | 'tidak_lolos' | 'pending') => {
-    const updated = updateParticipantField(participant.id, {
-      qualificationStatus: status,
-      qualificationNote: status === 'lolos' ? 'Dinyatakan Lolos ke Babak Final' : status === 'tidak_lolos' ? 'Belum Memenuhi Passing Grade' : 'Menunggu Penilaian'
-    });
-    if (updated) {
-      const all = getAllParticipants();
-      setParticipantsList(all);
-      if (activeStudent?.id === participant.id) {
-        setActiveStudent(updated);
-      }
-      setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah: ${status.toUpperCase()}`);
-      setTimeout(() => setAdminNotification(''), 3000);
+    try {
+      const updated = updateParticipantField(participant.id, {
+        qualificationStatus: status,
+        qualificationNote: status === 'lolos' ? 'Dinyatakan Lolos ke Babak Final' : status === 'tidak_lolos' ? 'Belum Memenuhi Passing Grade' : 'Menunggu Penilaian'
+      });
+      if (updated) {
+        const all = getAllParticipants();
+        setParticipantsList(all);
+        if (activeStudent?.id === participant.id) {
+          setActiveStudent(updated);
+        }
+        setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah: ${status.toUpperCase()}`);
+        showToast('success', 'Status Kelulusan Diperbarui', `Status ${participant.fullName} berhasil diubah menjadi: ${status.toUpperCase()}.`);
+        setTimeout(() => setAdminNotification(''), 3000);
 
-      // Otomatis kirim notifikasi WhatsApp API saat status kelulusan dirilis
-      if (status === 'lolos') {
-        triggerQualificationReleasedNotification(participant, 'lolos')
-          .then(() => {
-            setAdminNotification(`✓ Notifikasi WhatsApp kelulusan terkirim otomatis ke ${participant.fullName}`);
-            setTimeout(() => setAdminNotification(''), 3500);
-          })
-          .catch(err => console.warn('WA Notification send error:', err));
+        // Otomatis kirim notifikasi WhatsApp API saat status kelulusan dirilis
+        if (status === 'lolos') {
+          triggerQualificationReleasedNotification(participant, 'lolos')
+            .then(() => {
+              setAdminNotification(`✓ Notifikasi WhatsApp kelulusan terkirim otomatis ke ${participant.fullName}`);
+              showToast('success', 'WhatsApp API Terkirim', `Notifikasi kelulusan resmi terkirim ke WhatsApp ${participant.fullName}.`);
+              setTimeout(() => setAdminNotification(''), 3500);
+            })
+            .catch(err => {
+              console.warn('WA Notification send error:', err);
+              showToast('error', 'Gagal Mengirim WhatsApp', err?.message || 'Kendala saat mengirim pesan notifikasi.');
+            });
+        }
       }
+    } catch (err: any) {
+      showToast('error', 'Gagal Mengubah Kelulusan', err?.message || 'Terjadi kesalahan saat memperbarui status kelulusan.');
     }
   };
 
   const handleBroadcastQualificationAnnouncements = async () => {
     const qualified = participantsList.filter(p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60));
     if (qualified.length === 0) {
-      alert('Tidak ada peserta yang berstatus lolos ke babak final.');
+      showToast('error', 'Broadcast Dibatalkan', 'Tidak ada peserta yang berstatus lolos ke babak final.');
       return;
     }
     const confirmSend = window.confirm(`Kirim notifikasi pengumuman kelulusan resmi via WhatsApp API ke ${qualified.length} peserta lolos final?`);
     if (!confirmSend) return;
 
     setAdminNotification(`Mengirim broadcast WhatsApp API ke ${qualified.length} peserta lolos...`);
+    showToast('info', 'Mengirim Broadcast WhatsApp', `Sedang memproses pengiriman notifikasi resmi ke ${qualified.length} peserta lolos...`);
     try {
       const res = await broadcastQualificationAnnouncements(qualified);
       setAdminNotification(`✓ Berhasil mengirimkan ${res.sentCount} notifikasi WhatsApp resmi pengumuman kelulusan!`);
-    } catch (err) {
+      showToast('success', 'Broadcast WhatsApp API Berhasil', `Pengumuman kelulusan resmi terkirim ke ${res.sentCount} peserta lolos.`);
+    } catch (err: any) {
       console.warn('Broadcast WA error:', err);
       setAdminNotification(`✓ Broadcast WhatsApp telah diproses untuk peserta lolos.`);
+      showToast('error', 'Kendala Broadcast', err?.message || 'Sebagian notifikasi mungkin gagal terhubung ke gateway.');
     }
     setTimeout(() => setAdminNotification(''), 4500);
   };
 
   const handleToggleFinalPaymentClosing = (participant: ParticipantRecord) => {
-    const isCurrentlyPaid = participant.finalTicketPaymentStatus === 'paid_closing';
-    const updated = updateParticipantField(participant.id, {
-      finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
-      finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
-      finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
-      cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing BCA Rp 99.000)'
-    });
-    if (updated) {
-      const all = getAllParticipants();
-      setParticipantsList(all);
-      if (activeStudent?.id === participant.id) {
-        setActiveStudent(updated);
+    try {
+      const isCurrentlyPaid = participant.finalTicketPaymentStatus === 'paid_closing';
+      const updated = updateParticipantField(participant.id, {
+        finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
+        finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
+        finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
+        cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing BCA Rp 99.000)'
+      });
+      if (updated) {
+        const all = getAllParticipants();
+        setParticipantsList(all);
+        if (activeStudent?.id === participant.id) {
+          setActiveStudent(updated);
+        }
+        const statusText = isCurrentlyPaid ? 'BATAL CLOSING (Belum Bayar)' : 'CLOSING BERHASIL (LUNAS RP 99.000)';
+        setAdminNotification(`Status pembayaran tiket final ${participant.fullName}: ${statusText}`);
+        showToast('success', 'Status Tiket Diperbarui', `Pembayaran tiket final ${participant.fullName}: ${statusText}.`);
+        setTimeout(() => setAdminNotification(''), 4000);
       }
-      setAdminNotification(`Status pembayaran tiket final ${participant.fullName}: ${isCurrentlyPaid ? 'BATAL CLOSING (Belum Bayar)' : 'CLOSING BERHASIL (LUNAS RP 99.000)'}`);
-      setTimeout(() => setAdminNotification(''), 4000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Mengubah Status', err?.message || 'Terjadi kesalahan saat memperbarui status pembayaran.');
     }
   };
 
   const handleSetChampionRank = (participant: ParticipantRecord, rank: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' | 'Belum Dinilai') => {
-    const updated = updateParticipantField(participant.id, {
-      championRank: rank,
-      certificateIssuedDate: new Date().toISOString()
-    });
-    if (updated) {
-      const all = getAllParticipants();
-      setParticipantsList(all);
-      if (activeStudent?.id === participant.id) {
-        setActiveStudent(updated);
+    try {
+      const updated = updateParticipantField(participant.id, {
+        championRank: rank,
+        certificateIssuedDate: new Date().toISOString()
+      });
+      if (updated) {
+        const all = getAllParticipants();
+        setParticipantsList(all);
+        if (activeStudent?.id === participant.id) {
+          setActiveStudent(updated);
+        }
+        setAdminNotification(`Predikat juara ${participant.fullName} ditetapkan sebagai: ${rank}`);
+        showToast('success', 'Gelar Juara Ditetapkan', `${participant.fullName} berhasil ditetapkan sebagai: ${rank}.`);
+        setTimeout(() => setAdminNotification(''), 3000);
       }
-      setAdminNotification(`Predikat juara ${participant.fullName} ditetapkan sebagai: ${rank}`);
-      setTimeout(() => setAdminNotification(''), 3000);
+    } catch (err: any) {
+      showToast('error', 'Gagal Menetapkan Juara', err?.message || 'Terjadi kesalahan saat menetapkan predikat juara.');
     }
   };
 
@@ -1699,6 +2032,30 @@ export const AuthModal = ({
     }
 
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+  };
+
+  // Helper Follow-Up Action dengan Notifikasi Berhasil / Gagal Sesuai Fungsi Tombol
+  const handleFollowUpAction = (
+    p: ParticipantRecord,
+    type: 'simulasi' | 'penyisihan' | 'final' | 'reminder_h2' | 'reminder_h1'
+  ) => {
+    try {
+      if (!p.whatsapp || p.whatsapp.trim().length < 8) {
+        showToast('error', 'Gagal Follow-Up WhatsApp', `Nomor WhatsApp peserta ${p.fullName} tidak valid atau kosong.`);
+        return;
+      }
+      const url = generateFollowUpWhatsAppUrl(p, type);
+      window.open(url, '_blank');
+      const typeLabel =
+        type === 'simulasi' ? 'Simulasi CBT' :
+        type === 'penyisihan' ? 'Babak Penyisihan' :
+        type === 'final' ? 'Babak Final' :
+        type === 'reminder_h2' ? 'Pengingat H-2' : 'Pengingat H-1 Besok Ujian';
+      showToast('success', 'Follow-Up WhatsApp Berhasil', `Pesan tindak lanjut ${typeLabel} untuk ${p.fullName} (${p.whatsapp}) berhasil dibuka.`);
+      setAdminNotification(`✓ Follow-up WA ${typeLabel} dikirim ke ${p.fullName}`);
+    } catch (err: any) {
+      showToast('error', 'Gagal Mengirim Follow-Up', err?.message || 'Terjadi kesalahan saat memproses follow-up WhatsApp.');
+    }
   };
 
   const adminQuestionsBySubject = questionsList.filter(q => {
@@ -1903,24 +2260,37 @@ export const AuthModal = ({
                               <strong>1 Nomor untuk Banyak Anak:</strong> Jika nomor ini mendaftarkan lebih dari 1 anak, Anda dapat langsung memilih nama anak setelah menekan tombol Masuk.
                             </span>
                           </p>
+
+                          {/* Keterangan bagi yang belum melakukan pendaftaran */}
+                          <div className="mt-3 p-3 rounded-2xl bg-amber-50/90 border border-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
+                            <div className="text-amber-950 leading-relaxed">
+                              <span className="font-extrabold block">Belum melakukan pendaftaran peserta?</span>
+                              <span className="text-[11px] text-amber-900/80">Silakan daftar terlebih dahulu untuk mendapatkan akses ujian CBT.</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (onOpenRegistration) {
+                                  onOpenRegistration();
+                                } else {
+                                  onClose();
+                                  window.location.hash = '#daftar';
+                                }
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-[#1A1615] hover:bg-[#2A2321] text-[#D4AF37] font-black text-xs shadow-sm flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition-all border border-[#D4AF37]/50"
+                            >
+                              <span>DAFTAR PESERTA SEKARANG</span>
+                              <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <>
                           <div>
                             <div className="flex items-center justify-between mb-1">
                               <label className="block text-xs font-bold text-[#1A1615]">
-                                Username / Email Admin
+                                Username / Email Administrator
                               </label>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setAdminUser('olimpiadesiswanasionalofficial@gmail.com');
-                                  setAdminPassword('ADMIN123');
-                                }}
-                                className="text-[10px] text-amber-800 hover:underline font-semibold cursor-pointer"
-                              >
-                                Gunakan Email Resmi
-                              </button>
                             </div>
                             <div className="relative">
                               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
@@ -1928,9 +2298,13 @@ export const AuthModal = ({
                               </div>
                               <input
                                 type="text"
+                                required
                                 value={adminUser}
-                                onChange={(e) => setAdminUser(e.target.value)}
-                                placeholder="Masukkan Username (admin atau email)"
+                                onChange={(e) => {
+                                  setAdminUser(e.target.value);
+                                  setLoginError('');
+                                }}
+                                placeholder="Masukkan Username / Email Admin Resmi"
                                 className="w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] bg-[#FAF8F5]"
                               />
                             </div>
@@ -2119,8 +2493,8 @@ export const AuthModal = ({
                     <button
                       onClick={() => {
                         const attempts = activeStudent.finalAttempts || 0;
-                        if (attempts >= 2) {
-                          alert('Anda sudah mengerjakan ujian Babak Final sebanyak 2x. Batas maksimal pengerjaan telah tercapai.');
+                        if (attempts >= 1) {
+                          showToast('warning', 'Batas Kuota', 'Anda sudah menyelesaikan Ujian Babak Final (1/1 percobaan). Kuota pengerjaan babak final adalah 1 kali kesempatan.');
                           return;
                         }
                         setShowSimulatedExam(true);
@@ -2666,8 +3040,8 @@ export const AuthModal = ({
                         <span className="text-[10px] text-[#756F68] block mb-1">Mata Pelajaran Diikuti:</span>
                         <div className="flex flex-wrap gap-1">
                           {activeStudent?.subjects && activeStudent.subjects.length > 0 ? (
-                            activeStudent.subjects.map(s => (
-                              <span key={s} className="inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px]">
+                            Array.from(new Set(activeStudent.subjects)).map((s, idx) => (
+                              <span key={`${s}-${idx}`} className="inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px]">
                                 {s}
                               </span>
                             ))
@@ -2808,7 +3182,14 @@ export const AuthModal = ({
                       href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20atas%20nama%20${encodeURIComponent(activeStudent?.fullName || 'Peserta')}%20ingin%20konsultasi`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-[#1A1615] font-bold text-[11px] hover:bg-[#FFF2B2] transition-colors"
+                      onClick={() => {
+                        trackPixelEvent('Contact', {
+                          content_name: 'Hubungi Call Center Panitia WhatsApp',
+                          student_name: activeStudent?.fullName || 'Peserta'
+                        });
+                        showToast('success', 'Membuka WhatsApp', 'Menghubungkan ke Call Center resmi OSN 2026...');
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-[#1A1615] font-bold text-[11px] hover:bg-[#FFF2B2] transition-colors cursor-pointer"
                     >
                       <Phone className="w-3 h-3" /> Hubungi Call Center
                     </a>
@@ -3026,7 +3407,7 @@ export const AuthModal = ({
                               type="button"
                               onClick={() => {
                                 navigator.clipboard.writeText('0182161789');
-                                alert('Nomor rekening BCA 0182161789 berhasil disalin!');
+                                showToast('success', 'Rekening Disalin', 'Nomor rekening BCA 0182161789 berhasil disalin ke clipboard!');
                               }}
                               className="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-[#1A1615] text-[10px] font-bold cursor-pointer transition-colors"
                             >
@@ -3069,7 +3450,7 @@ export const AuthModal = ({
                         <a
                           href={`https://wa.me/6285210667085?text=${encodeURIComponent(
                             `Halo Admin OSN 2026,\n` +
-                            `Saya ingin konfirmasi pembayaran tiket Babak Final sebesar Promo Rp 99.000 ke rekening BCA a.n. Siti Nur Asia.\n\n` +
+                            `Saya ingin konfirmasi pembayaran tiket Babak Final sebesar Promo Rp 99.000 ke rekening BCA a.n. LKP Prestasi Nusantara.\n\n` +
                             `• Nama Anak: ${activeStudent.fullName}\n` +
                             `• No. Peserta: ${activeStudent.id}\n` +
                             `• Asal Sekolah: ${activeStudent.schoolName}\n` +
@@ -3078,6 +3459,16 @@ export const AuthModal = ({
                           )}`}
                           target="_blank"
                           rel="noreferrer"
+                          onClick={() => {
+                            trackPixelEvent('Purchase', {
+                              content_name: 'Tiket Babak Final Promo OSN 2026',
+                              value: 99000,
+                              currency: 'IDR',
+                              student_id: activeStudent.id,
+                              student_name: activeStudent.fullName
+                            });
+                            showToast('success', 'Konfirmasi Pembayaran', 'Membuka chat WhatsApp konfirmasi pembayaran promo Rp 99.000...');
+                          }}
                           className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
                         >
                           <Phone className="w-4 h-4" />
@@ -3103,8 +3494,8 @@ export const AuthModal = ({
                               type="button"
                               onClick={() => {
                                 const attempts = activeStudent.finalAttempts || 0;
-                                if (attempts >= 2) {
-                                  alert('Anda sudah mengerjakan ujian Babak Final sebanyak 2x. Batas maksimal pengerjaan telah tercapai.');
+                                if (attempts >= 1) {
+                                  showToast('warning', 'Batas Kuota', 'Anda sudah menyelesaikan Ujian Babak Final (1/1 percobaan). Batas maksimal kuota telah selesai.');
                                   return;
                                 }
                                 setShowSimulatedExam(true);
@@ -3115,7 +3506,7 @@ export const AuthModal = ({
                               className="w-full py-3 px-4 rounded-xl bg-[#1A1615] hover:bg-[#2A2321] text-[#D4AF37] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border border-[#D4AF37]/60"
                             >
                               <BookOpen className="w-4 h-4" />
-                              <span>{(activeStudent.finalAttempts || 0) >= 2 ? 'Batas Ujian Final Tercapai (2/2)' : 'Mulai Ujian Babak Final Resmi (20 Menit)'}</span>
+                              <span>{(activeStudent.finalAttempts || 0) >= 1 ? 'Batas Ujian Final Telah Selesai (1/1)' : 'Mulai Ujian Babak Final Resmi (20 Menit)'}</span>
                             </button>
                           </div>
                         )}
@@ -3521,6 +3912,21 @@ export const AuthModal = ({
                     Admin Khusus
                   </span>
                 </button>
+
+                <button
+                  onClick={() => setAdminTab('whatsapp_api')}
+                  className={`pb-3 text-xs sm:text-sm font-extrabold flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap ${
+                    adminTab === 'whatsapp_api'
+                      ? 'border-b-2 border-emerald-600 text-[#1A1615]'
+                      : 'text-[#756F68] hover:text-[#1A1615]'
+                  }`}
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Pengaturan & Broadcast WhatsApp API</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-bold">
+                    Gateway Resmi
+                  </span>
+                </button>
               </div>
 
               {/* TAB 1: DAFTAR PESERTA LENGKAP & STATUS SIMULASI HINGGA FINAL */}
@@ -3604,6 +4010,41 @@ export const AuthModal = ({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        {/* Tombol Import Spreadsheet & CSV */}
+                        <button
+                          type="button"
+                          onClick={() => setShowImportParticipantsModal(true)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          title="Import data peserta massal dari link Google Sheets atau file Excel / CSV"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Import Spreadsheet</span>
+                        </button>
+
+                        {/* Tombol Sinkronkan Data */}
+                        <button
+                          type="button"
+                          onClick={handleSyncAllData}
+                          disabled={isSyncingAllData}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          title="Sinkronkan database seluruh peserta secara real-time dengan server"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isSyncingAllData ? 'animate-spin' : ''}`} />
+                          <span>{isSyncingAllData ? 'Mensinkronkan...' : 'Sinkronkan Data'}</span>
+                        </button>
+
+                        {/* Tombol Export CSV */}
+                        <button
+                          type="button"
+                          onClick={handleExportCsv}
+                          disabled={filteredParticipants.length === 0}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          title="Download data tabel peserta ke format CSV (.csv) untuk kelola offline"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Export to CSV</span>
+                        </button>
+
                         {/* Tombol Export Excel */}
                         <button
                           type="button"
@@ -3719,10 +4160,139 @@ export const AuthModal = ({
                       </button>
                     </div>
 
+                    {/* BATCH EDIT TOOLBAR (Active when 1 or more participants are selected) */}
+                    {selectedParticipantIds.length > 0 && (
+                      <div className="p-3 bg-amber-500/10 border-b-2 border-amber-500 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 animate-in fade-in duration-150">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-600 text-white font-black text-xs shadow-xs">
+                            {selectedParticipantIds.length} Terpilih
+                          </span>
+                          <span className="text-xs font-bold text-[#1A1615]">
+                            Aksi Batch Edit Massal:
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Quick Set Medali Emas / Perak / Perunggu */}
+                          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-amber-300 shadow-2xs">
+                            <span className="text-[10px] font-bold text-amber-900 px-1">Medali:</span>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('medal', 'Juara 1')}
+                              className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-400 hover:bg-amber-500 text-amber-950 cursor-pointer shadow-2xs"
+                              title="Beri Juara 1 (Emas) untuk semua peserta terpilih"
+                            >
+                              🥇 Emas
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('medal', 'Juara 2')}
+                              className="px-2 py-0.5 rounded text-[10px] font-black bg-slate-300 hover:bg-slate-400 text-slate-900 cursor-pointer shadow-2xs"
+                              title="Beri Juara 2 (Perak) untuk semua peserta terpilih"
+                            >
+                              🥈 Perak
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('medal', 'Juara 3')}
+                              className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-700 hover:bg-amber-800 text-white cursor-pointer shadow-2xs"
+                              title="Beri Juara 3 (Perunggu) untuk semua peserta terpilih"
+                            >
+                              🥉 Perunggu
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('medal', 'Hapus Medali')}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-rose-700 hover:bg-rose-50 cursor-pointer"
+                              title="Hapus medali / Belum dinilai"
+                            >
+                              Hapus
+                            </button>
+                          </div>
+
+                          {/* Quick Set Kelulusan Lolos */}
+                          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-emerald-300 shadow-2xs">
+                            <span className="text-[10px] font-bold text-emerald-900 px-1">Status:</span>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('qualification', 'lolos')}
+                              className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-2xs"
+                              title="Set Lolos Final untuk semua peserta terpilih"
+                            >
+                              ✓ Lolos Final
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('qualification', 'tidak_lolos')}
+                              className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-800 cursor-pointer"
+                              title="Set Tidak Lolos"
+                            >
+                              ✗ Tidak Lolos
+                            </button>
+                          </div>
+
+                          {/* Quick Set Pembayaran Closing Rp99k */}
+                          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-purple-300 shadow-2xs">
+                            <span className="text-[10px] font-bold text-purple-900 px-1">Closing:</span>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('payment', 'paid_closing')}
+                              className="px-2 py-0.5 rounded text-[10px] font-black bg-purple-700 hover:bg-purple-800 text-white cursor-pointer shadow-2xs"
+                              title="Tandai Closing Final Rp 99k Lunas untuk semua peserta terpilih"
+                            >
+                              💰 Lunas Rp99k
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExecuteBatchEdit('payment', 'unpaid')}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-neutral-600 hover:bg-neutral-100 cursor-pointer"
+                              title="Set Belum Bayar"
+                            >
+                              Belum Bayar
+                            </button>
+                          </div>
+
+                          {/* Reset Kuota CBT */}
+                          <button
+                            type="button"
+                            onClick={() => handleExecuteBatchEdit('reset_quota')}
+                            className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 cursor-pointer shadow-2xs"
+                            title="Reset kuota ujian CBT terpilih menjadi 0/2"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Reset Kuota</span>
+                          </button>
+
+                          {/* Batal Pilih */}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedParticipantIds([])}
+                            className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-neutral-200 hover:bg-neutral-300 text-neutral-800 cursor-pointer"
+                          >
+                            Batal
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
                           <tr className="bg-[#FAF8F5] border-b border-[#E8E2D9] text-[#756F68] font-bold text-[11px]">
+                            <th className="py-3 px-3 w-10 text-center">
+                              <button
+                                type="button"
+                                onClick={handleToggleSelectAll}
+                                className="p-1 rounded text-neutral-500 hover:text-[#1A1615] cursor-pointer"
+                                title="Pilih / Batal Pilih Semua di Halaman Ini"
+                              >
+                                {displayedParticipants.length > 0 && displayedParticipants.every(p => selectedParticipantIds.includes(p.id)) ? (
+                                  <CheckSquare className="w-4 h-4 text-amber-600" />
+                                ) : (
+                                  <Square className="w-4 h-4" />
+                                )}
+                              </button>
+                            </th>
                             <th className="py-3 px-3">No. Peserta</th>
                             <th className="py-3 px-3">Nama Siswa & Kontak</th>
                             <th className="py-3 px-3">Orang Tua / Wali & Domisili</th>
@@ -3739,7 +4309,7 @@ export const AuthModal = ({
                         <tbody className="divide-y divide-[#E8E2D9]">
                           {displayedParticipants.length === 0 ? (
                             <tr>
-                              <td colSpan={11} className="py-12 text-center text-neutral-500">
+                              <td colSpan={12} className="py-12 text-center text-neutral-500">
                                 <div className="flex flex-col items-center justify-center">
                                   <Database className="w-8 h-8 text-neutral-300 mb-2" />
                                   <p className="font-bold text-sm text-[#1A1615]">Tidak ada data peserta ditemukan</p>
@@ -3751,9 +4321,24 @@ export const AuthModal = ({
                             displayedParticipants.map((p) => {
                             const isPaidClosing = p.finalTicketPaymentStatus === 'paid_closing';
                             const isLolos = p.qualificationStatus === 'lolos';
+                            const isSelected = selectedParticipantIds.includes(p.id);
 
                             return (
-                              <tr key={p.id} className={`transition-colors ${isPaidClosing ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'hover:bg-amber-50/40'}`}>
+                              <tr key={p.id} className={`transition-colors ${isSelected ? 'bg-amber-100/60 hover:bg-amber-100/80' : isPaidClosing ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'hover:bg-amber-50/40'}`}>
+                                <td className="py-3 px-3 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleSelectParticipant(p.id)}
+                                    className="p-1 rounded text-neutral-500 hover:text-amber-600 cursor-pointer"
+                                    title={isSelected ? 'Batal pilih' : 'Pilih peserta ini'}
+                                  >
+                                    {isSelected ? (
+                                      <CheckSquare className="w-4 h-4 text-amber-600" />
+                                    ) : (
+                                      <Square className="w-4 h-4 text-neutral-300" />
+                                    )}
+                                  </button>
+                                </td>
                                 <td className="py-3 px-3 font-mono font-bold text-[#1A1615]">
                                   <div className="flex items-center gap-1">
                                     <span>{p.id}</span>
@@ -3813,8 +4398,8 @@ export const AuthModal = ({
                                 <td className="py-3 px-3">
                                   <div className="flex flex-wrap gap-1">
                                     {p.subjects && p.subjects.length > 0 ? (
-                                      p.subjects.map(s => (
-                                        <span key={s} className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-semibold">
+                                      Array.from(new Set(p.subjects)).map((s, idx) => (
+                                        <span key={`${s}-${idx}`} className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-semibold">
                                           {s}
                                         </span>
                                       ))
@@ -3991,64 +4576,59 @@ export const AuthModal = ({
                                 <td className="py-3 px-4 text-center">
                                   <div className="flex flex-col items-center gap-1">
                                     {!p.simulatedExam && (
-                                      <a
-                                        href={generateFollowUpWhatsAppUrl(p, 'simulasi')}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="px-2 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center"
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFollowUpAction(p, 'simulasi')}
+                                        className="px-2 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center cursor-pointer"
                                         title="Follow up via WA: Peserta belum mengerjakan simulasi ujian"
                                       >
                                         <MessageCircle className="w-2.5 h-2.5 text-amber-700" />
                                         <span>Follow-Up Simulasi</span>
-                                      </a>
+                                      </button>
                                     )}
 
                                     {(!p.simulatedExam || p.simulatedExam.score < 50) && (
-                                      <a
-                                        href={generateFollowUpWhatsAppUrl(p, 'penyisihan')}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center"
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFollowUpAction(p, 'penyisihan')}
+                                        className="px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center cursor-pointer"
                                         title="Follow up via WA: Peserta belum mengerjakan babak penyisihan"
                                       >
                                         <MessageCircle className="w-2.5 h-2.5 text-rose-700" />
                                         <span>Follow-Up Penyisihan</span>
-                                      </a>
+                                      </button>
                                     )}
 
                                     {isLolos && (
-                                      <a
-                                        href={generateFollowUpWhatsAppUrl(p, 'final')}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="px-2 py-0.5 rounded-md bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center shadow-2xs"
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFollowUpAction(p, 'final')}
+                                        className="px-2 py-0.5 rounded-md bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 text-[10px] font-bold flex items-center gap-1 transition-colors w-full justify-center shadow-2xs cursor-pointer"
                                         title="Follow up via WA: Peserta lolos babak final OSN"
                                       >
                                         <MessageCircle className="w-2.5 h-2.5 text-purple-700" />
                                         <span>Follow-Up Final</span>
-                                      </a>
+                                      </button>
                                     )}
 
                                     {/* H-2 / H-1 Reminders */}
                                     <div className="flex gap-1 w-full justify-center pt-0.5">
-                                      <a
-                                        href={generateFollowUpWhatsAppUrl(p, 'reminder_h2')}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 hover:bg-emerald-50 text-neutral-700 hover:text-emerald-700 border border-neutral-200"
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFollowUpAction(p, 'reminder_h2')}
+                                        className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 hover:bg-emerald-50 text-neutral-700 hover:text-emerald-700 border border-neutral-200 cursor-pointer"
                                         title="Kirim Pesan Reminder H-2 Pelaksanaan"
                                       >
                                         H-2 WA
-                                      </a>
-                                      <a
-                                        href={generateFollowUpWhatsAppUrl(p, 'reminder_h1')}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 hover:bg-emerald-50 text-neutral-700 hover:text-emerald-700 border border-neutral-200"
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFollowUpAction(p, 'reminder_h1')}
+                                        className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 hover:bg-emerald-50 text-neutral-700 hover:text-emerald-700 border border-neutral-200 cursor-pointer"
                                         title="Kirim Pesan Reminder H-1 Besok Ujian"
                                       >
                                         H-1 WA
-                                      </a>
+                                      </button>
                                     </div>
                                   </div>
                                 </td>
@@ -4270,9 +4850,9 @@ export const AuthModal = ({
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#E8E2D9] pb-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs font-black text-[#1A1615]">Mata Pelajaran (100 Soal/Mapel):</span>
-                        {['Matematika', 'IPA / Sains', 'Bahasa Indonesia', 'Bahasa Inggris'].map(subj => (
+                        {['Matematika', 'IPA / Sains', 'Bahasa Indonesia', 'Bahasa Inggris'].map((subj, idx) => (
                           <button
-                            key={subj}
+                            key={`${subj}-${idx}`}
                             onClick={() => {
                               setSelectedAdminSubject(subj);
                               setEditingQuestion(null);
@@ -4288,13 +4868,71 @@ export const AuthModal = ({
                         ))}
                       </div>
 
-                      <button
-                        onClick={handleAddNewQuestion}
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm shrink-0"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Tambah Soal Baru</span>
-                      </button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Hidden File Input for Question Import */}
+                        <input
+                          type="file"
+                          ref={questionFileInputRef}
+                          onChange={handleImportQuestionsFromFile}
+                          accept=".csv,.xlsx,.xls"
+                          className="hidden"
+                        />
+
+                        {/* Tombol Export Soal CSV */}
+                        <button
+                          type="button"
+                          onClick={handleExportQuestionsCsv}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-700 text-white hover:bg-teal-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="Export bank soal ke format CSV (.csv)"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Export CSV</span>
+                        </button>
+
+                        {/* Tombol Export Soal Excel */}
+                        <button
+                          type="button"
+                          onClick={handleExportQuestionsExcel}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-700 text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="Export bank soal ke format Excel (.xlsx)"
+                        >
+                          <FileSpreadsheet className="w-3.5 h-3.5" />
+                          <span>Export Excel</span>
+                        </button>
+
+                        {/* Tombol Download Template */}
+                        <button
+                          type="button"
+                          onClick={() => downloadQuestionTemplate('xlsx')}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-neutral-800 border border-[#D4AF37]/50 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="Download format template Excel untuk penambahan soal massal"
+                        >
+                          <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Template (.xlsx)</span>
+                        </button>
+
+                        {/* Tombol Import Soal Massal */}
+                        <button
+                          type="button"
+                          onClick={() => questionFileInputRef.current?.click()}
+                          disabled={isImportingQuestions}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="Unggah file CSV atau Excel untuk menambahkan banyak soal sekaligus"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{isImportingQuestions ? 'Mengimpor...' : 'Import Soal (CSV/Excel)'}</span>
+                        </button>
+
+                        {/* Tombol Tambah Soal Baru Manual */}
+                        <button
+                          type="button"
+                          onClick={handleAddNewQuestion}
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Tambah Soal</span>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Filter Kategori Tahap / Level Kesulitan */}
@@ -4692,20 +5330,72 @@ export const AuthModal = ({
                             </button>
                           </div>
                         ) : (
-                          <button
-                            type="button"
-                            onClick={handleGoogleSignIn}
-                            disabled={isGoogleLoading}
-                            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#4285F4] hover:bg-blue-600 text-white shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                          >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24">
-                              <path fill="#fff" d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
-                            </svg>
-                            <span>{isGoogleLoading ? 'Menghubungkan...' : 'Sign in with Google'}</span>
-                          </button>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleGoogleSignIn}
+                              disabled={isGoogleLoading}
+                              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#4285F4] hover:bg-blue-600 text-white shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                            >
+                              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#fff" d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+                              </svg>
+                              <span>{isGoogleLoading ? 'Menghubungkan...' : 'Sign in with Google'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShowManualGoogleToken(prev => !prev)}
+                              className="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#FAF8F5] hover:bg-neutral-100 text-[#1A1615] border border-[#E8E2D9] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                              title="Gunakan access token Google jika jendela popup peramban terblokir"
+                            >
+                              <KeyRound className="w-3.5 h-3.5 text-[#D4AF37]" />
+                              <span>Token Manual</span>
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
+
+                    {/* Manual Access Token Input Box */}
+                    {showManualGoogleToken && !googleUser && (
+                      <div className="mt-4 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 animate-in fade-in duration-200">
+                        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-amber-900">
+                          <KeyRound className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Hubungkan Google Workspace Menggunakan OAuth Access Token</span>
+                        </div>
+                        <p className="text-[11px] text-amber-800/90 mb-3 leading-relaxed">
+                          Solusi cepat jika popup Google terblokir oleh peramban atau iframe sandbox. Masukkan token akses OAuth Google yang memiliki izin Spreadsheets, Contacts, atau Drive.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="password"
+                            value={manualTokenInput}
+                            onChange={(e) => setManualTokenInput(e.target.value)}
+                            placeholder="ya29.a0Ac..."
+                            className="flex-1 px-3 py-2 bg-white rounded-xl border border-amber-300 text-xs font-mono text-neutral-800 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                          />
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleConnectManualToken}
+                              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-neutral-800 transition-all cursor-pointer whitespace-nowrap shadow-xs"
+                            >
+                              Hubungkan Token
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowManualGoogleToken(false);
+                                setManualTokenInput('');
+                              }}
+                              className="px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-200 hover:bg-neutral-300 text-neutral-700 transition-all cursor-pointer"
+                            >
+                              Batal
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* 3 Main Action Cards: Sheets, Contacts, Drive */}
@@ -4722,9 +5412,9 @@ export const AuthModal = ({
                         </p>
                       </div>
 
-                      <div className="pt-2">
+                      <div className="pt-2 space-y-2">
                         {lastCreatedSheet ? (
-                          <div className="mb-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
                             <span className="font-bold text-emerald-900 block truncate">{lastCreatedSheet.title}</span>
                             <a
                               href={lastCreatedSheet.spreadsheetUrl}
@@ -4745,6 +5435,17 @@ export const AuthModal = ({
                         >
                           <FileSpreadsheet className="w-4 h-4" />
                           <span>{isExportingSheet ? 'Memproses...' : 'Ekspor ke Google Sheets'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            exportParticipantsToGoogleSheetsCsv(filteredParticipants);
+                            showToast('success', 'File Siap', `Data ${filteredParticipants.length} peserta berformat Google Sheets (.CSV) berhasil diunduh.`);
+                          }}
+                          className="w-full py-2 rounded-xl text-xs font-bold bg-[#FAF8F5] hover:bg-neutral-100 text-[#1A1615] border border-[#E8E2D9] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Unduh Format Google Sheets (.CSV)</span>
                         </button>
                       </div>
                     </div>
@@ -5019,7 +5720,15 @@ export const AuthModal = ({
                         {/* Dokumen 1: Laporan Peserta Lolos Babak Penyisihan */}
                         <button
                           type="button"
-                          onClick={() => exportLolosPenyisihanReportPdf(participantsList)}
+                          onClick={async () => {
+                            try {
+                              showToast('info', 'Menyiapkan Laporan', 'Sedang memproses Laporan Resmi Peserta Lolos Penyisihan (PDF)...');
+                              await exportLolosPenyisihanReportPdf(participantsList);
+                              showToast('success', 'Laporan Berhasil Dicetak', 'Laporan Resmi Peserta Lolos Babak Penyisihan (PDF) berhasil diunduh.');
+                            } catch (e: any) {
+                              showToast('error', 'Gagal Mencetak Laporan', e?.message || 'Terjadi kesalahan saat memproses laporan.');
+                            }
+                          }}
                           className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
                           title="Download Dokumen Resmi 1: Laporan Peserta Lolos Babak Penyisihan PDF"
                         >
@@ -5030,7 +5739,15 @@ export const AuthModal = ({
                         {/* Dokumen 2: Laporan Peserta Lolos Babak Final & Pemenang Juara */}
                         <button
                           type="button"
-                          onClick={() => exportLolosFinalDanJuaraReportPdf(participantsList)}
+                          onClick={async () => {
+                            try {
+                              showToast('info', 'Menyiapkan Laporan Juara', 'Sedang memproses Laporan Resmi Pemenang Juara & Finalis (PDF)...');
+                              await exportLolosFinalDanJuaraReportPdf(participantsList);
+                              showToast('success', 'Laporan Juara Berhasil Dicetak', 'Laporan Resmi Pemenang Juara & Finalis (PDF) berhasil diunduh.');
+                            } catch (e: any) {
+                              showToast('error', 'Gagal Mencetak Laporan', e?.message || 'Terjadi kesalahan saat memproses laporan juara.');
+                            }
+                          }}
                           className="px-3.5 py-2 rounded-xl bg-[#1A1615] hover:bg-neutral-800 text-[#D4AF37] border border-[#D4AF37]/50 font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
                           title="Download Dokumen Resmi 2: Laporan Peserta Lolos Babak Final & Pemenang Juara PDF"
                         >
@@ -5589,6 +6306,590 @@ export const AuthModal = ({
                 </div>
               )}
 
+              {/* TAB 9: PENGATURAN & PUSAT BROADCAST WHATSAPP API RESMI */}
+              {adminTab === 'whatsapp_api' && (
+                <div className="space-y-6">
+                  {/* Header Banner */}
+                  <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-[#1A1615] rounded-3xl p-6 sm:p-7 text-white shadow-lg border border-emerald-500/30">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center font-bold">
+                          <MessageCircle className="w-6 h-6 text-emerald-400" />
+                        </div>
+                        <div>
+                          <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black uppercase tracking-wider mb-1">
+                            <span>Sistem Gateway & Broadcast Resmi</span>
+                          </div>
+                          <h4 className="text-xl font-black text-white">
+                            Pengaturan & Pusat Broadcast WhatsApp API
+                          </h4>
+                          <p className="text-xs text-emerald-100/80 mt-0.5 max-w-2xl">
+                            Kelola gateway WhatsApp API resmi untuk otomatisasi pengiriman hasil ujian CBT, pengumuman kelulusan ber-sertifikat, pengingat jadwal, dan pesan tindak lanjut tiket final.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 text-xs font-bold flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4 text-emerald-400" />
+                          <span>Status: Gateway Aktif & Siap</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 1: Konfigurasi & Uji Coba WhatsApp Gateway */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Form Pengaturan */}
+                    <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm space-y-5">
+                      <div className="flex items-center justify-between pb-3 border-b border-[#E8E2D9]">
+                        <h5 className="text-sm font-black text-[#1A1615] flex items-center gap-2">
+                          <Settings className="w-4 h-4 text-emerald-600" />
+                          <span>Konfigurasi WhatsApp Gateway API</span>
+                        </h5>
+                        <span className="text-[10px] text-[#756F68] font-semibold">
+                          Endpoint Server: /api/whatsapp/send
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-[#1A1615] mb-1">
+                            Provider Gateway WhatsApp
+                          </label>
+                          <select
+                            value={waSettings.provider}
+                            onChange={(e) => setWaSettings({ ...waSettings, provider: e.target.value as any })}
+                            className="w-full px-3 py-2.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none focus:border-emerald-600 font-semibold"
+                          >
+                            <option value="fonnte">Fonnte API Gateway (Official Indonesia)</option>
+                            <option value="wablas">Wablas Server Gateway</option>
+                            <option value="starsender">Starsender API</option>
+                            <option value="ultramsg">UltraMsg WhatsApp Cloud</option>
+                            <option value="twilio">Twilio WhatsApp for Business</option>
+                            <option value="custom_gateway">Custom REST API Proxy Server</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-[#1A1615] mb-1">
+                            Nomor Pengirim Resmi (Sender Number)
+                          </label>
+                          <input
+                            type="text"
+                            value={waSettings.senderNumber}
+                            onChange={(e) => setWaSettings({ ...waSettings, senderNumber: e.target.value })}
+                            placeholder="Contoh: 6285810243460"
+                            className="w-full px-3 py-2.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none focus:border-emerald-600 font-mono font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-[#1A1615] mb-1">
+                            API Key / Token Rahasia Gateway
+                          </label>
+                          <input
+                            type="text"
+                            value={waSettings.apiKey}
+                            onChange={(e) => setWaSettings({ ...waSettings, apiKey: e.target.value })}
+                            placeholder="Masukkan API Key / Token Gateway"
+                            className="w-full px-3 py-2.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none focus:border-emerald-600 font-mono font-semibold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-[#1A1615] mb-1">
+                            Endpoint Route Proxy
+                          </label>
+                          <input
+                            type="text"
+                            value={waSettings.endpointUrl}
+                            onChange={(e) => setWaSettings({ ...waSettings, endpointUrl: e.target.value })}
+                            placeholder="/api/whatsapp/send"
+                            className="w-full px-3 py-2.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none focus:border-emerald-600 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sakelar Otomatisasi Notifikasi */}
+                      <div className="pt-3 border-t border-[#E8E2D9] space-y-3">
+                        <span className="text-xs font-black text-[#1A1615] block uppercase tracking-wider text-[11px]">
+                          Pengaturan Otomatisasi Notifikasi Real-Time:
+                        </span>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <label className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={waSettings.autoSendExamGraded}
+                              onChange={(e) => setWaSettings({ ...waSettings, autoSendExamGraded: e.target.checked })}
+                              className="w-4 h-4 text-emerald-600 rounded border-neutral-300 focus:ring-emerald-500"
+                            />
+                            <div className="text-xs">
+                              <span className="font-bold text-emerald-950 block">Auto-Kirim Nilai Ujian</span>
+                              <span className="text-[10px] text-emerald-800">Kirim otomatis saat siswa selesai dinilai</span>
+                            </div>
+                          </label>
+
+                          <label className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={waSettings.autoSendQualification}
+                              onChange={(e) => setWaSettings({ ...waSettings, autoSendQualification: e.target.checked })}
+                              className="w-4 h-4 text-emerald-600 rounded border-neutral-300 focus:ring-emerald-500"
+                            />
+                            <div className="text-xs">
+                              <span className="font-bold text-emerald-950 block">Auto-Kirim Status Kelulusan</span>
+                              <span className="text-[10px] text-emerald-800">Kirim saat status lolos final diaktifkan</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            try {
+                              saveWhatsAppApiSettings(waSettings);
+                              setAdminNotification('Pengaturan WhatsApp API berhasil disimpan!');
+                              showToast('success', 'Pengaturan Disimpan', 'Konfigurasi gateway WhatsApp API berhasil diperbarui.');
+                              setTimeout(() => setAdminNotification(''), 3500);
+                            } catch (e: any) {
+                              showToast('error', 'Gagal Menyimpan', e?.message || 'Terjadi kesalahan saat menyimpan pengaturan.');
+                            }
+                          }}
+                          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 cursor-pointer transition-all"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>Simpan Pengaturan Gateway</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Form Uji Coba Koneksi */}
+                    <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm space-y-4 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 pb-3 border-b border-[#E8E2D9]">
+                          <Zap className="w-4 h-4 text-amber-600" />
+                          <h5 className="text-sm font-black text-[#1A1615]">
+                            Uji Coba Koneksi WhatsApp API
+                          </h5>
+                        </div>
+
+                        <p className="text-xs text-[#756F68] mt-3 leading-relaxed">
+                          Kirimkan pesan tes langsung ke nomor WhatsApp penguji atau admin untuk memastikan integrasi gateway dan server proxy berfungsi dengan lancar.
+                        </p>
+
+                        <div className="mt-4 space-y-2">
+                          <label className="block text-xs font-bold text-[#1A1615]">
+                            Nomor WhatsApp Penguji
+                          </label>
+                          <div className="relative">
+                            <Phone className="w-4 h-4 absolute left-3 top-3 text-neutral-400" />
+                            <input
+                              type="tel"
+                              value={waTestPhone}
+                              onChange={(e) => setWaTestPhone(e.target.value)}
+                              placeholder="Contoh: 085810243460"
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none focus:border-emerald-600 font-mono font-bold"
+                            />
+                          </div>
+                          <span className="text-[10px] text-neutral-500 block">
+                            Pesan tes memuat identitas resmi OSN 2026 & status koneksi sistem.
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-[#E8E2D9]">
+                        <button
+                          type="button"
+                          disabled={isTestingWa}
+                          onClick={async () => {
+                            if (!waTestPhone || waTestPhone.trim().length < 8) {
+                              showToast('error', 'Nomor Tidak Valid', 'Silakan masukkan nomor WhatsApp penguji yang valid.');
+                              return;
+                            }
+                            setIsTestingWa(true);
+                            showToast('info', 'Menguji Koneksi', `Sedang mengirim pesan tes ke ${waTestPhone}...`);
+                            try {
+                              const res = await testWhatsAppApiConnection(waTestPhone.trim());
+                              setWaLogsList(getStoredWhatsAppLogs());
+                              showToast('success', 'Uji Coba Berhasil', res.message);
+                              setAdminNotification(`✓ Pesan tes WhatsApp sukses dikirim ke ${waTestPhone}`);
+                              setTimeout(() => setAdminNotification(''), 4000);
+                            } catch (err: any) {
+                              showToast('error', 'Uji Coba Gagal', err?.message || 'Gagal mengirim pesan uji coba.');
+                            } finally {
+                              setIsTestingWa(false);
+                            }
+                          }}
+                          className="w-full py-3 rounded-xl bg-[#1A1615] hover:bg-neutral-800 text-[#D4AF37] border border-[#D4AF37]/50 font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span>{isTestingWa ? 'Mengirim Uji Coba...' : 'Kirim Pesan Uji Coba Sekarang'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Pusat Eksekusi Broadcast Massal 1-Klik */}
+                  <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm space-y-5">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-[#E8E2D9]">
+                      <div>
+                        <h5 className="text-sm font-black text-[#1A1615] flex items-center gap-2">
+                          <Send className="w-4 h-4 text-emerald-600" />
+                          <span>Pusat Broadcast WhatsApp API Massal (1-Klik)</span>
+                        </h5>
+                        <p className="text-xs text-[#756F68] mt-0.5">
+                          Kirim pesan resmi secara serentak ke segmen peserta yang dituju. Pesan mencakup link portal dan sertifikat resmi.
+                        </p>
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+                        {participantsList.length} Total Peserta Terdata
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Card Broadcast 1: Kelulusan Penyisihan */}
+                      {(() => {
+                        const targetLolos = participantsList.filter(
+                          p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60)
+                        );
+                        return (
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 space-y-3 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                  BABAK FINAL
+                                </span>
+                                <span className="text-xs font-mono font-black text-emerald-900">
+                                  Target: {targetLolos.length} Peserta
+                                </span>
+                              </div>
+                              <h6 className="text-sm font-black text-emerald-950">
+                                Broadcast Kelulusan Babak Penyisihan
+                              </h6>
+                              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                Mengirimkan pengumuman resmi kelulusan ke seluruh peserta lolos final, lengkap dengan skor dan link unduh Sertifikat Digital Resmi ber-QR Code.
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isBroadcastingWa || targetLolos.length === 0}
+                              onClick={async () => {
+                                if (targetLolos.length === 0) {
+                                  showToast('error', 'Broadcast Dibatalkan', 'Tidak ada peserta lolos yang ditemukan.');
+                                  return;
+                                }
+                                const c = window.confirm(`Kirim broadcast pengumuman kelulusan resmi ke ${targetLolos.length} peserta lolos final?`);
+                                if (!c) return;
+                                setIsBroadcastingWa(true);
+                                showToast('info', 'Mengirim Broadcast', `Sedang mengirimkan broadcast ke ${targetLolos.length} peserta lolos...`);
+                                try {
+                                  const res = await broadcastQualificationAnnouncements(targetLolos);
+                                  setWaLogsList(getStoredWhatsAppLogs());
+                                  showToast('success', 'Broadcast Kelulusan Berhasil', `Pengumuman kelulusan sukses terkirim ke ${res.sentCount} peserta lolos!`);
+                                  setAdminNotification(`✓ Broadcast kelulusan sukses dikirim ke ${res.sentCount} peserta.`);
+                                  setTimeout(() => setAdminNotification(''), 4500);
+                                } catch (e: any) {
+                                  showToast('error', 'Kendala Broadcast', e?.message || 'Terjadi kendala saat mengirimkan broadcast.');
+                                } finally {
+                                  setIsBroadcastingWa(false);
+                                }
+                              }}
+                              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Kirim Broadcast Kelulusan Sekarang</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Card Broadcast 2: Pengumuman Juara Final */}
+                      {(() => {
+                        const targetJuara = participantsList.filter(
+                          p => !!p.finalExam || (p.championRank && p.championRank.includes('Juara'))
+                        );
+                        return (
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-white border border-purple-200 space-y-3 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-300">
+                                  MEDALI & PRESTASI
+                                </span>
+                                <span className="text-xs font-mono font-black text-purple-900">
+                                  Target: {targetJuara.length} Pemenang
+                                </span>
+                              </div>
+                              <h6 className="text-sm font-black text-purple-950">
+                                Broadcast Pengumuman Juara & Medali Final
+                              </h6>
+                              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                Mengirimkan ucapan selamat prestasi juara (Emas/Perak/Perunggu/Finalis), rincian skor babak final, dan link unduh piagam/sertifikat juara ber-stempel resmi.
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isBroadcastingWa || targetJuara.length === 0}
+                              onClick={async () => {
+                                if (targetJuara.length === 0) {
+                                  showToast('error', 'Broadcast Dibatalkan', 'Belum ada data pengerjaan babak final atau pemenang juara.');
+                                  return;
+                                }
+                                const c = window.confirm(`Kirim broadcast pengumuman juara ke ${targetJuara.length} pemenang final?`);
+                                if (!c) return;
+                                setIsBroadcastingWa(true);
+                                showToast('info', 'Mengirim Broadcast Juara', `Sedang mengirimkan broadcast ke ${targetJuara.length} pemenang...`);
+                                try {
+                                  const res = await broadcastChampionAnnouncements(targetJuara);
+                                  setWaLogsList(getStoredWhatsAppLogs());
+                                  showToast('success', 'Broadcast Juara Berhasil', `Pengumuman juara resmi sukses terkirim ke ${res.sentCount} pemenang!`);
+                                  setAdminNotification(`✓ Broadcast juara sukses dikirim ke ${res.sentCount} siswa.`);
+                                  setTimeout(() => setAdminNotification(''), 4500);
+                                } catch (e: any) {
+                                  showToast('error', 'Kendala Broadcast', e?.message || 'Terjadi kesalahan saat memproses broadcast juara.');
+                                } finally {
+                                  setIsBroadcastingWa(false);
+                                }
+                              }}
+                              className="w-full py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                            >
+                              <Trophy className="w-3.5 h-3.5" />
+                              <span>Kirim Broadcast Pengumuman Juara</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Card Broadcast 3: Pengingat Jadwal CBT Belum Ujian */}
+                      {(() => {
+                        const targetBelum = participantsList.filter(p => !p.penyisihanExam && !p.simulatedExam);
+                        return (
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-200 space-y-3 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300">
+                                  PENGINGAT UJIAN
+                                </span>
+                                <span className="text-xs font-mono font-black text-amber-900">
+                                  Target: {targetBelum.length} Peserta
+                                </span>
+                              </div>
+                              <h6 className="text-sm font-black text-amber-950">
+                                Broadcast Pengingat Jadwal Ujian CBT
+                              </h6>
+                              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                Mengingatkan peserta yang belum login/mengerjakan soal agar segera masuk ke Ruang Ujian CBT hanya menggunakan nomor WhatsApp terdaftar.
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isBroadcastingWa || targetBelum.length === 0}
+                              onClick={async () => {
+                                if (targetBelum.length === 0) {
+                                  showToast('info', 'Semua Sudah Ujian', 'Seluruh peserta tercatat telah mengerjakan simulasi atau penyisihan.');
+                                  return;
+                                }
+                                const c = window.confirm(`Kirim pengingat jadwal ujian via WhatsApp API ke ${targetBelum.length} peserta belum ujian?`);
+                                if (!c) return;
+                                setIsBroadcastingWa(true);
+                                showToast('info', 'Mengirim Pengingat CBT', `Sedang mengirim pengingat ke ${targetBelum.length} peserta...`);
+                                try {
+                                  const res = await broadcastExamReminder(targetBelum);
+                                  setWaLogsList(getStoredWhatsAppLogs());
+                                  showToast('success', 'Broadcast Pengingat Selesai', `Pengingat jadwal terkirim ke ${res.sentCount} peserta.`);
+                                  setAdminNotification(`✓ Pengingat ujian dikirim ke ${res.sentCount} siswa.`);
+                                  setTimeout(() => setAdminNotification(''), 4500);
+                                } catch (e: any) {
+                                  showToast('error', 'Kendala Broadcast', e?.message || 'Gagal mengirim pengingat jadwal.');
+                                } finally {
+                                  setIsBroadcastingWa(false);
+                                }
+                              }}
+                              className="w-full py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                            >
+                              <Clock className="w-3.5 h-3.5" />
+                              <span>Kirim Broadcast Pengingat CBT</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Card Broadcast 4: Follow Up Closing Final Rp 99.000 */}
+                      {(() => {
+                        const targetClosing = participantsList.filter(
+                          p => (p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60)) &&
+                               p.finalTicketPaymentStatus !== 'paid_closing'
+                        );
+                        return (
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-200 space-y-3 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300">
+                                  CLOSING FINAL BCA
+                                </span>
+                                <span className="text-xs font-mono font-black text-blue-900">
+                                  Target: {targetClosing.length} Peserta
+                                </span>
+                              </div>
+                              <h6 className="text-sm font-black text-blue-950">
+                                Broadcast Follow Up Tiket Final Promo Rp 99k
+                              </h6>
+                              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                Follow up tiket babak final promo Rp 99.000 (hemat 45% dari normal Rp 180.000) ke peserta lolos yang belum konfirmasi pembayaran.
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isBroadcastingWa || targetClosing.length === 0}
+                              onClick={async () => {
+                                if (targetClosing.length === 0) {
+                                  showToast('info', 'Semua Sudah Closing', 'Seluruh peserta lolos telah menyelesaikan pembayaran closing tiket final.');
+                                  return;
+                                }
+                                const c = window.confirm(`Kirim follow up tiket final promo Rp 99.000 ke ${targetClosing.length} peserta lolos yang belum bayar?`);
+                                if (!c) return;
+                                setIsBroadcastingWa(true);
+                                showToast('info', 'Mengirim Follow Up Closing', `Sedang memproses ${targetClosing.length} peserta...`);
+                                try {
+                                  const res = await broadcastClosingPaymentReminder(targetClosing);
+                                  setWaLogsList(getStoredWhatsAppLogs());
+                                  showToast('success', 'Follow Up Closing Terkirim', `Pesan follow up tiket promo berhasil dikirim ke ${res.sentCount} peserta.`);
+                                  setAdminNotification(`✓ Follow up promo final dikirim ke ${res.sentCount} peserta.`);
+                                  setTimeout(() => setAdminNotification(''), 4500);
+                                } catch (e: any) {
+                                  showToast('error', 'Kendala Follow Up', e?.message || 'Gagal mengirim pesan follow up.');
+                                } finally {
+                                  setIsBroadcastingWa(false);
+                                }
+                              }}
+                              className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                            >
+                              <Banknote className="w-3.5 h-3.5" />
+                              <span>Kirim Broadcast Follow-Up Promo Rp 99k</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Section 3: Riwayat Log Notifikasi WhatsApp API */}
+                  <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm space-y-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E2D9]">
+                      <div className="flex items-center gap-2">
+                        <Database className="w-4 h-4 text-emerald-600" />
+                        <h5 className="text-sm font-black text-[#1A1615]">
+                          Riwayat Log Pengiriman WhatsApp API ({waLogsList.length})
+                        </h5>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWaLogsList(getStoredWhatsAppLogs());
+                            showToast('info', 'Log Diperbarui', 'Data riwayat pengiriman WhatsApp telah disegarkan.');
+                          }}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Segarkan Log</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={waLogsList.length === 0}
+                          onClick={() => {
+                            clearWhatsAppLogs();
+                            setWaLogsList([]);
+                            showToast('success', 'Log Dibersihkan', 'Riwayat log pengiriman WhatsApp telah dikosongkan.');
+                          }}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Hapus Riwayat</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {waLogsList.length === 0 ? (
+                      <div className="text-center py-8 text-neutral-400 text-xs">
+                        <MessageCircle className="w-8 h-8 mx-auto text-neutral-300 mb-2" />
+                        <span>Belum ada pesan yang tercatat di log pengiriman WhatsApp API.</span>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="border-b border-[#E8E2D9] text-[#756F68] font-bold">
+                              <th className="py-2.5 px-3">Waktu</th>
+                              <th className="py-2.5 px-3">Penerima</th>
+                              <th className="py-2.5 px-3">No. WhatsApp</th>
+                              <th className="py-2.5 px-3">Tipe Pesan</th>
+                              <th className="py-2.5 px-3 text-center">Status</th>
+                              <th className="py-2.5 px-3 text-center">Aksi Buka Chat</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E8E2D9]/60">
+                            {waLogsList.slice(0, 15).map((log) => (
+                              <tr key={log.id} className="hover:bg-[#FAF8F5]">
+                                <td className="py-2.5 px-3 font-mono text-[11px] text-neutral-500 whitespace-nowrap">
+                                  {new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                </td>
+                                <td className="py-2.5 px-3 font-bold text-[#1A1615]">
+                                  {log.recipientName}
+                                </td>
+                                <td className="py-2.5 px-3 font-mono font-semibold text-neutral-700">
+                                  {log.recipientPhone}
+                                </td>
+                                <td className="py-2.5 px-3">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-800">
+                                    {log.type === 'qualification_released' ? 'Kelulusan Lolos' :
+                                     log.type === 'final_champion' ? 'Juara Final' :
+                                     log.type === 'exam_reminder' ? 'Pengingat CBT' :
+                                     log.type === 'test_connection' ? 'Uji Koneksi' : 'Nilai Ujian'}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                    log.status === 'DELIVERED'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : log.status === 'SENT'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : 'bg-rose-100 text-rose-800'
+                                  }`}>
+                                    {log.status}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <a
+                                    href={log.directWaUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => showToast('success', 'Buka WhatsApp', `Membuka chat WhatsApp untuk ${log.recipientName}...`)}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[10px] transition-colors"
+                                  >
+                                    <MessageCircle className="w-3 h-3 text-emerald-600" />
+                                    <span>Buka WA</span>
+                                  </a>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
         </div>
@@ -5629,9 +6930,15 @@ export const AuthModal = ({
                     2
                   </span>
                   <div>
-                    Batasan Akses: Maksimal <strong>2x Percobaan Pengerjaan</strong>.
+                    Batasan Akses: {examTypeMode === 'simulasi' ? (
+                      <span><strong>Percobaan Latihan Tanpa Batas (Unlimited)</strong>.</span>
+                    ) : (
+                      <span>Tepat <strong>1x Kesempatan Pengerjaan Resmi</strong>.</span>
+                    )}
                     <p className="text-[11px] text-[#756F68] font-normal mt-0.5">
-                      Soal ujian {examTypeMode === 'final' ? 'Babak Final' : 'Babak Penyisihan'} hanya dapat diakses 2x saja. Setelah mengerjakan 2x, Anda tidak dapat mengulang kembali.
+                      {examTypeMode === 'simulasi'
+                        ? 'Ujian simulasi dapat diulang sepuasnya tanpa batas kuota untuk melatih kesiapan Anda.'
+                        : `Soal ujian resmi ${examTypeMode === 'final' ? 'Babak Final' : 'Babak Penyisihan'} hanya dapat diakses 1x saja demi menjaga integritas kompetisi.`}
                     </p>
                   </div>
                 </div>
@@ -5646,13 +6953,23 @@ export const AuthModal = ({
                       </p>
                     </div>
                   </div>
-                ) : (
+                ) : examTypeMode === 'penyisihan' ? (
                   <div className="flex items-start gap-2 text-emerald-900 font-bold bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
                     <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                      <span>Babak Penyisihan (Simulasi Latihan Mandiri)</span>
+                      <span>Babak Penyisihan Resmi (1x Percobaan)</span>
                       <p className="text-[11px] text-emerald-800 font-normal mt-0.5">
-                        Gunakan kesempatan 2x pengerjaan ini sebaik-baiknya untuk mengukur kesiapan materi Anda sebelum pengumuman babak final.
+                        Gunakan 1 kesempatan resmi ini sebaik-baiknya untuk menguji kemampuan dan memperebutkan tiket ke Babak Final.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2 text-amber-900 font-bold bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                    <CheckCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span>Simulasi Latihan Bebas (Unlimited)</span>
+                      <p className="text-[11px] text-amber-800 font-normal mt-0.5">
+                        Anda dapat mencoba simulasi ujian kapan saja berulang kali untuk mengenal format 20 soal bergambar dan timer.
                       </p>
                     </div>
                   </div>
@@ -5785,7 +7102,7 @@ export const AuthModal = ({
                           loadWorkspaceData();
                         }
                       } catch (err: any) {
-                        alert(`Gagal sync Google: ${err.message}`);
+                        showToast('error', 'Gagal Sinkronisasi Google', err?.message || 'Terjadi kesalahan.');
                       }
                     }}
                     className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#4285F4] hover:bg-blue-600 text-white shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
@@ -6144,8 +7461,8 @@ export const AuthModal = ({
                     <div className="text-[10px] text-[#756F68]">Mata Pelajaran yang Diikuti:</div>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {viewDetailParticipant.subjects && viewDetailParticipant.subjects.length > 0 ? (
-                        viewDetailParticipant.subjects.map(s => (
-                          <span key={s} className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold text-[10px]">
+                        Array.from(new Set(viewDetailParticipant.subjects)).map((s, idx) => (
+                          <span key={`${s}-${idx}`} className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold text-[10px]">
                             {s}
                           </span>
                         ))
@@ -6261,9 +7578,9 @@ export const AuthModal = ({
                     onClick={async () => {
                       try {
                         await triggerQualificationReleasedNotification(viewDetailParticipant, 'lolos');
-                        alert(`Notifikasi WhatsApp API resmi berhasil dikirim ke ${viewDetailParticipant.fullName} (${viewDetailParticipant.whatsapp})!`);
+                        showToast('success', 'WA API Terkirim', `Notifikasi WhatsApp API resmi berhasil dikirim ke ${viewDetailParticipant.fullName} (${viewDetailParticipant.whatsapp})!`);
                       } catch (e) {
-                        alert(`Notifikasi WhatsApp telah diproses.`);
+                        showToast('info', 'Notifikasi Diproses', 'Notifikasi WhatsApp telah diproses oleh gateway sistem.');
                       }
                     }}
                     className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 cursor-pointer shadow-xs"
@@ -6387,6 +7704,25 @@ export const AuthModal = ({
             </div>
           </div>
         )}
+
+        {/* MODAL IMPORT PESERTA DARI SPREADSHEET (LINK / EXCEL / CSV) */}
+        <ImportParticipantsModal
+          isOpen={showImportParticipantsModal}
+          onClose={() => setShowImportParticipantsModal(false)}
+          existingParticipants={participantsList}
+          onImportSuccess={(inserted, updated) => {
+            syncParticipantsWithServer().then(synced => {
+              if (synced && synced.length > 0) {
+                setParticipantsList(synced);
+              }
+            });
+            logAdminAction(
+              'IMPORT_PARTICIPANTS',
+              'Import Peserta Spreadsheet',
+              `Berhasil import data peserta massal (${inserted} baru, ${updated} diperbarui)`
+            );
+          }}
+        />
 
       </div>
     </div>

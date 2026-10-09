@@ -1,30 +1,23 @@
 import { QuestionItem, ExamTier, EducationLevel, SubjectName } from './cbtQuestionTypes';
-import { ALL_KATEGORI_A_QUESTIONS } from './questionsKategoriA';
-import { ALL_KATEGORI_B_QUESTIONS } from './questionsKategoriB';
-import { ALL_KATEGORI_C_QUESTIONS } from './questionsKategoriC';
-import { DRIVE_OFFICIAL_QUESTIONS } from './cbtDriveQuestionsData';
+import { ALL_SIMULASI_OFFICIAL_QUESTIONS } from './simulasiQuestionsAll';
+import { ALL_PENYISIHAN_OFFICIAL_QUESTIONS } from './penyisihanQuestionsAll';
 
 export * from './cbtQuestionTypes';
 
-const STORAGE_OVERRIDES_KEY = 'osn_cbt_question_overrides_v1';
-const STORAGE_DELETED_KEY = 'osn_cbt_deleted_question_ids_v1';
+const STORAGE_OVERRIDES_KEY = 'osn_cbt_question_overrides_v2';
+const STORAGE_DELETED_KEY = 'osn_cbt_deleted_question_ids_v2';
 
-// Retain warmup simulation questions and replace all Penyisihan and Final questions with official Google Drive data
-const BASE_SIMULASI_QUESTIONS = [
-  ...ALL_KATEGORI_A_QUESTIONS,
-  ...ALL_KATEGORI_B_QUESTIONS,
-  ...ALL_KATEGORI_C_QUESTIONS
-].filter(q => q.stage === 'simulasi');
-
-// Total Bank Soal: 1.100 Soal Resmi Penyisihan & Final Google Drive + Soal Simulasi Pemanasan
+// Bank Soal Resmi: 240 Soal Simulasi Bergambar + Soal Resmi Babak Penyisihan
 export const ALL_INITIAL_QUESTIONS: QuestionItem[] = [
-  ...DRIVE_OFFICIAL_QUESTIONS,
-  ...BASE_SIMULASI_QUESTIONS
+  ...ALL_SIMULASI_OFFICIAL_QUESTIONS,
+  ...ALL_PENYISIHAN_OFFICIAL_QUESTIONS
 ];
 
-// Clean up legacy bloated storage keys to immediately free up browser localStorage quota
+// Clean up legacy questions and overrides to ensure completely fresh simulation questions
 try {
   if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.removeItem('osn_cbt_question_overrides_v1');
+    localStorage.removeItem('osn_cbt_deleted_question_ids_v1');
     localStorage.removeItem('osn_cbt_questions_database_v3_1200');
     localStorage.removeItem('osn_cbt_questions_database_v2');
     localStorage.removeItem('osn_cbt_questions_database');
@@ -113,6 +106,9 @@ export function saveAllQuestions(questions: QuestionItem[]): void {
       }
     }
     localStorage.setItem(STORAGE_OVERRIDES_KEY, JSON.stringify(overrides));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('osn_questions_updated'));
+    }
   } catch (err) {
     console.warn('Could not persist question overrides to localStorage:', err);
   }
@@ -125,6 +121,35 @@ export function saveAllQuestions(questions: QuestionItem[]): void {
       body: JSON.stringify({ questions })
     }).catch(() => {});
   } catch {}
+}
+
+/**
+ * Sync question bank from server database
+ */
+export async function syncQuestionsWithServer(): Promise<QuestionItem[]> {
+  try {
+    const res = await fetch('/api/questions');
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+        const overrides = loadStoredOverrides();
+        json.data.forEach((q: QuestionItem) => {
+          if (q && q.id) {
+            overrides[q.id] = q;
+          }
+        });
+        localStorage.setItem(STORAGE_OVERRIDES_KEY, JSON.stringify(overrides));
+        inMemoryQuestions = null;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_questions_updated'));
+        }
+        return getAllQuestions();
+      }
+    }
+  } catch (err) {
+    console.warn('Could not sync questions with server:', err);
+  }
+  return getAllQuestions();
 }
 
 export function updateQuestion(updated: QuestionItem): QuestionItem[] {
@@ -142,6 +167,9 @@ export function updateQuestion(updated: QuestionItem): QuestionItem[] {
     const overrides = loadStoredOverrides();
     overrides[updated.id] = updated;
     localStorage.setItem(STORAGE_OVERRIDES_KEY, JSON.stringify(overrides));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('osn_questions_updated'));
+    }
   } catch (err) {
     console.warn('Could not persist question update:', err);
   }

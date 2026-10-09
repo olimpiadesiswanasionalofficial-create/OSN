@@ -47,8 +47,9 @@ import { RecentWinnersMarquee } from './components/RecentWinnersMarquee';
 import { GalleryOSN } from './components/GalleryOSN';
 import { CompetitionCountdown } from './components/CompetitionCountdown';
 import { PublicAnnouncementTable } from './components/PublicAnnouncementTable';
-import { NotificationToastContainer } from './components/NotificationToast';
-import { saveParticipant, saveMultipleParticipants, getAllParticipants, ParticipantRecord } from './services/participantDb';
+import { NotificationToastContainer, showToast } from './components/NotificationToast';
+import { saveParticipant, saveMultipleParticipants, getAllParticipants, syncParticipantsWithServer, ParticipantRecord } from './services/participantDb';
+import { syncQuestionsWithServer } from './services/cbtQuestionsDb';
 import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
 import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
 
@@ -220,6 +221,25 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
 
+    // Sync participants & questions database with server on initial load
+    syncParticipantsWithServer().then(synced => {
+      if (synced && synced.length > 0) {
+        setPublicParticipants(synced);
+      }
+    }).catch(() => {});
+
+    syncQuestionsWithServer().catch(() => {});
+
+    // Periodic Automatic Real-Time Synchronization (every 30 seconds)
+    const autoSyncInterval = setInterval(() => {
+      syncParticipantsWithServer().then(synced => {
+        if (synced && synced.length > 0) {
+          setPublicParticipants(synced);
+        }
+      }).catch(() => {});
+      syncQuestionsWithServer().catch(() => {});
+    }, 30000);
+
     setLiveSchedule(getEventSchedule());
     const onScheduleChange = (e: any) => {
       if (e.detail) {
@@ -244,8 +264,10 @@ export default function App() {
     window.addEventListener('osn_pixel_updated', onPixelChange);
 
     return () => {
+      clearInterval(autoSyncInterval);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('osn_schedule_updated', onScheduleChange);
+      window.removeEventListener('osn_participants_updated', onParticipantsChange);
       window.removeEventListener('osn_pixel_updated', onPixelChange);
     };
   }, []);
@@ -588,7 +610,11 @@ export default function App() {
               href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi%20pendaftaran`}
               target="_blank"
               rel="noreferrer"
-              className="text-[#D4AF37] hover:text-[#FFF2B2] font-bold inline-flex items-center gap-1.5 transition-colors"
+              onClick={() => {
+                trackPixelEvent('Contact', { content_name: 'WhatsApp Call Center Top Bar' });
+                showToast('success', 'Membuka WhatsApp', 'Menghubungkan ke Call Center resmi OSN 2026...');
+              }}
+              className="text-[#D4AF37] hover:text-[#FFF2B2] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Phone className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp Call Center: {APP_CONFIG.contact.displayPhone}
             </a>
@@ -757,7 +783,11 @@ export default function App() {
                 href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm"
+                onClick={() => {
+                  trackPixelEvent('Contact', { content_name: 'WhatsApp Panitia Mobile Header' });
+                  showToast('success', 'Membuka WhatsApp', 'Menghubungkan ke WhatsApp Panitia...');
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm cursor-pointer"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>WhatsApp Panitia: {APP_CONFIG.contact.displayPhone}</span>
@@ -2380,8 +2410,8 @@ export default function App() {
                             Mata Pelajaran yang Diikuti:
                           </span>
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {(rec.subjects || ['Matematika']).map(s => (
-                              <span key={s} className="px-2 py-0.5 rounded-lg bg-[#1A1615] text-[#D4AF37] font-bold text-[11px] inline-flex items-center gap-1 shadow-xs">
+                            {Array.from(new Set(rec.subjects || ['Matematika'])).map((s, idx) => (
+                              <span key={`${s}-${idx}`} className="px-2 py-0.5 rounded-lg bg-[#1A1615] text-[#D4AF37] font-bold text-[11px] inline-flex items-center gap-1 shadow-xs">
                                 <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
                                 {s}
                               </span>
@@ -2423,6 +2453,13 @@ export default function App() {
                       href={generateWhatsAppUrlMulti(childrenForms)}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => {
+                        trackPixelEvent('Contact', {
+                          content_name: 'Konfirmasi Pendaftaran ke WhatsApp Admin',
+                          students_count: childrenForms.length
+                        });
+                        showToast('success', 'Konfirmasi Pendaftaran', 'Membuka WhatsApp Admin untuk konfirmasi pendaftaran & link sosmed...');
+                      }}
                       className="w-full py-3.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                     >
                       <MessageCircle className="w-4 h-4" />

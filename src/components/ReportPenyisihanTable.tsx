@@ -23,12 +23,15 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { ParticipantRecord, updateParticipantField } from '../services/participantDb';
+import { ParticipantRecord, updateParticipantField, safeDispatchParticipantsUpdated } from '../services/participantDb';
 import {
   triggerQualificationReleasedNotification,
   broadcastQualificationAnnouncements
 } from '../services/whatsappApiService';
 import { generateDigitalCertificatePdf } from '../services/certificateGenerator';
+import { showToast } from './NotificationToast';
+import { exportLolosPenyisihanReportPdf } from '../services/officialReportsGenerator';
+import { logAdminAction } from '../services/adminAuditLogService';
 
 interface ReportPenyisihanTableProps {
   participantsList: ParticipantRecord[];
@@ -65,7 +68,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     );
 
     if (candidates.length === 0) {
-      alert('Semua peserta dengan nilai > 60 sudah berstatus Lolos ke Babak Final.');
+      showToast('info', 'Sudah Berstatus Lolos', 'Semua peserta dengan nilai > 60 sudah berstatus Lolos ke Babak Final.');
       return;
     }
 
@@ -86,8 +89,10 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       count++;
     }
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
+    logAdminAction('AUTO_QUALIFY', 'Otomatis Loloskan Nilai > 60', `Meloloskan ${count} peserta ke Babak Final`);
     setActionNotification(`✓ Berhasil meloloskan ${count} peserta (>60) ke Babak Final & notifikasi WhatsApp dikirim!`);
+    showToast('success', 'Kelulusan Massal Berhasil', `Berhasil meloloskan ${count} peserta (>60) ke Babak Final.`);
     setTimeout(() => setActionNotification(''), 4500);
   };
 
@@ -100,7 +105,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
   const handleMassBoostScores = () => {
     const candidates = participantsList.filter(p => !!p.penyisihanExam);
     if (candidates.length === 0) {
-      alert('Belum ada data pengerjaan ujian penyisihan yang dapat ditingkatkan nilainya.');
+      showToast('error', 'Gagal Tingkatkan Nilai', 'Belum ada data pengerjaan ujian penyisihan.');
       return;
     }
 
@@ -140,8 +145,10 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       }
     }
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
+    logAdminAction('BULK_SCORE_BOOST', 'Tingkatkan Nilai Massal', `Menyesuaikan nilai untuk ${updatedCount} peserta`);
     setActionNotification(`✓ Sukses meningkatkan nilai secara massal untuk ${updatedCount} peserta!`);
+    showToast('success', 'Tingkatkan Nilai Berhasil', `Nilai ${updatedCount} peserta berhasil ditingkatkan sesuai ketentuan.`);
     setTimeout(() => setActionNotification(''), 4500);
   };
 
@@ -155,7 +162,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     if (input === null) return;
     const parsed = parseInt(input.trim(), 10);
     if (isNaN(parsed) || parsed < 0 || parsed > 100) {
-      alert('Nilai harus berupa angka antara 0 hingga 100.');
+      showToast('error', 'Nilai Tidak Valid', 'Nilai harus berupa angka antara 0 hingga 100.');
       return;
     }
 
@@ -175,8 +182,10 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       qualificationNote: isNowLolos ? 'Lolos Seleksi Babak Penyisihan' : p.qualificationNote
     });
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
+    logAdminAction('MANUAL_SCORE_EDIT', 'Ubah Nilai Penyisihan', `Ubah nilai ${p.fullName} menjadi ${parsed}/100`, p.id, p.fullName);
     setActionNotification(`✓ Nilai peserta ${p.fullName} berhasil diubah menjadi ${parsed}/100.`);
+    showToast('success', 'Nilai Diperbarui', `Nilai ${p.fullName} berhasil diubah menjadi ${parsed}/100.`);
     setTimeout(() => setActionNotification(''), 3500);
   };
 
@@ -202,80 +211,26 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       }
     });
 
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
     setActionNotification(`✓ Waktu pengerjaan ${p.fullName} berhasil diperbarui: ${input.trim()}`);
+    showToast('success', 'Durasi Diperbarui', `Waktu pengerjaan ${p.fullName} diubah menjadi: ${input.trim()}.`);
     setTimeout(() => setActionNotification(''), 3500);
   };
 
-  // Fitur Cetak PDF Laporan Hasil Ujian Lengkap dengan Durasi & Nilai
+  // Fitur Cetak PDF Laporan Hasil Ujian Lengkap dengan 3 Logo & Tanda Tangan Resmi
   const handleDownloadPdfReport = async () => {
-    const { jsPDF } = await import('jspdf');
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const width = 297;
-
-    // Header
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(15);
-    doc.setTextColor(26, 22, 21);
-    doc.text('LAPORAN RESMI HASIL UJIAN BABAK PENYISIHAN CBT - OSN 2026', width / 2, 15, { align: 'center' });
-
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(90, 85, 80);
-    doc.text(`LKP Prestasi Nusantara · Dicetak pada: ${new Date().toLocaleDateString('id-ID')} · Total Peserta: ${filteredData.length}`, width / 2, 21, { align: 'center' });
-
-    doc.setDrawColor(212, 175, 55);
-    doc.setLineWidth(0.7);
-    doc.line(14, 24, width - 14, 24);
-
-    // Table Header
-    let y = 31;
-    doc.setFillColor(245, 240, 225);
-    doc.rect(14, y - 5, width - 28, 7.5, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(26, 22, 21);
-
-    doc.text('No', 16, y);
-    doc.text('No. Peserta', 25, y);
-    doc.text('Nama Lengkap Siswa', 56, y);
-    doc.text('Asal Sekolah', 115, y);
-    doc.text('Jenjang', 162, y);
-    doc.text('Mata Pelajaran', 190, y);
-    doc.text('Skor', 218, y);
-    doc.text('Waktu Pengerjaan', 232, y);
-    doc.text('Status Kelulusan', 265, y);
-
-    y += 5.5;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-
-    filteredData.slice(0, 80).forEach((p, idx) => {
-      if (y > 195) {
-        doc.addPage();
-        y = 20;
-      }
-
-      const score = p.penyisihanExam ? p.penyisihanExam.score : '-';
-      const duration = p.penyisihanExam?.durationText || '18 Menit 24 Detik';
-      const isLolos = p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60);
-
-      doc.text(String(idx + 1), 16, y);
-      doc.text(p.id.slice(-10), 25, y);
-      doc.text(p.fullName.slice(0, 26), 56, y);
-      doc.text(p.schoolName.slice(0, 24), 115, y);
-      doc.text(p.level.split('(')[0].trim().slice(0, 13), 162, y);
-      doc.text((p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika').slice(0, 14), 190, y);
-      doc.text(String(score), 218, y);
-      doc.text(duration, 232, y);
-      doc.text(isLolos ? 'LOLOS FINAL' : 'TIDAK LOLOS', 265, y);
-
-      y += 4.8;
-    });
-
-    doc.save(`Laporan_Hasil_Ujian_Penyisihan_OSN_2026_${Date.now()}.pdf`);
-    setActionNotification('✓ Berhasil mengunduh Laporan Hasil Ujian dalam format PDF!');
-    setTimeout(() => setActionNotification(''), 3500);
+    try {
+      showToast('info', 'Menyiapkan Laporan', 'Sedang memproses Laporan Resmi Peserta Lolos Babak Penyisihan (PDF)...');
+      await exportLolosPenyisihanReportPdf(filteredData.length > 0 ? filteredData : participantsList);
+      logAdminAction('EXPORT_REPORT', 'Cetak Laporan Lolos Penyisihan (PDF)', `Export ${filteredData.length} data`);
+      setActionNotification('✓ Berhasil mengunduh Laporan Resmi Peserta Lolos Babak Penyisihan PDF!');
+      showToast('success', 'Laporan PDF Berhasil Diunduh', 'Laporan Resmi Peserta Lolos Babak Penyisihan (PDF) berhasil dicetak.');
+    } catch (err: any) {
+      console.error('Failed to generate report PDF:', err);
+      showToast('error', 'Gagal Mencetak Laporan', err?.message || 'Terjadi kesalahan saat memproses dokumen PDF.');
+    } finally {
+      setTimeout(() => setActionNotification(''), 3500);
+    }
   };
 
   // Broadcast WhatsApp API untuk Seluruh Peserta Lolos
@@ -285,7 +240,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     );
 
     if (qualified.length === 0) {
-      alert('Tidak ada peserta lolos yang ditemukan untuk di-broadcast.');
+      showToast('error', 'Broadcast Dibatalkan', 'Tidak ada peserta lolos yang ditemukan untuk di-broadcast.');
       return;
     }
 
@@ -296,12 +251,16 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
 
     setIsBroadcasting(true);
     setActionNotification(`Mengirim broadcast WhatsApp API ke ${qualified.length} peserta...`);
+    showToast('info', 'Mengirim Broadcast WA', `Sedang mengirimkan broadcast ke ${qualified.length} peserta...`);
 
     try {
       const res = await broadcastQualificationAnnouncements(qualified);
+      logAdminAction('WHATSAPP_BROADCAST', 'Broadcast Pengumuman Kelulusan', `Terkirim ke ${res.sentCount} peserta lolos`);
       setActionNotification(`✓ Broadcast WhatsApp API sukses terkirim ke ${res.sentCount} peserta!`);
-    } catch (e) {
+      showToast('success', 'Broadcast WhatsApp API Sukses', `Pengumuman kelulusan resmi berhasil dikirim ke ${res.sentCount} peserta lolos!`);
+    } catch (e: any) {
       setActionNotification(`✓ Broadcast WhatsApp API telah diproses.`);
+      showToast('error', 'Kendala Broadcast WA', e?.message || 'Broadcast telah diproses dengan beberapa kendala koneksi.');
     } finally {
       setIsBroadcasting(false);
       setTimeout(() => setActionNotification(''), 4500);
@@ -313,9 +272,12 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     setActionNotification(`Mengirim notifikasi WhatsApp API ke ${p.fullName}...`);
     try {
       await triggerQualificationReleasedNotification(p, 'lolos');
+      logAdminAction('WHATSAPP_BROADCAST', `Kirim Notifikasi WA Kelulusan: ${p.fullName}`, `Kirim ke ${p.whatsapp}`, p.id, p.fullName);
       setActionNotification(`✓ Notifikasi WhatsApp API resmi terkirim ke ${p.fullName}!`);
-    } catch (e) {
+      showToast('success', 'WhatsApp API Terkirim', `Notifikasi kelulusan resmi sukses terkirim ke ${p.fullName}.`);
+    } catch (e: any) {
       setActionNotification(`✓ Notifikasi WhatsApp diproses untuk ${p.fullName}.`);
+      showToast('error', 'Gagal Mengirim WhatsApp', e?.message || `Gagal mengirim ke ${p.fullName}.`);
     }
     setTimeout(() => setActionNotification(''), 3500);
   };
@@ -453,10 +415,11 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast('success', 'Ekspor CSV Berhasil', 'Data pengerjaan babak penyisihan (.csv) berhasil diunduh.');
   };
 
   const handlePrint = () => {
-    window.print();
+    handleDownloadPdfReport();
   };
 
   return (
@@ -918,7 +881,10 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                             href={generateFollowUpWhatsAppUrl(p, isLolos ? 'final' : 'penyisihan')}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
+                            onClick={() => {
+                              showToast('success', 'Membuka WhatsApp', `Menghubungkan chat tindak lanjut untuk ${p.fullName}...`);
+                            }}
+                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                             title="Buka Chat WhatsApp Web/App Langsung"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -927,14 +893,20 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                           {(isLolos || (p.penyisihanExam && p.penyisihanExam.score >= 60)) && (
                             <button
                               type="button"
-                              onClick={() => {
-                                generateDigitalCertificatePdf({
-                                  student: p,
-                                  score: p.penyisihanExam?.score ?? 85,
-                                  subject: p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika',
-                                  rankTitle: 'Lolos Babak Final (Finalis Nasional)',
-                                  stageTitle: 'BABAK PENYISIHAN NASIONAL'
-                                });
+                              onClick={async () => {
+                                try {
+                                  showToast('info', 'Menyiapkan Sertifikat', `Sedang memproses Sertifikat Resmi untuk ${p.fullName}...`);
+                                  await generateDigitalCertificatePdf({
+                                    student: p,
+                                    score: p.penyisihanExam?.score ?? 85,
+                                    subject: p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika',
+                                    rankTitle: 'Lolos Babak Final (Finalis Nasional)',
+                                    stageTitle: 'BABAK PENYISIHAN NASIONAL'
+                                  });
+                                  showToast('success', 'Sertifikat Berhasil Diunduh', `Sertifikat Resmi untuk ${p.fullName} berhasil dicetak.`);
+                                } catch (err: any) {
+                                  showToast('error', 'Gagal Mengunduh Sertifikat', err?.message || 'Terjadi kesalahan saat memproses sertifikat PDF.');
+                                }
                               }}
                               className="p-1.5 rounded-lg bg-[#1A1615] hover:bg-neutral-800 text-[#D4AF37] border border-[#D4AF37]/50 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                               title="Unduh Sertifikat Digital Resmi Peserta Lolos (PDF)"
@@ -945,9 +917,17 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
 
                           <button
                             type="button"
-                            onClick={() => downloadExamCardPdf(p)}
+                            onClick={() => {
+                              try {
+                                showToast('info', 'Menyiapkan Kartu Ujian', `Sedang mengunduh Kartu Peserta Ujian ${p.fullName}...`);
+                                downloadExamCardPdf(p);
+                                showToast('success', 'Kartu Ujian Diunduh', `Kartu Ujian untuk ${p.fullName} berhasil diunduh.`);
+                              } catch (e: any) {
+                                showToast('error', 'Gagal Mengunduh Kartu', e?.message || 'Terjadi kesalahan saat memproses kartu.');
+                              }
+                            }}
                             className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-colors cursor-pointer"
-                            title="Download Kartu Peserta Ujian PDF"
+                            title="Unduh Kartu Peserta Ujian PDF"
                           >
                             <Download className="w-3.5 h-3.5" />
                           </button>

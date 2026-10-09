@@ -208,10 +208,16 @@ export async function generateDigitalCertificatePdf(options: CertificateOptions)
   doc.setTextColor(100, 90, 75);
   doc.text('Dinyatakan Lulus dan Meraih Predikat Penghargaan:', width / 2, 104, { align: 'center' });
 
+  // PERMINTAAN USER: Buat teks " & LOLOS BABAK FINAL (FINALIS NASIONAL) & " center pada desainnya
+  const isFinalistRank = rank.toUpperCase().includes('FINALIS') || rank.toUpperCase().includes('LOLOS');
+  const formattedRankText = isFinalistRank
+    ? '& LOLOS BABAK FINAL (FINALIS NASIONAL) &'
+    : `★  ${rank.toUpperCase()}  ★`;
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(160, 105, 10);
-  doc.text(`★  ${rank.toUpperCase()}  ★`, width / 2, 112, { align: 'center' });
+  doc.text(formattedRankText, width / 2, 112, { align: 'center' });
 
   // Subject and Score Info
   doc.setFont('helvetica', 'bold');
@@ -245,18 +251,31 @@ export async function generateDigitalCertificatePdf(options: CertificateOptions)
   // 4. BAGIAN TANDA TANGAN & STEMPEL RESMI
   // ==========================================
   // PERMINTAAN USER:
-  // - Tanda tangan Mengetahui & Mengesahkan, Direktur LKP Prestasi Nusantara
-  // - Tanpa menggunakan nama (hapus semua nama pada tanda tangan sertifikat)
+  // - Tanda tangan Mengetahui & Mengesahkan, Direktur LKP Prestasi Nusantara (tanpa nama, hapus semua nama)
   // - Hapus (Reg. LKP. 021/PN/DIKNAS/2024, NIP. 19780512 200212 1 003, Dr. H. Hendra Gunawan, M.Si, Hj. Siti Nur Asia, S.Pd., M.)
-  // - Tampilkan Stempel LKP resmi pada pengesahan
+  // - Terapkan tanda tangan pada nama Panitia Pelaksana Pusat di sertifikat
+  // - Ubah teks "Ditetapkan di Jakarta" menjadi "Ditetapkan pada Tanggal"
+  // - Tampilkan 3 Logo Resmi: Logo OSN, Logo LKP, Stempel Resmi LKP
   const footerY = 145;
 
-  // Left Signature: Panitia Pelaksana OSN 2026 (Tanpa Nama & Tanpa NIP)
+  // Left Signature: Panitia Pelaksana OSN 2026
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(90, 85, 80);
-  doc.text(`Ditetapkan di Jakarta, ${executionDate}`, 48, footerY, { align: 'center' });
+  doc.text(`Ditetapkan pada Tanggal : ${executionDate}`, 48, footerY, { align: 'center' });
   doc.text('Panitia Pelaksana OSN 2026', 48, footerY + 5, { align: 'center' });
+
+  // Tanda Tangan Resmi Panitia Pelaksana Pusat (Goresan Tanda Tangan Digital Resmi)
+  doc.setDrawColor(20, 35, 75);
+  doc.setLineWidth(0.65);
+  doc.line(36, footerY + 18, 41, footerY + 11);
+  doc.line(41, footerY + 11, 46, footerY + 19);
+  doc.line(46, footerY + 19, 52, footerY + 12);
+  doc.line(52, footerY + 12, 59, footerY + 17);
+  doc.setFont('times', 'italic');
+  doc.setFontSize(10.5);
+  doc.setTextColor(25, 40, 80);
+  doc.text('Panitia Pelaksana', 48, footerY + 18, { align: 'center' });
 
   // Signature line
   doc.setDrawColor(180, 180, 180);

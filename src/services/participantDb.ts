@@ -47,8 +47,9 @@ export interface ParticipantRecord {
   finalTicketPaymentStatus?: 'unpaid' | 'pending_verification' | 'paid_closing';
   finalTicketPaidAt?: string;
   finalTicketAmount?: number;
-  // Final Award / Certificate Champion Title
-  championRank?: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' | 'Belum Dinilai';
+  // Final Award / Certificate Champion Title (DITENTUKAN OLEH ADMIN, SISTEM HANYA MEMBERIKAN REKOMENDASI)
+  championRank?: 'Juara 1' | 'Juara 2' | 'Juara 3' | 'Peserta Final' | 'Belum Dinilai' | 'Belum Ditetapkan' | string;
+  recommendedChampionRank?: string;
   certificateIssuedDate?: string;
   // Stored randomized question sets for participant exam sessions (guarantees 20 unique randomized questions per session)
   sessionQuestionIds?: { [examKey: string]: string[] };
@@ -278,6 +279,40 @@ export function getAllParticipants(): ParticipantRecord[] {
 }
 
 /**
+ * Safely dispatch participant updated event asynchronously to prevent updating
+ * a component during rendering of another component
+ */
+export function safeDispatchParticipantsUpdated(): void {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      try {
+        window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+      } catch {}
+    }, 0);
+  }
+}
+
+/**
+ * Simpan seluruh daftar peserta hasil batch edit / modifikasi massal
+ */
+export function saveAllParticipants(updated: ParticipantRecord[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    safeDispatchParticipantsUpdated();
+    // Background sync to server so server file data/participants.json stays 100% synchronized
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/participants/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participants: updated })
+      }).catch(err => console.warn('Background sync to server:', err));
+    }
+  } catch (err) {
+    console.error('Failed to save all participants:', err);
+  }
+}
+
+/**
  * Kebijakan Peningkatan Nilai Massal Panitia OSN 2026:
  * - jika nilai < 40 otomatis ditingkatkan ke 75
  * - jika nilai < 50 otomatis ditingkatkan ke 80
@@ -355,7 +390,7 @@ export function massBoostScores(stage: 'penyisihan' | 'final' | 'all' = 'penyisi
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
   } catch (err) {
     console.error('Failed to save mass score boost:', err);
   }
@@ -386,7 +421,7 @@ export function autoQualifyParticipantsAbove60(): { qualifiedCount: number; list
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
   } catch (err) {
     console.error('Failed to save auto qualify:', err);
   }
@@ -463,7 +498,7 @@ export function manualUpdateParticipantScoreAndTime(
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+    safeDispatchParticipantsUpdated();
   } catch (err) {
     console.error('Failed to save manual edit:', err);
   }
@@ -489,16 +524,14 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
           if (serverP.id) mergedMap.set(serverP.id, serverP);
         });
 
+        const itemsToPushToServer: ParticipantRecord[] = [];
+
         // Smart merge with local
         local.forEach((localP: ParticipantRecord) => {
           const serverP = mergedMap.get(localP.id);
           if (!serverP) {
             mergedMap.set(localP.id, localP);
-            fetch('/api/participants', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(localP)
-            }).catch(() => {});
+            itemsToPushToServer.push(localP);
           } else {
             // Merge preserving whichever side has completed exam data
             const mergedItem: ParticipantRecord = {
@@ -522,18 +555,22 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
               (localP.penyisihanExam && !serverP.penyisihanExam) ||
               (localP.finalExam && !serverP.finalExam)
             ) {
-              fetch(`/api/participants/${localP.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(mergedItem)
-              }).catch(() => {});
+              itemsToPushToServer.push(mergedItem);
             }
           }
         });
 
+        if (itemsToPushToServer.length > 0) {
+          fetch('/api/participants/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ participants: itemsToPushToServer })
+          }).catch(() => {});
+        }
+
         const merged = Array.from(mergedMap.values());
         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-        window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+        safeDispatchParticipantsUpdated();
         return merged;
       }
     }
@@ -620,7 +657,7 @@ export async function saveParticipant(data: {
     // network fallback
   }
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return record;
 }
 
@@ -738,14 +775,22 @@ export function getOrGenerateParticipantExamQuestions(
   const selectedIds = selected20.map(q => q.id);
 
   // Store the selected set in the participant's record to prevent duplicates and keep sessions consistent
-  if (participant) {
+  if (participant && idx >= 0) {
     if (!participant.sessionQuestionIds) {
       participant.sessionQuestionIds = {};
     }
     participant.sessionQuestionIds[examKey] = selectedIds;
-    updateParticipantField(participant.id, {
-      sessionQuestionIds: participant.sessionQuestionIds
-    });
+    allParticipants[idx] = { ...participant };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allParticipants));
+    } catch {}
+    try {
+      fetch(`/api/participants/${participant.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionQuestionIds: participant.sessionQuestionIds })
+      }).catch(() => {});
+    } catch {}
   }
 
   return selected20;
@@ -823,10 +868,18 @@ export function updateParticipantExamResult(
     p.cbtStatus = result.violationReason
       ? `Pelanggaran CBT Final: ${result.violationReason}`
       : `Selesai Ujian Final (${result.score}/100)`;
-    if (result.score >= 90) p.championRank = 'Juara 1';
-    else if (result.score >= 80) p.championRank = 'Juara 2';
-    else if (result.score >= 70) p.championRank = 'Juara 3';
-    else p.championRank = 'Peserta Final';
+    
+    // PERMINTAAN USER: Juara dan pemenang maupun medali jangan ditentukan otomatis oleh sistem.
+    // Ditentukan oleh admin (sistem hanya memberikan rekomendasi siapa juara dan pemenang maupun medali).
+    if (result.score >= 90) p.recommendedChampionRank = 'Juara 1';
+    else if (result.score >= 80) p.recommendedChampionRank = 'Juara 2';
+    else if (result.score >= 70) p.recommendedChampionRank = 'Juara 3';
+    else p.recommendedChampionRank = 'Peserta Final';
+
+    // Jika belum pernah ditentukan oleh admin, status awal adalah Belum Ditetapkan (Menunggu Admin)
+    if (!p.championRank || p.championRank === 'Belum Dinilai' || p.championRank === 'Belum Ditetapkan') {
+      p.championRank = 'Belum Ditetapkan';
+    }
   } else if (examType === 'penyisihan') {
     p.penyisihanExam = examInfo;
     p.penyisihanAttempts = currentAttempts;
@@ -880,7 +933,7 @@ export function updateParticipantExamResult(
     }).catch(() => {});
   } catch {}
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return p;
 }
 
@@ -901,7 +954,7 @@ export function deleteParticipant(participantId: string): boolean {
     }).catch(() => {});
   } catch {}
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return true;
 }
 
@@ -932,7 +985,7 @@ export function updateParticipantField(
     }).catch(() => {});
   } catch {}
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return all[idx];
 }
 
@@ -971,7 +1024,7 @@ export function resetParticipantAttempts(
     p.simulatedAttempts = 0;
     p.penyisihanAttempts = 0;
     p.finalAttempts = 0;
-    p.cbtStatus = 'Aktif (Seluruh Kuota Ujian Direset 0/2)';
+    p.cbtStatus = 'Aktif (Seluruh Kuota Ujian Direset: Simulasi Unlimited, Resmi 0/1)';
     if (clearHistory) {
       delete p.simulatedExam;
       delete p.penyisihanExam;
@@ -980,20 +1033,20 @@ export function resetParticipantAttempts(
     }
   } else if (examType === 'simulasi') {
     p.simulatedAttempts = 0;
-    p.cbtStatus = 'Aktif (Kuota Simulasi Direset 0/2)';
+    p.cbtStatus = 'Aktif (Kuota Simulasi Unlimited)';
     if (clearHistory) {
       delete p.simulatedExam;
     }
   } else if (examType === 'penyisihan') {
     p.penyisihanAttempts = 0;
-    p.cbtStatus = 'Aktif (Kuota Babak Penyisihan Direset 0/2)';
+    p.cbtStatus = 'Aktif (Kuota Babak Penyisihan Direset 0/1)';
     if (clearHistory) {
       delete p.penyisihanExam;
       p.qualificationStatus = 'pending';
     }
   } else if (examType === 'final') {
     p.finalAttempts = 0;
-    p.cbtStatus = 'Aktif (Kuota Final Direset 0/2)';
+    p.cbtStatus = 'Aktif (Kuota Final Direset 0/1)';
     if (clearHistory) {
       delete p.finalExam;
     }
@@ -1015,7 +1068,7 @@ export function resetParticipantAttempts(
     }).catch(() => {});
   } catch {}
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return p;
 }
 
@@ -1055,7 +1108,7 @@ export function grantExtraAttempt(
     }).catch(() => {});
   } catch {}
 
-  window.dispatchEvent(new CustomEvent('osn_participants_updated'));
+  safeDispatchParticipantsUpdated();
   return p;
 }
 

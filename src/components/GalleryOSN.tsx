@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG } from '../../appConfig.js';
 import { LogoLKP, StempelLKP, LogoOSN } from './BrandLogos';
+import { showToast } from './NotificationToast';
 
 export interface GalleryItem {
   id: string;
@@ -85,7 +86,7 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
 
   const handleFileUpload = (itemId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isAdmin) {
-      alert('Akses Ditolak: Fitur unggah dan sinkronisasi foto hanya diperuntukkan bagi Administrator / Panitia Pusat.');
+      showToast('error', 'Akses Ditolak', 'Fitur unggah dan sinkronisasi foto hanya diperuntukkan bagi Administrator / Panitia Pusat.');
       return;
     }
     const file = e.target.files?.[0];

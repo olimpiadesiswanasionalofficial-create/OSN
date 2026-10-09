@@ -28,7 +28,11 @@ export function saveMetaPixelConfig(config: MetaPixelConfig): MetaPixelConfig {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
     applyMetaPixel(config);
-    window.dispatchEvent(new CustomEvent('osn_pixel_updated', { detail: config }));
+    setTimeout(() => {
+      try {
+        window.dispatchEvent(new CustomEvent('osn_pixel_updated', { detail: config }));
+      } catch {}
+    }, 0);
   } catch (err) {
     console.error('Failed to save Meta Pixel config:', err);
   }

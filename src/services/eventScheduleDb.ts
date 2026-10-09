@@ -61,7 +61,11 @@ export function saveEventSchedule(schedule: Partial<EventScheduleConfig>): Event
 
     // Dispatch a custom event so other components (App.tsx, etc.) update reactively
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('osn_schedule_updated', { detail: updated }));
+      setTimeout(() => {
+        try {
+          window.dispatchEvent(new CustomEvent('osn_schedule_updated', { detail: updated }));
+        } catch {}
+      }, 0);
     }
 
     return updated;

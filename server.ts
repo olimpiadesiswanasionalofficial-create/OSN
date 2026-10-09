@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { APP_CONFIG } from './appConfig.js';
+import * as XLSX from 'xlsx';
 
 dotenv.config();
 
@@ -275,6 +276,177 @@ app.post('/api/participants', (req: Request, res: Response) => {
   }
 });
 
+// Endpoint to bulk add or update participants
+app.post('/api/participants/bulk', (req: Request, res: Response) => {
+  try {
+    const { participants } = req.body;
+    if (!Array.isArray(participants)) {
+      return res.status(400).json({ success: false, error: 'Format data peserta harus berupa array.' });
+    }
+
+    const currentList = getStoredParticipants();
+    const map = new Map<string, any>();
+
+    // Index existing participants by ID
+    currentList.forEach((p: any) => {
+      if (p.id) map.set(p.id, p);
+    });
+
+    let insertedCount = 0;
+    let updatedCount = 0;
+
+    participants.forEach((p: any) => {
+      if (!p.fullName) return;
+      const cleanPhone = String(p.whatsapp || '').replace(/[^0-9]/g, '').replace(/^62/, '0');
+      
+      // Look up existing by id or matching phone + name
+      let existingId = p.id;
+      if (!existingId || !map.has(existingId)) {
+        for (const [idKey, existingP] of map.entries()) {
+          const exPhone = String(existingP.whatsapp || '').replace(/[^0-9]/g, '').replace(/^62/, '0');
+          if (
+            cleanPhone && exPhone === cleanPhone &&
+            existingP.fullName?.trim().toLowerCase() === String(p.fullName).trim().toLowerCase()
+          ) {
+            existingId = idKey;
+            break;
+          }
+        }
+      }
+
+      const existingRecord = existingId ? map.get(existingId) : null;
+      const finalId = existingId || p.id || `OSN-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const merged = {
+        ...(existingRecord || {}),
+        ...p,
+        id: finalId,
+        fullName: String(p.fullName).trim(),
+        level: p.level || existingRecord?.level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
+        schoolName: p.schoolName || existingRecord?.schoolName || '-',
+        cityProvince: p.cityProvince || existingRecord?.cityProvince || '-',
+        whatsapp: String(p.whatsapp || existingRecord?.whatsapp || '').trim(),
+        email: p.email || existingRecord?.email || '-',
+        parentName: p.parentName || existingRecord?.parentName || '-',
+        fullAddress: p.fullAddress || existingRecord?.fullAddress || '-',
+        subjects: Array.isArray(p.subjects) && p.subjects.length > 0 ? p.subjects : (existingRecord?.subjects || ['Matematika']),
+        registeredAt: p.registeredAt || existingRecord?.registeredAt || new Date().toISOString(),
+        cbtStatus: p.cbtStatus || existingRecord?.cbtStatus || 'Aktif & Siap Ujian (Tercatat di Database)',
+        simulatedExam: p.simulatedExam || existingRecord?.simulatedExam,
+        penyisihanExam: p.penyisihanExam || existingRecord?.penyisihanExam,
+        finalExam: p.finalExam || existingRecord?.finalExam,
+        simulatedAttempts: p.simulatedAttempts ?? existingRecord?.simulatedAttempts ?? 0,
+        penyisihanAttempts: p.penyisihanAttempts ?? existingRecord?.penyisihanAttempts ?? 0,
+        finalAttempts: p.finalAttempts ?? existingRecord?.finalAttempts ?? 0,
+        qualificationStatus: p.qualificationStatus || existingRecord?.qualificationStatus || 'pending',
+        finalTicketPaymentStatus: p.finalTicketPaymentStatus || existingRecord?.finalTicketPaymentStatus || 'unpaid',
+        championRank: p.championRank || existingRecord?.championRank
+      };
+
+      if (existingRecord) {
+        updatedCount++;
+      } else {
+        insertedCount++;
+      }
+
+      map.set(finalId, merged);
+    });
+
+    const newList = Array.from(map.values());
+    saveStoredParticipants(newList);
+
+    return res.json({
+      success: true,
+      message: `Berhasil sinkronisasi ${participants.length} data peserta (${insertedCount} baru, ${updatedCount} diperbarui). Total database: ${newList.length} peserta.`,
+      total: newList.length,
+      inserted: insertedCount,
+      updated: updatedCount
+    });
+  } catch (error: any) {
+    console.error('Error in POST /api/participants/bulk:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal menyimpan data massal.' });
+  }
+});
+
+// Endpoint to fetch spreadsheet data from Google Sheets or Web URL (bypassing CORS)
+app.post('/api/participants/fetch-spreadsheet', async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ success: false, error: 'URL Spreadsheet wajib diisi.' });
+    }
+
+    const trimmed = url.trim();
+    let fetchUrl = trimmed;
+
+    // Detect Google Sheets URL format
+    const googleSheetMatch = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    if (googleSheetMatch) {
+      const sheetId = googleSheetMatch[1];
+      const gidMatch = trimmed.match(/[#&?]gid=([0-9]+)/);
+      const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
+      fetchUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv${gidParam}`;
+    }
+
+    const response = await fetch(fetchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
+        'Accept': 'text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(400).json({
+        success: false,
+        error: `Gagal mengunduh spreadsheet dari link (${response.status} ${response.statusText}). Pastikan link Google Sheet disetel "Siapa saja yang memiliki link dapat melihat" (Anyone with the link can view).`
+      });
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    let workbook: XLSX.WorkBook;
+
+    if (contentType.includes('spreadsheet') || contentType.includes('octet-stream')) {
+      const arrayBuffer = await response.arrayBuffer();
+      workbook = XLSX.read(Buffer.from(arrayBuffer), { type: 'buffer' });
+    } else {
+      const text = await response.text();
+      workbook = XLSX.read(text, { type: 'string' });
+    }
+
+    if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+      return res.status(400).json({ success: false, error: 'File spreadsheet tidak memiliki lembar kerja (sheet).' });
+    }
+
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(firstSheet, { defval: '' });
+
+    return res.json({
+      success: true,
+      total: rows.length,
+      rows: rows,
+      sheetName: workbook.SheetNames[0]
+    });
+  } catch (error: any) {
+    console.error('Error fetching spreadsheet url:', error);
+    return res.status(500).json({ success: false, error: error?.message || 'Gagal memproses link spreadsheet.' });
+  }
+});
+
+// Endpoint to check database sync status and statistics
+app.get('/api/sync/status', (_req: Request, res: Response) => {
+  try {
+    const participants = getStoredParticipants();
+    res.json({
+      success: true,
+      totalParticipants: participants.length,
+      timestamp: new Date().toISOString(),
+      serverStatus: 'connected'
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message });
+  }
+});
+
 // Update participant exam results / progress (Simulasi, Penyisihan, or Final)
 app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
   try {
@@ -519,13 +691,29 @@ app.get('/api/questions', (_req: Request, res: Response) => {
 
 app.post('/api/questions', (req: Request, res: Response) => {
   try {
-    const { questions } = req.body;
+    const { questions, question } = req.body;
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
     if (Array.isArray(questions)) {
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
       fs.writeFileSync(questionsFile, JSON.stringify(questions, null, 2), 'utf-8');
       return res.json({ success: true, message: 'Soal berhasil disimpan pada server database.' });
+    } else if (question && typeof question === 'object') {
+      let current: any[] = [];
+      if (fs.existsSync(questionsFile)) {
+        try {
+          current = JSON.parse(fs.readFileSync(questionsFile, 'utf-8'));
+        } catch {}
+      }
+      const idx = current.findIndex(q => q.id === question.id);
+      if (idx >= 0) {
+        current[idx] = question;
+      } else {
+        current.push(question);
+      }
+      fs.writeFileSync(questionsFile, JSON.stringify(current, null, 2), 'utf-8');
+      return res.json({ success: true, message: 'Soal berhasil diperbarui di server database.' });
     }
     return res.status(400).json({ success: false, error: 'Data soal tidak valid.' });
   } catch (e: any) {
