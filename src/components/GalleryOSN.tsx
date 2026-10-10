@@ -67,6 +67,24 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
     }
   });
 
+  // Sync gallery images from Neon DB server on load
+  React.useEffect(() => {
+    fetch('/api/gallery', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.data && typeof json.data === 'object') {
+          setCustomImages(prev => {
+            const merged = { ...prev, ...json.data };
+            try {
+              localStorage.setItem('osn_gallery_custom_images', JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   React.useEffect(() => {
     const checkAdmin = () => {
       try {
@@ -103,8 +121,15 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
           } catch (err) {
             console.warn('Could not persist image to localStorage', err);
           }
+          // Sync to Neon DB server
+          fetch('/api/gallery', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ images: updated })
+          }).catch(() => {});
           return updated;
         });
+        showToast('success', 'Foto Tersimpan & Tersinkron', 'Foto galeri juara berhasil diunggah dan disinkronkan ke server database.');
       }
     };
     reader.readAsDataURL(file);
@@ -118,6 +143,12 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
       try {
         localStorage.setItem('osn_gallery_custom_images', JSON.stringify(updated));
       } catch {}
+      // Sync to Neon DB server
+      fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: updated })
+      }).catch(() => {});
       return updated;
     });
   };

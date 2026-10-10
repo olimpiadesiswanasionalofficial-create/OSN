@@ -712,7 +712,7 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                           </a>
 
                           {/* Reset Kuota */}
-                          {attempts >= 2 && (
+                          {attempts > 0 && (
                             <button
                               type="button"
                               onClick={() => {
@@ -720,7 +720,7 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                                 showToast('info', 'Reset Kuota Dipilih', `Membuka pengaturan reset kuota final untuk ${p.fullName}.`);
                               }}
                               className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
-                              title="Reset kuota ujian babak final"
+                              title="Reset riwayat ujian babak final"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
                             </button>

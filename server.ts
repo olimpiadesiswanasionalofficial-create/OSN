@@ -16,6 +16,11 @@ import {
   deleteParticipantFromDb,
   getDbHealthStatus,
   postVercelWebhook,
+  getSettingFromDb,
+  saveSettingToDb,
+  getAllQuestionsFromDb,
+  saveQuestionToDb,
+  deleteQuestionFromDb
 } from './src/server/db.js';
 
 dotenv.config();
@@ -556,45 +561,30 @@ app.delete('/api/participants/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Questions API
-const questionsFile = path.join(dataDir, 'cbt_questions.json');
-app.get('/api/questions', (_req: Request, res: Response) => {
+// Questions API (Neon PostgreSQL + Fallback)
+app.get('/api/questions', async (_req: Request, res: Response) => {
   try {
-    if (fs.existsSync(questionsFile)) {
-      const data = JSON.parse(fs.readFileSync(questionsFile, 'utf-8'));
-      return res.json({ success: true, data });
+    const dbQuestions = await getAllQuestionsFromDb();
+    if (dbQuestions.length > 0) {
+      return res.json({ success: true, data: dbQuestions });
     }
-  } catch (e) {
-    console.error('Error reading questions file:', e);
+  } catch (e: any) {
+    console.error('Error reading questions from db:', e?.message);
   }
   return res.json({ success: true, data: [] });
 });
 
-app.post('/api/questions', (req: Request, res: Response) => {
+app.post('/api/questions', async (req: Request, res: Response) => {
   try {
     const { questions, question } = req.body;
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-
     if (Array.isArray(questions)) {
-      fs.writeFileSync(questionsFile, JSON.stringify(questions, null, 2), 'utf-8');
-      return res.json({ success: true, message: 'Soal berhasil disimpan pada server database.' });
+      for (const q of questions) {
+        await saveQuestionToDb(q);
+      }
+      return res.json({ success: true, message: 'Seluruh soal berhasil disinkronkan ke server database Neon.' });
     } else if (question && typeof question === 'object') {
-      let current: any[] = [];
-      if (fs.existsSync(questionsFile)) {
-        try {
-          current = JSON.parse(fs.readFileSync(questionsFile, 'utf-8'));
-        } catch {}
-      }
-      const idx = current.findIndex(q => q.id === question.id);
-      if (idx >= 0) {
-        current[idx] = question;
-      } else {
-        current.push(question);
-      }
-      fs.writeFileSync(questionsFile, JSON.stringify(current, null, 2), 'utf-8');
-      return res.json({ success: true, message: 'Soal berhasil diperbarui di server database.' });
+      const saved = await saveQuestionToDb(question);
+      return res.json({ success: true, message: 'Soal berhasil disimpan ke server database Neon.', data: saved });
     }
     return res.status(400).json({ success: false, error: 'Data soal tidak valid.' });
   } catch (e: any) {
@@ -603,46 +593,139 @@ app.post('/api/questions', (req: Request, res: Response) => {
   }
 });
 
-// Schedule & Event Dates Configuration endpoints
-const scheduleFile = path.join(dataDir, 'schedule.json');
-
-app.get('/api/schedule-config', (_req: Request, res: Response) => {
+app.delete('/api/questions/:id', async (req: Request, res: Response) => {
   try {
-    if (fs.existsSync(scheduleFile)) {
-      const data = JSON.parse(fs.readFileSync(scheduleFile, 'utf-8'));
-      return res.json({ success: true, data });
-    }
-  } catch (e) {
-    console.error('Error reading schedule file:', e);
+    const id = req.params.id;
+    const ok = await deleteQuestionFromDb(id);
+    return res.json({ success: true, deleted: ok });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, error: e?.message });
   }
-  return res.json({
-    success: true,
-    data: {
-      registrationOpenDate: "25 Agustus – 11 September 2026",
-      registrationDesc: "Pendaftaran online mudah & praktis. Terbuka untuk seluruh siswa di Indonesia tanpa kuota zonasi.",
-      penyisihanDate: "12 September 2026",
-      penyisihanDesc: "Ujian online aman dari rumah via sistem CBT mutakhir anti-kecurangan. Penyisihan GRATIS untuk semua peserta.",
-      finalDate: "19 September 2026",
-      finalDesc: "Babak penentuan medalis nasional dan perebutan gelar Juara Umum OSN tingkat nasional.",
-      announcementDate: "20 September 2026",
-      announcementDesc: "Pengumuman resmi juara, penerbitan sertifikat QR-Code & pengiriman paket piala/medali fisik ke alamat pemenang."
-    }
-  });
 });
 
-app.post('/api/schedule-config', (req: Request, res: Response) => {
+// Schedule & Event Dates Configuration endpoints (Neon PostgreSQL)
+const DEFAULT_SCHEDULE = {
+  registrationOpenDate: "25 Agustus – 11 September 2026",
+  registrationDesc: "Pendaftaran online mudah & praktis. Terbuka untuk seluruh siswa di Indonesia tanpa kuota zonasi.",
+  penyisihanDate: "12 September 2026",
+  penyisihanDesc: "Ujian online aman dari rumah via sistem CBT mutakhir anti-kecurangan. Penyisihan GRATIS untuk semua peserta.",
+  finalDate: "19 September 2026",
+  finalDesc: "Babak penentuan medalis nasional dan perebutan gelar Juara Umum OSN tingkat nasional.",
+  announcementDate: "20 September 2026",
+  announcementDesc: "Pengumuman resmi juara, penerbitan sertifikat QR-Code & pengiriman paket piala/medali fisik ke alamat pemenang."
+};
+
+app.get('/api/schedule-config', async (_req: Request, res: Response) => {
   try {
-    const { schedule } = req.body;
+    const data = await getSettingFromDb('schedule', DEFAULT_SCHEDULE);
+    return res.json({ success: true, data: data || DEFAULT_SCHEDULE });
+  } catch (e: any) {
+    console.error('Error getting schedule from DB:', e?.message);
+    return res.json({ success: true, data: DEFAULT_SCHEDULE });
+  }
+});
+
+app.post('/api/schedule-config', async (req: Request, res: Response) => {
+  try {
+    const schedule = req.body?.schedule || req.body;
     if (schedule && typeof schedule === 'object') {
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
-      fs.writeFileSync(scheduleFile, JSON.stringify(schedule, null, 2), 'utf-8');
-      return res.json({ success: true, message: 'Jadwal event olimpiade berhasil diperbarui.', data: schedule });
+      const saved = await saveSettingToDb('schedule', schedule);
+      return res.json({ success: true, message: 'Jadwal event olimpiade berhasil disimpan dan disinkronkan ke server database.', data: saved });
     }
     return res.status(400).json({ success: false, error: 'Data jadwal tidak valid.' });
   } catch (e: any) {
     console.error('Error saving schedule config:', e);
+    return res.status(500).json({ success: false, error: e?.message });
+  }
+});
+
+// Meta Pixel Configuration endpoints (Neon PostgreSQL)
+app.get('/api/meta-pixel', async (_req: Request, res: Response) => {
+  try {
+    const data = await getSettingFromDb('meta_pixel', { pixelId: '', customScript: '', isEnabled: false });
+    return res.json({ success: true, data: data || { pixelId: '', customScript: '', isEnabled: false } });
+  } catch (e: any) {
+    return res.json({ success: true, data: { pixelId: '', customScript: '', isEnabled: false } });
+  }
+});
+
+app.post('/api/meta-pixel', async (req: Request, res: Response) => {
+  try {
+    const config = req.body?.config || req.body;
+    const saved = await saveSettingToDb('meta_pixel', config);
+    return res.json({ success: true, message: 'Pengaturan Meta Pixel berhasil disinkronkan ke server database.', data: saved });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, error: e?.message });
+  }
+});
+
+// Gallery Juara endpoints (Neon PostgreSQL)
+app.get('/api/gallery', async (_req: Request, res: Response) => {
+  try {
+    const data = await getSettingFromDb('gallery', {});
+    return res.json({ success: true, data: data || {} });
+  } catch (e: any) {
+    return res.json({ success: true, data: {} });
+  }
+});
+
+app.post('/api/gallery', async (req: Request, res: Response) => {
+  try {
+    const images = req.body?.images || req.body?.gallery || req.body;
+    const saved = await saveSettingToDb('gallery', images);
+    return res.json({ success: true, message: 'Foto Galeri Juara berhasil disinkronkan ke server database.', data: saved });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, error: e?.message });
+  }
+});
+
+// WhatsApp API Settings endpoints (Neon PostgreSQL)
+app.get('/api/whatsapp-settings', async (_req: Request, res: Response) => {
+  try {
+    const data = await getSettingFromDb('whatsapp_api', {
+      provider: 'fonnte',
+      apiKey: '',
+      senderNumber: '081234567890',
+      isEnabled: true,
+      autoNotifyRegistration: true,
+      autoNotifyExamComplete: true,
+      autoNotifyQualification: true,
+    });
+    return res.json({ success: true, data });
+  } catch (e: any) {
+    return res.json({ success: true, data: { provider: 'fonnte', isEnabled: true } });
+  }
+});
+
+app.post('/api/whatsapp-settings', async (req: Request, res: Response) => {
+  try {
+    const settings = req.body?.settings || req.body;
+    const saved = await saveSettingToDb('whatsapp_api', settings);
+    return res.json({ success: true, message: 'Pengaturan WhatsApp API berhasil disinkronkan ke server database.', data: saved });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, error: e?.message });
+  }
+});
+
+// Generic System Settings endpoints (Neon PostgreSQL)
+app.get('/api/settings', async (req: Request, res: Response) => {
+  try {
+    const key = String(req.query.key || '');
+    if (!key) return res.status(400).json({ success: false, error: 'Key required' });
+    const data = await getSettingFromDb(key);
+    return res.json({ success: true, data });
+  } catch (e: any) {
+    return res.status(500).json({ success: false, error: e?.message });
+  }
+});
+
+app.post('/api/settings', async (req: Request, res: Response) => {
+  try {
+    const { key, value } = req.body;
+    if (!key) return res.status(400).json({ success: false, error: 'Key required' });
+    const saved = await saveSettingToDb(key, value);
+    return res.json({ success: true, data: saved });
+  } catch (e: any) {
     return res.status(500).json({ success: false, error: e?.message });
   }
 });

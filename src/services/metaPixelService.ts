@@ -28,6 +28,14 @@ export function saveMetaPixelConfig(config: MetaPixelConfig): MetaPixelConfig {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
     applyMetaPixel(config);
+
+    // Sync to Neon PostgreSQL server hosting directly
+    fetch('/api/meta-pixel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config })
+    }).catch((err) => console.warn('Failed to sync meta pixel to server:', err));
+
     setTimeout(() => {
       try {
         window.dispatchEvent(new CustomEvent('osn_pixel_updated', { detail: config }));
@@ -37,6 +45,34 @@ export function saveMetaPixelConfig(config: MetaPixelConfig): MetaPixelConfig {
     console.error('Failed to save Meta Pixel config:', err);
   }
   return config;
+}
+
+export async function fetchMetaPixelConfigFromServer(): Promise<MetaPixelConfig> {
+  try {
+    const res = await fetch('/api/meta-pixel', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const config: MetaPixelConfig = { ...DEFAULT_PIXEL_CONFIG, ...json.data };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        applyMetaPixel(config);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_pixel_updated', { detail: config }));
+        }
+        return config;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch Meta Pixel config from server:', err);
+  }
+  return getMetaPixelConfig();
+}
+
+// Auto-sync on module load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetchMetaPixelConfigFromServer().catch(() => {});
+  }, 100);
 }
 
 export function applyMetaPixel(config: MetaPixelConfig): void {

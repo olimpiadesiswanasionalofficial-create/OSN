@@ -74,3 +74,34 @@ export function saveEventSchedule(schedule: Partial<EventScheduleConfig>): Event
     return { ...DEFAULT_EVENT_SCHEDULE, ...schedule };
   }
 }
+
+/**
+ * Fetch latest schedule from Neon PostgreSQL server hosting directly
+ */
+export async function fetchEventScheduleFromServer(): Promise<EventScheduleConfig> {
+  try {
+    const res = await fetch('/api/schedule-config', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const merged: EventScheduleConfig = { ...DEFAULT_EVENT_SCHEDULE, ...json.data };
+        localStorage.setItem(STORAGE_SCHEDULE_KEY, JSON.stringify(merged));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_schedule_updated', { detail: merged }));
+        }
+        return merged;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch schedule from server:', err);
+  }
+  return getEventSchedule();
+}
+
+// Auto-trigger sync on module load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetchEventScheduleFromServer().catch(() => {});
+  }, 100);
+}
+

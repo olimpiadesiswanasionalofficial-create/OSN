@@ -38,6 +38,34 @@
       "destination": "/api/participants/index"
     },
     {
+      "source": "/api/schedule-config",
+      "destination": "/api/schedule-config"
+    },
+    {
+      "source": "/api/meta-pixel",
+      "destination": "/api/meta-pixel"
+    },
+    {
+      "source": "/api/gallery",
+      "destination": "/api/gallery"
+    },
+    {
+      "source": "/api/whatsapp-settings",
+      "destination": "/api/whatsapp-settings"
+    },
+    {
+      "source": "/api/questions/:id",
+      "destination": "/api/questions/index"
+    },
+    {
+      "source": "/api/questions",
+      "destination": "/api/questions/index"
+    },
+    {
+      "source": "/api/settings",
+      "destination": "/api/settings"
+    },
+    {
       "source": "/api/sync/status",
       "destination": "/api/sync/status"
     },

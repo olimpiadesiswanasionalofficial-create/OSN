@@ -823,17 +823,15 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                       <td className="py-3 px-3 text-center">
                         <div className="space-y-1 text-[11px] text-[#756F68]">
                           <div className="flex items-center justify-center gap-1">
-                            <span className="font-semibold">Percobaan: {attempts}/2</span>
-                            {attempts >= 2 && (
-                              <button
-                                type="button"
-                                onClick={() => onResetQuota(p)}
-                                className="p-0.5 rounded text-purple-700 hover:text-purple-900 cursor-pointer"
-                                title="Reset kuota pengerjaan babak penyisihan"
-                              >
-                                <RotateCcw className="w-3 h-3" />
-                              </button>
-                            )}
+                            <span className="font-semibold">Ujian: {attempts}x (Bebas)</span>
+                            <button
+                              type="button"
+                              onClick={() => onResetQuota(p)}
+                              className="p-0.5 rounded text-purple-700 hover:text-purple-900 cursor-pointer"
+                              title="Reset riwayat ujian babak penyisihan"
+                            >
+                              <RotateCcw className="w-3 h-3" />
+                            </button>
                           </div>
 
                           {/* Display Durasi Waktu Pengerjaan Ujian + Tombol Edit Admin */}

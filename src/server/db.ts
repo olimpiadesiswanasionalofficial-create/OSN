@@ -486,6 +486,129 @@ export async function deleteParticipantFromDb(id: string): Promise<boolean> {
 }
 
 /**
+ * Get application setting from Neon PostgreSQL schedule_config/settings table
+ */
+export async function getSettingFromDb(key: string, defaultValue: any = null): Promise<any> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  try {
+    const res = await p.query('SELECT value FROM schedule_config WHERE key = $1', [key]);
+    if (res.rows.length > 0 && res.rows[0].value !== null) {
+      return res.rows[0].value;
+    }
+  } catch (err: any) {
+    console.error(`Error fetching setting ${key}:`, err.message);
+  }
+  return defaultValue;
+}
+
+/**
+ * Save / Update application setting into Neon PostgreSQL schedule_config table
+ */
+export async function saveSettingToDb(key: string, value: any): Promise<any> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  try {
+    const res = await p.query(`
+      INSERT INTO schedule_config (key, value, updated_at)
+      VALUES ($1, $2, NOW())
+      ON CONFLICT (key) DO UPDATE
+      SET value = EXCLUDED.value,
+          updated_at = NOW()
+      RETURNING value
+    `, [key, JSON.stringify(value)]);
+    postVercelWebhook(`settings.${key}.updated`, { key, value }).catch(() => {});
+    return res.rows[0]?.value ?? value;
+  } catch (err: any) {
+    console.error(`Error saving setting ${key}:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * Get all questions from Neon PostgreSQL
+ */
+export async function getAllQuestionsFromDb(): Promise<any[]> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  try {
+    const res = await p.query('SELECT * FROM cbt_questions ORDER BY updated_at DESC');
+    if (res.rows.length > 0) {
+      return res.rows.map((r: any) => ({
+        id: r.id,
+        subject: r.subject,
+        level: r.level,
+        questionText: r.question,
+        options: r.options,
+        correctAnswer: r.correct_answer,
+        explanation: r.explanation,
+        imageUrl: r.image_url,
+        ...(r.data && typeof r.data === 'object' ? r.data : {})
+      }));
+    }
+  } catch (err: any) {
+    console.error('Error fetching questions from DB:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Save a single question to Neon PostgreSQL
+ */
+export async function saveQuestionToDb(q: any): Promise<any> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  try {
+    const res = await p.query(`
+      INSERT INTO cbt_questions (id, subject, level, question, options, correct_answer, explanation, image_url, data, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      ON CONFLICT (id) DO UPDATE
+      SET subject = EXCLUDED.subject,
+          level = EXCLUDED.level,
+          question = EXCLUDED.question,
+          options = EXCLUDED.options,
+          correct_answer = EXCLUDED.correct_answer,
+          explanation = EXCLUDED.explanation,
+          image_url = EXCLUDED.image_url,
+          data = EXCLUDED.data,
+          updated_at = NOW()
+      RETURNING *
+    `, [
+      q.id,
+      q.subject || 'Matematika',
+      q.level || 'SD / MI',
+      q.questionText || q.question || '',
+      JSON.stringify(q.options || []),
+      q.correctAnswer ?? 0,
+      q.explanation || '',
+      q.imageUrl || q.imageSvg || null,
+      JSON.stringify(q)
+    ]);
+    postVercelWebhook('question.saved', { id: q.id, subject: q.subject }).catch(() => {});
+    return res.rows[0];
+  } catch (err: any) {
+    console.error('Error saving question to DB:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * Delete a question from Neon PostgreSQL
+ */
+export async function deleteQuestionFromDb(id: string): Promise<boolean> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  try {
+    const res = await p.query('DELETE FROM cbt_questions WHERE id = $1', [id]);
+    postVercelWebhook('question.deleted', { id }).catch(() => {});
+    return (res.rowCount ?? 0) > 0;
+  } catch (err: any) {
+    console.error('Error deleting question from DB:', err.message);
+    return false;
+  }
+}
+
+/**
  * Get database connectivity & health status
  */
 export async function getDbHealthStatus(): Promise<{

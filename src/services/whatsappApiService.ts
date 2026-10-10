@@ -78,10 +78,42 @@ export function getWhatsAppApiSettings(): WhatsAppApiSettings {
 export function saveWhatsAppApiSettings(settings: WhatsAppApiSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY_WA_SETTINGS, JSON.stringify(settings));
+    // Sync to Neon DB server
+    fetch('/api/whatsapp-settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings })
+    }).catch((err) => console.warn('Failed to sync WA settings to server:', err));
+
     window.dispatchEvent(new CustomEvent('osn_whatsapp_settings_updated', { detail: settings }));
   } catch (e) {
     console.error('Error saving whatsapp api settings:', e);
   }
+}
+
+export async function fetchWhatsAppApiSettingsFromServer(): Promise<WhatsAppApiSettings> {
+  try {
+    const res = await fetch('/api/whatsapp-settings', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const settings: WhatsAppApiSettings = { ...DEFAULT_WA_SETTINGS, ...json.data };
+        localStorage.setItem(STORAGE_KEY_WA_SETTINGS, JSON.stringify(settings));
+        window.dispatchEvent(new CustomEvent('osn_whatsapp_settings_updated', { detail: settings }));
+        return settings;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch WA settings from server:', err);
+  }
+  return getWhatsAppApiSettings();
+}
+
+// Auto-sync on module load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetchWhatsAppApiSettingsFromServer().catch(() => {});
+  }, 100);
 }
 
 export function normalizePhoneForWa(phone: string): string {

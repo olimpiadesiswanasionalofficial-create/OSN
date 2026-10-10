@@ -224,6 +224,8 @@ export const AuthModal = ({
   const [showExamDisclaimer, setShowExamDisclaimer] = useState(false);
   const [disclaimerPendingSubject, setDisclaimerPendingSubject] = useState<string>('');
   const [antiCheatViolationPopup, setAntiCheatViolationPopup] = useState<string | null>(null);
+  const [hideExamHeader, setHideExamHeader] = useState(false);
+  const [hideQuickNav, setHideQuickNav] = useState(false);
   const [isAntiCheatEnabled, setIsAntiCheatEnabled] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('osn_anti_cheat_enabled');
@@ -751,18 +753,7 @@ export const AuthModal = ({
   };
 
   const startSimulation = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Cek batas kuota pengerjaan: Ujian simulasi unlimited, babak resmi (penyisihan & final) 1 percobaan
-    if (activeStudent && mode !== 'simulasi') {
-      const attempts = mode === 'final'
-        ? (activeStudent.finalAttempts || 0)
-        : (activeStudent.penyisihanAttempts || 0);
-      if (attempts >= 1) {
-        const modeLabel = mode === 'final' ? 'Babak Final' : 'Babak Penyisihan';
-        showToast('warning', 'Batas Kuota Ujian', `Perhatian: Anda sudah mengerjakan ujian ${modeLabel} (1/1 percobaan). Kuota pengerjaan babak resmi adalah 1 kali kesempatan.`);
-        return;
-      }
-    }
-
+    // Kuota pengerjaan ujian telah dihapus: seluruh ujian (simulasi, penyisihan, final) bebas akses tanpa batas kuota
     setExamTypeMode(mode);
     setSelectedSubjectForExam(subject);
     setExamSubjectChosen(true);
@@ -774,17 +765,7 @@ export const AuthModal = ({
   };
 
   const handlePromptStartExam = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Cek batasan pengerjaan: simulasi unlimited, penyisihan & final 1x
-    if (activeStudent && mode !== 'simulasi') {
-      const attempts = mode === 'final'
-        ? (activeStudent.finalAttempts || 0)
-        : (activeStudent.penyisihanAttempts || 0);
-      if (attempts >= 1) {
-        const modeLabel = mode === 'final' ? 'Babak Final' : 'Babak Penyisihan';
-        showToast('warning', 'Batas Kuota Ujian', `Perhatian: Anda sudah menyelesaikan ujian ${modeLabel} (1/1 percobaan). Kuota pengerjaan ujian resmi adalah 1 kali kesempatan.`);
-        return;
-      }
-    }
+    // Kuota pengerjaan ujian telah dihapus: seluruh peserta dapat mengikuti ujian tanpa batasan kuota
     setExamTypeMode(mode);
     setDisclaimerPendingSubject(subject);
     setShowExamDisclaimer(true);
@@ -2507,11 +2488,6 @@ export const AuthModal = ({
                   {activeStudent?.qualificationStatus === 'lolos' && (
                     <button
                       onClick={() => {
-                        const attempts = activeStudent.finalAttempts || 0;
-                        if (attempts >= 1) {
-                          showToast('warning', 'Batas Kuota', 'Anda sudah menyelesaikan Ujian Babak Final (1/1 percobaan). Kuota pengerjaan babak final adalah 1 kali kesempatan.');
-                          return;
-                        }
                         setShowSimulatedExam(true);
                         setExamTypeMode('final');
                         setExamSubjectChosen(false);
@@ -2599,23 +2575,23 @@ export const AuthModal = ({
                         </p>
                       </div>
 
-                      {/* Info Batas 2x Pengerjaan Card */}
+                      {/* Info Akses Ujian Tanpa Batas Kuota */}
                       {activeStudent && (
-                        <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex items-center justify-between">
+                        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+                            <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
                             <span className="font-semibold">
-                              Sisa Kuota Pengerjaan ({examTypeMode === 'final' ? 'Final' : examTypeMode === 'penyisihan' ? 'Penyisihan' : 'Simulasi'}): Maksimal 2x Percobaan
+                              Akses Ujian CBT: <strong>Bebas Tanpa Batas Kuota</strong> (Dapat Dikerjakan Berulang Kali Bebas Kesempatan)
                             </span>
                           </div>
-                          <span className="px-2.5 py-1 rounded-xl bg-white font-extrabold text-xs shadow-xs border border-amber-200 text-amber-900">
-                            Terpakai:{' '}
+                          <span className="px-2.5 py-1 rounded-xl bg-white font-extrabold text-xs shadow-xs border border-emerald-300 text-emerald-900">
+                            Riwayat Selesai:{' '}
                             {examTypeMode === 'final'
                               ? activeStudent.finalAttempts || 0
                               : examTypeMode === 'penyisihan'
                               ? activeStudent.penyisihanAttempts || 0
                               : activeStudent.simulatedAttempts || 0}{' '}
-                            / 2
+                            x (Bebas Akses)
                           </span>
                         </div>
                       )}
@@ -2627,22 +2603,11 @@ export const AuthModal = ({
                           { name: 'Bahasa Indonesia', desc: 'Literasi teks, tata bahasa, pantun & makna', color: 'border-amber-300 bg-amber-50/50 hover:bg-amber-50' },
                           { name: 'Bahasa Inggris', desc: 'Grammar, vocabulary, tenses & reading', color: 'border-purple-300 bg-purple-50/50 hover:bg-purple-50' }
                         ].map((subj) => {
-                          const currentAttempts =
-                            examTypeMode === 'final'
-                              ? activeStudent?.finalAttempts || 0
-                              : examTypeMode === 'penyisihan'
-                              ? activeStudent?.penyisihanAttempts || 0
-                              : activeStudent?.simulatedAttempts || 0;
-                          const isMaxAttempts = currentAttempts >= 2;
-
                           return (
                             <button
                               key={subj.name}
-                              disabled={isMaxAttempts}
                               onClick={() => handlePromptStartExam(subj.name, examTypeMode)}
-                              className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${subj.color} ${
-                                isMaxAttempts ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'
-                              }`}
+                              className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${subj.color} cursor-pointer hover:shadow-md`}
                             >
                               <div className="flex items-center justify-between w-full">
                                 <span className="text-sm font-extrabold text-[#1A1615]">{subj.name}</span>
@@ -2652,7 +2617,7 @@ export const AuthModal = ({
                               </div>
                               <p className="text-xs text-[#756F68] mt-2 mb-3">{subj.desc}</p>
                               <div className="flex items-center justify-between text-xs font-bold text-[#1A1615]">
-                                <span>{isMaxAttempts ? 'Batas Maksimal Tercapai (2/2)' : 'Mulai Ujian (20 Menit)'}</span>
+                                <span>Mulai Ujian ({subj.name})</span>
                                 <ArrowRight className="w-3.5 h-3.5" />
                               </div>
                             </button>
@@ -2771,76 +2736,107 @@ export const AuthModal = ({
                   ) : (
                     /* Step 2: Layar Pengerjaan Seluruh 20 Soal Bergambar Sekaligus Dalam 1 Halaman */
                     <div className="space-y-6">
-                      {/* Sticky Exam Control Header */}
-                      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md p-4 rounded-2xl border-2 border-[#D4AF37] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                              examTypeMode === 'final'
-                                ? 'bg-purple-100 text-purple-900 border border-purple-300'
-                                : 'text-emerald-700 bg-emerald-100'
-                            }`}>
-                              {examTypeMode === 'final' ? '★ Babak Final CBT' : 'CBT 1 Halaman Penuh'}
-                            </span>
-                            <span className="text-xs font-bold text-[#1A1615]">
-                              Mata Pelajaran: {selectedSubjectForExam}
-                            </span>
-                            {examTypeMode === 'final' && isAntiCheatEnabled && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-200">
-                                <ShieldAlert className="w-3 h-3 text-rose-600 animate-pulse" />
-                                <span>Anti-Cheat Aktif</span>
+                      {/* Exam Control Header - Flow naturally at top, NOT sticky, so questions and answers are NEVER blocked while scrolling */}
+                      <div className="relative bg-white p-4 sm:p-5 rounded-2xl border-2 border-[#D4AF37]/80 shadow-sm space-y-3">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                examTypeMode === 'final'
+                                  ? 'bg-purple-100 text-purple-900 border border-purple-300'
+                                  : 'text-emerald-700 bg-emerald-100'
+                              }`}>
+                                {examTypeMode === 'final' ? '★ Babak Final CBT' : 'CBT 1 Halaman Penuh'}
                               </span>
-                            )}
+                              <span className="text-xs font-bold text-[#1A1615]">
+                                Mata Pelajaran: {selectedSubjectForExam}
+                              </span>
+                              {examTypeMode === 'final' && isAntiCheatEnabled && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-200">
+                                  <ShieldAlert className="w-3 h-3 text-rose-600 animate-pulse" />
+                                  <span>Anti-Cheat Aktif</span>
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-sm sm:text-base font-extrabold text-[#1A1615] mt-1">
+                              Lembar Soal Ujian (Menampilkan Seluruh {currentSubjectQuestions.length} Soal Tanpa Halangan)
+                            </h4>
                           </div>
-                          <h4 className="text-sm sm:text-base font-extrabold text-[#1A1615] mt-1">
-                            Lembar Soal Ujian (Menampilkan Seluruh {currentSubjectQuestions.length} Soal Sekaligus)
-                          </h4>
+
+                          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+                            <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200">
+                              Terjawab: <strong className="text-emerald-700 text-sm font-black">{Object.keys(studentAnswers).length}</strong> / {currentSubjectQuestions.length}
+                            </div>
+
+                            <div className={`flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-xl shrink-0 shadow-sm ${
+                              examTimer <= 300
+                                ? 'bg-rose-600 text-white animate-pulse'
+                                : 'text-[#D4AF37] bg-[#1A1615]'
+                            }`}>
+                              <Clock className={`w-4 h-4 ${examTimer <= 300 ? 'text-white' : 'text-[#D4AF37]'}`} />
+                              <span>Sisa Waktu: {formatTime(examTimer)} (20 Menit)</span>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setHideExamHeader(!hideExamHeader)}
+                              className="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-700 flex items-center gap-1 transition-all cursor-pointer"
+                              title={hideExamHeader ? 'Perluas tampilan header' : 'Sembunyikan header agar ruang baca soal lebih lega'}
+                            >
+                              {hideExamHeader ? <Eye className="w-3.5 h-3.5 text-amber-600" /> : <EyeOff className="w-3.5 h-3.5 text-neutral-500" />}
+                              <span>{hideExamHeader ? 'Buka Header' : 'Sembunyikan'}</span>
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                          <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200">
-                            Terjawab: <strong className="text-emerald-700 text-sm font-black">{Object.keys(studentAnswers).length}</strong> / {currentSubjectQuestions.length}
+                        {/* Petunjuk pengerjaan (dapat diciutkan) */}
+                        {!hideExamHeader && (
+                          <div className="pt-2 border-t border-[#E8E2D9] text-[11px] text-[#756F68] flex items-center justify-between">
+                            <span>💡 Seluruh 20 soal dapat dijawab langsung pada halaman ini. Gulir ke bawah secara leluasa tanpa tertutup panel floating.</span>
+                            <span className="font-semibold text-emerald-800">Bebas kuota pengerjaan aktif</span>
                           </div>
-
-                          <div className={`flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-xl shrink-0 shadow-sm ${
-                            examTimer <= 300
-                              ? 'bg-rose-600 text-white animate-pulse'
-                              : 'text-[#D4AF37] bg-[#1A1615]'
-                          }`}>
-                            <Clock className={`w-4 h-4 ${examTimer <= 300 ? 'text-white' : 'text-[#D4AF37]'}`} />
-                            <span>Sisa Waktu: {formatTime(examTimer)} (20 Menit)</span>
-                          </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Quick Jump Bar to Any Question */}
                       <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] space-y-2">
                         <div className="flex items-center justify-between text-[11px] text-[#756F68] font-bold">
                           <span>Navigasi Cepat Lompat ke Nomor Soal:</span>
-                          <span className="text-emerald-700 font-semibold">
-                            {Object.keys(studentAnswers).length === currentSubjectQuestions.length
-                              ? '✓ Seluruh Soal Telah Terjawab'
-                              : `${currentSubjectQuestions.length - Object.keys(studentAnswers).length} Soal Belum Terjawab`}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-emerald-700 font-semibold hidden sm:inline">
+                              {Object.keys(studentAnswers).length === currentSubjectQuestions.length
+                                ? '✓ Seluruh Soal Telah Terjawab'
+                                : `${currentSubjectQuestions.length - Object.keys(studentAnswers).length} Soal Belum Terjawab`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setHideQuickNav(!hideQuickNav)}
+                              className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white border border-[#E8E2D9] text-[#1A1615] hover:bg-neutral-100 cursor-pointer"
+                            >
+                              {hideQuickNav ? 'Tampilkan Nomor' : 'Sembunyikan'}
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {currentSubjectQuestions.map((_, idx) => {
-                            const isAnswered = studentAnswers[idx] !== undefined;
-                            return (
-                              <a
-                                key={idx}
-                                href={`#soal-no-${idx + 1}`}
-                                className={`w-8 h-8 rounded-xl text-xs font-black flex items-center justify-center transition-all ${
-                                  isAnswered
-                                    ? 'bg-emerald-600 text-white shadow-xs'
-                                    : 'bg-white text-[#1A1615] border border-[#E8E2D9] hover:border-[#D4AF37]'
-                                }`}
-                              >
-                                {idx + 1}
-                              </a>
-                            );
-                          })}
-                        </div>
+                        {!hideQuickNav && (
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {currentSubjectQuestions.map((_, idx) => {
+                              const isAnswered = studentAnswers[idx] !== undefined;
+                              return (
+                                <a
+                                  key={idx}
+                                  href={`#soal-no-${idx + 1}`}
+                                  className={`w-8 h-8 rounded-xl text-xs font-black flex items-center justify-center transition-all ${
+                                    isAnswered
+                                      ? 'bg-emerald-600 text-white shadow-xs'
+                                      : 'bg-white text-[#1A1615] border border-[#E8E2D9] hover:border-[#D4AF37]'
+                                  }`}
+                                >
+                                  {idx + 1}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       {/* LIST OF ALL 20 QUESTIONS IN 1 PAGE */}
@@ -2950,18 +2946,18 @@ export const AuthModal = ({
                         })}
                       </div>
 
-                      {/* Bottom Exam Action Button */}
-                      <div className="sticky bottom-4 z-20 p-4 rounded-2xl bg-[#1A1615] text-[#D4AF37] border-2 border-[#D4AF37] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                      {/* Bottom Exam Action Button - Positioned naturally at the end of all questions, NOT sticky so it never covers choices A, B, C, D */}
+                      <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-[#1A1615] text-[#D4AF37] border-2 border-[#D4AF37] shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-xs">
-                          <p className="font-extrabold text-white">
+                          <p className="font-extrabold text-white text-sm">
                             Status Jawaban Anda: {Object.keys(studentAnswers).length} dari {currentSubjectQuestions.length} Soal Terjawab
                           </p>
-                          <p className="text-[11px] text-neutral-300">
+                          <p className="text-[11px] text-neutral-300 mt-0.5">
                             Pastikan Anda telah memeriksa seluruh jawaban sebelum menekan tombol selesaikan ujian.
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="flex items-center gap-2.5 w-full sm:w-auto">
                           <button
                             type="button"
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -2972,7 +2968,7 @@ export const AuthModal = ({
                           <button
                             type="button"
                             onClick={() => finishExam()}
-                            className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                            className="flex-1 sm:flex-initial px-6 py-3 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                           >
                             <CheckCircle className="w-4 h-4" />
                             <span>Kirim & Selesaikan Ujian ({selectedSubjectForExam})</span>

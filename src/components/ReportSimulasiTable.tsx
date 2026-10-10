@@ -197,7 +197,7 @@ export const ReportSimulasiTable: React.FC<ReportSimulasiTableProps> = ({
               Tabel Rekapitulasi Pengerjaan Simulasi CBT 2026
             </h2>
             <p className="text-xs sm:text-sm text-neutral-300 mt-1 max-w-2xl leading-relaxed">
-              Pantau progres peserta yang telah menyelesaikan simulasi 20 soal bergambar, evaluasi passing grade nilai (skor 0-100), kuota pengerjaan (maks. 2x), dan follow-up WhatsApp.
+              Pantau progres peserta yang telah menyelesaikan simulasi 20 soal bergambar, evaluasi passing grade nilai (skor 0-100), riwayat pengerjaan (bebas tanpa batas kuota), dan follow-up WhatsApp.
             </p>
           </div>
 
@@ -481,17 +481,15 @@ export const ReportSimulasiTable: React.FC<ReportSimulasiTableProps> = ({
                           )}
 
                           <div className="text-[10px] text-[#756F68] flex items-center justify-center gap-1">
-                            <span>Kuota: {attempts}/2</span>
-                            {attempts >= 2 && (
-                              <button
-                                type="button"
-                                onClick={() => onResetQuota(p)}
-                                className="p-0.5 rounded text-purple-700 hover:text-purple-900"
-                                title="Reset kuota simulasi peserta"
-                              >
-                                <RotateCcw className="w-3 h-3" />
-                              </button>
-                            )}
+                            <span>Selesai: {attempts}x (Bebas)</span>
+                            <button
+                              type="button"
+                              onClick={() => onResetQuota(p)}
+                              className="p-0.5 rounded text-purple-700 hover:text-purple-900"
+                              title="Reset riwayat simulasi peserta"
+                            >
+                              <RotateCcw className="w-3 h-3" />
+                            </button>
                           </div>
                         </div>
                       </td>
