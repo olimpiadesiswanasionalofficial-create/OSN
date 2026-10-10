@@ -223,22 +223,22 @@ export default function App() {
 
     // Sync participants & questions database with server on initial load
     syncParticipantsWithServer().then(synced => {
-      if (synced && synced.length > 0) {
+      if (Array.isArray(synced)) {
         setPublicParticipants(synced);
       }
     }).catch(() => {});
 
     syncQuestionsWithServer().catch(() => {});
 
-    // Periodic Automatic Real-Time Synchronization (every 30 seconds)
+    // Periodic Automatic Real-Time Synchronization with hosting server database (every 15 seconds)
     const autoSyncInterval = setInterval(() => {
       syncParticipantsWithServer().then(synced => {
-        if (synced && synced.length > 0) {
+        if (Array.isArray(synced)) {
           setPublicParticipants(synced);
         }
       }).catch(() => {});
       syncQuestionsWithServer().catch(() => {});
-    }, 30000);
+    }, 15000);
 
     setLiveSchedule(getEventSchedule());
     const onScheduleChange = (e: any) => {

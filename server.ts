@@ -7,6 +7,16 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { APP_CONFIG } from './appConfig.js';
 import * as XLSX from 'xlsx';
+import {
+  getAllParticipantsFromDb,
+  saveParticipantToDb,
+  bulkSaveParticipantsToDb,
+  clearAllParticipantsFromDb,
+  recordExamInDb,
+  deleteParticipantFromDb,
+  getDbHealthStatus,
+  postVercelWebhook,
+} from './src/server/db.js';
 
 dotenv.config();
 
@@ -188,73 +198,43 @@ function saveStoredParticipants(list: any[]) {
   }
 }
 
-// Endpoint to list participants (for Admin portal)
-app.get('/api/participants', (_req: Request, res: Response) => {
-  const participants = getStoredParticipants();
-  res.json({
-    success: true,
-    data: participants,
-    total: participants.length
-  });
+// Endpoint to list participants (for Admin portal & CBT verification)
+app.get('/api/participants', async (_req: Request, res: Response) => {
+  try {
+    const participants = await getAllParticipantsFromDb();
+    res.json({
+      success: true,
+      data: participants,
+      total: participants.length,
+      source: 'Neon PostgreSQL Hosting Database'
+    });
+  } catch (err: any) {
+    const fallback = getStoredParticipants();
+    res.json({ success: true, data: fallback, total: fallback.length, source: 'local-fallback' });
+  }
 });
 
 // Endpoint to record a new registration automatically to database
-app.post('/api/participants', (req: Request, res: Response) => {
+app.post('/api/participants', async (req: Request, res: Response) => {
   try {
-    const { fullName, level, schoolName, cityProvince, whatsapp, email, subjects, parentName, fullAddress, id } = req.body;
+    const { fullName, whatsapp } = req.body;
     if (!fullName || !whatsapp) {
       return res.status(400).json({ success: false, error: 'Nama Lengkap dan Nomor WhatsApp wajib diisi.' });
     }
 
+    const saved = await saveParticipantToDb(req.body);
+
+    // Keep local json fallback in sync
     const currentList = getStoredParticipants();
-    const cleanPhone = String(whatsapp).replace(/[^0-9]/g, '').replace(/^62/, '0');
-    
-    // Check if already registered
-    const existingIndex = currentList.findIndex((p: any) => {
-      const pPhone = String(p.whatsapp).replace(/[^0-9]/g, '').replace(/^62/, '0');
-      return (id && p.id === id) || (pPhone === cleanPhone && p.fullName.toLowerCase() === String(fullName).trim().toLowerCase());
-    });
-
-    const existingP = existingIndex >= 0 ? currentList[existingIndex] : null;
-    const newRecord = {
-      ...(existingP || {}),
-      ...(req.body || {}),
-      id: id || existingP?.id || `OSN-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-      fullName: String(fullName).trim(),
-      level: level || existingP?.level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-      schoolName: schoolName || existingP?.schoolName || '-',
-      cityProvince: cityProvince || existingP?.cityProvince || '-',
-      whatsapp: String(whatsapp).trim(),
-      email: email || existingP?.email || '-',
-      parentName: parentName || existingP?.parentName || '-',
-      fullAddress: fullAddress || existingP?.fullAddress || '-',
-      subjects: Array.isArray(subjects) && subjects.length > 0 ? subjects : (existingP?.subjects || ['Matematika']),
-      registeredAt: existingP?.registeredAt || new Date().toISOString(),
-      cbtStatus: req.body.cbtStatus || existingP?.cbtStatus || 'Aktif & Siap Ujian (Tercatat di Database)',
-      // PRESERVE ALL EXAM RESULTS & ATTEMPTS
-      simulatedExam: req.body.simulatedExam || existingP?.simulatedExam,
-      penyisihanExam: req.body.penyisihanExam || existingP?.penyisihanExam,
-      finalExam: req.body.finalExam || existingP?.finalExam,
-      simulatedAttempts: req.body.simulatedAttempts ?? existingP?.simulatedAttempts ?? 0,
-      penyisihanAttempts: req.body.penyisihanAttempts ?? existingP?.penyisihanAttempts ?? 0,
-      finalAttempts: req.body.finalAttempts ?? existingP?.finalAttempts ?? 0,
-      qualificationStatus: req.body.qualificationStatus || existingP?.qualificationStatus || 'pending',
-      finalTicketPaymentStatus: req.body.finalTicketPaymentStatus || existingP?.finalTicketPaymentStatus || 'unpaid',
-      championRank: req.body.championRank || existingP?.championRank
-    };
-
-    if (existingIndex >= 0) {
-      currentList[existingIndex] = newRecord;
-    } else {
-      currentList.unshift(newRecord);
-    }
-
+    const idx = currentList.findIndex((p: any) => p.id === saved.id);
+    if (idx >= 0) currentList[idx] = saved;
+    else currentList.unshift(saved);
     saveStoredParticipants(currentList);
 
     return res.json({
       success: true,
-      message: 'Pendaftaran otomatis tercatat pada sistem & database.',
-      data: newRecord
+      message: 'Pendaftaran otomatis tercatat pada sistem & database Neon PostgreSQL.',
+      data: saved
     });
   } catch (error: any) {
     console.error('Error in POST /api/participants:', error);
@@ -263,12 +243,13 @@ app.post('/api/participants', (req: Request, res: Response) => {
 });
 
 // Endpoint to completely clear all participants and exam histories
-app.post('/api/participants/clear', (_req: Request, res: Response) => {
+app.post('/api/participants/clear', async (_req: Request, res: Response) => {
   try {
+    await clearAllParticipantsFromDb();
     saveStoredParticipants([]);
     return res.json({
       success: true,
-      message: 'Seluruh data peserta dan riwayat ujian berhasil dihapus permanen dari sistem.',
+      message: 'Seluruh data peserta dan riwayat ujian berhasil dihapus permanen dari Neon PostgreSQL & sistem hosting.',
       total: 0
     });
   } catch (error: any) {
@@ -278,90 +259,25 @@ app.post('/api/participants/clear', (_req: Request, res: Response) => {
 });
 
 // Endpoint to bulk add or update participants
-app.post('/api/participants/bulk', (req: Request, res: Response) => {
+app.post('/api/participants/bulk', async (req: Request, res: Response) => {
   try {
     const { participants } = req.body;
     if (!Array.isArray(participants)) {
       return res.status(400).json({ success: false, error: 'Format data peserta harus berupa array.' });
     }
 
-    const currentList = getStoredParticipants();
-    const map = new Map<string, any>();
-
-    // Index existing participants by ID
-    currentList.forEach((p: any) => {
-      if (p.id) map.set(p.id, p);
-    });
-
-    let insertedCount = 0;
-    let updatedCount = 0;
-
-    participants.forEach((p: any) => {
-      if (!p.fullName) return;
-      const cleanPhone = String(p.whatsapp || '').replace(/[^0-9]/g, '').replace(/^62/, '0');
-      
-      // Look up existing by id or matching phone + name
-      let existingId = p.id;
-      if (!existingId || !map.has(existingId)) {
-        for (const [idKey, existingP] of map.entries()) {
-          const exPhone = String(existingP.whatsapp || '').replace(/[^0-9]/g, '').replace(/^62/, '0');
-          if (
-            cleanPhone && exPhone === cleanPhone &&
-            existingP.fullName?.trim().toLowerCase() === String(p.fullName).trim().toLowerCase()
-          ) {
-            existingId = idKey;
-            break;
-          }
-        }
-      }
-
-      const existingRecord = existingId ? map.get(existingId) : null;
-      const finalId = existingId || p.id || `OSN-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-
-      const merged = {
-        ...(existingRecord || {}),
-        ...p,
-        id: finalId,
-        fullName: String(p.fullName).trim(),
-        level: p.level || existingRecord?.level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-        schoolName: p.schoolName || existingRecord?.schoolName || '-',
-        cityProvince: p.cityProvince || existingRecord?.cityProvince || '-',
-        whatsapp: String(p.whatsapp || existingRecord?.whatsapp || '').trim(),
-        email: p.email || existingRecord?.email || '-',
-        parentName: p.parentName || existingRecord?.parentName || '-',
-        fullAddress: p.fullAddress || existingRecord?.fullAddress || '-',
-        subjects: Array.isArray(p.subjects) && p.subjects.length > 0 ? p.subjects : (existingRecord?.subjects || ['Matematika']),
-        registeredAt: p.registeredAt || existingRecord?.registeredAt || new Date().toISOString(),
-        cbtStatus: p.cbtStatus || existingRecord?.cbtStatus || 'Aktif & Siap Ujian (Tercatat di Database)',
-        simulatedExam: p.simulatedExam || existingRecord?.simulatedExam,
-        penyisihanExam: p.penyisihanExam || existingRecord?.penyisihanExam,
-        finalExam: p.finalExam || existingRecord?.finalExam,
-        simulatedAttempts: p.simulatedAttempts ?? existingRecord?.simulatedAttempts ?? 0,
-        penyisihanAttempts: p.penyisihanAttempts ?? existingRecord?.penyisihanAttempts ?? 0,
-        finalAttempts: p.finalAttempts ?? existingRecord?.finalAttempts ?? 0,
-        qualificationStatus: p.qualificationStatus || existingRecord?.qualificationStatus || 'pending',
-        finalTicketPaymentStatus: p.finalTicketPaymentStatus || existingRecord?.finalTicketPaymentStatus || 'unpaid',
-        championRank: p.championRank || existingRecord?.championRank
-      };
-
-      if (existingRecord) {
-        updatedCount++;
-      } else {
-        insertedCount++;
-      }
-
-      map.set(finalId, merged);
-    });
-
-    const newList = Array.from(map.values());
-    saveStoredParticipants(newList);
+    const result = await bulkSaveParticipantsToDb(participants);
+    
+    // Also keep local fallback synchronized
+    const latestList = await getAllParticipantsFromDb();
+    saveStoredParticipants(latestList);
 
     return res.json({
       success: true,
-      message: `Berhasil sinkronisasi ${participants.length} data peserta (${insertedCount} baru, ${updatedCount} diperbarui). Total database: ${newList.length} peserta.`,
-      total: newList.length,
-      inserted: insertedCount,
-      updated: updatedCount
+      message: `Berhasil sinkronisasi ${participants.length} data peserta ke Neon PostgreSQL (${result.inserted} diproses). Total database hosting: ${result.total} peserta.`,
+      total: result.total,
+      inserted: result.inserted,
+      updated: result.updated
     });
   } catch (error: any) {
     console.error('Error in POST /api/participants/bulk:', error);
@@ -433,65 +349,79 @@ app.post('/api/participants/fetch-spreadsheet', async (req: Request, res: Respon
   }
 });
 
-// Endpoint to check database sync status and statistics
-app.get('/api/sync/status', (_req: Request, res: Response) => {
+// Endpoint to check database sync status and statistics (Neon PostgreSQL + Local Fallback)
+app.get('/api/sync/status', async (_req: Request, res: Response) => {
   try {
-    const participants = getStoredParticipants();
+    const health = await getDbHealthStatus();
     res.json({
       success: true,
-      totalParticipants: participants.length,
       timestamp: new Date().toISOString(),
-      serverStatus: 'connected'
+      domain: 'https://osn-one.vercel.app',
+      database: health,
+      webhookTarget: health.webhookUrl,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error?.message });
   }
 });
 
-// Update participant exam results / progress (Simulasi, Penyisihan, or Final)
-app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
+// Webhook trigger endpoint
+app.post('/api/webhook', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { examType, subject, score, totalQuestions, completedAt, violationReason, whatsapp, fullName, level, schoolName } = req.body;
-    const currentList = getStoredParticipants();
+    const { event, data } = req.body || {};
+    const eventType = event || 'custom.trigger';
+    await postVercelWebhook(eventType, data || req.body);
+    res.json({
+      success: true,
+      message: 'Webhook event posted to Vercel Connect trigger.',
+      target: 'https://connect.vercel.com/trigger/scl_73yUAYJiNJUPyT7UQZ0iA',
+      event: eventType,
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message });
+  }
+});
+
+app.get('/api/webhook', async (_req: Request, res: Response) => {
+  const health = await getDbHealthStatus();
+  res.json({
+    success: true,
+    webhookTarget: 'https://connect.vercel.com/trigger/scl_73yUAYJiNJUPyT7UQZ0iA',
+    databaseConnected: health.connected,
+  });
+});
+
+// Update participant exam results / progress (Simulasi, Penyisihan, or Final)
+app.post(['/api/participants/:id/exam', '/api/participants/exam'], async (req: Request, res: Response) => {
+  try {
+    const participantId = req.params?.id || req.body?.id;
+    const { examType, subject, score, totalQuestions, completedAt, violationReason, whatsapp, fullName, level, schoolName, examResult } = req.body;
     
-    // Robust participant lookup (Exact ID, case-insensitive, trimmed, or by phone/name)
-    const cleanId = String(id || '').trim();
-    let idx = currentList.findIndex((p: any) => p.id === cleanId);
-    if (idx === -1) {
-      idx = currentList.findIndex((p: any) => p.id?.trim().toLowerCase() === cleanId.toLowerCase());
-    }
-    if (idx === -1 && whatsapp) {
-      const cleanPhone = String(whatsapp).replace(/\D/g, '').replace(/^62/, '0');
-      if (cleanPhone) {
-        idx = currentList.findIndex((p: any) => String(p.whatsapp || '').replace(/\D/g, '').replace(/^62/, '0') === cleanPhone);
-      }
-    }
-    if (idx === -1 && fullName) {
-      idx = currentList.findIndex((p: any) => p.fullName?.trim().toLowerCase() === String(fullName).trim().toLowerCase());
-    }
+    const numericScore = typeof score === 'number' ? score : (examResult?.score ?? parseInt(score, 10) ?? 0);
+    const resolvedExamType: 'simulasi' | 'penyisihan' | 'final' = examType || examResult?.examType || 'simulasi';
 
-    const numericScore = typeof score === 'number' ? score : parseInt(score, 10) || 0;
-
-    const examInfo = {
+    const examInfo = examResult || {
       subject: subject || 'Matematika',
       score: numericScore,
       totalQuestions: totalQuestions || 20,
       completedAt: completedAt || new Date().toISOString(),
       status: violationReason
         ? `Pelanggaran: ${violationReason}`
-        : examType === 'final'
+        : resolvedExamType === 'final'
         ? `Selesai Ujian Final (${numericScore}/100)`
-        : examType === 'penyisihan'
+        : resolvedExamType === 'penyisihan'
         ? `Selesai Babak Penyisihan (${numericScore}/100)`
         : `Selesai Simulasi CBT (${numericScore}/100)`,
       violationReason
     };
 
-    if (idx === -1) {
-      // Create record if not found so score is never lost
-      const newP: any = {
-        id: cleanId,
+    let updated = null;
+    try {
+      updated = await recordExamInDb(String(participantId), resolvedExamType, examInfo);
+    } catch {
+      // If not yet in db, create record and save to Neon PostgreSQL
+      const newP = {
+        id: String(participantId),
         fullName: fullName || 'Peserta CBT',
         level: level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
         schoolName: schoolName || '-',
@@ -500,73 +430,22 @@ app.post('/api/participants/:id/exam', (req: Request, res: Response) => {
         email: '-',
         subjects: [subject || 'Matematika'],
         registeredAt: new Date().toISOString(),
-        cbtStatus: examInfo.status
+        cbtStatus: examInfo.status,
+        simulatedExam: resolvedExamType === 'simulasi' ? examInfo : undefined,
+        penyisihanExam: resolvedExamType === 'penyisihan' ? examInfo : undefined,
+        finalExam: resolvedExamType === 'final' ? examInfo : undefined,
       };
-      if (examType === 'final') {
-        newP.finalExam = examInfo;
-        newP.finalAttempts = 1;
-        newP.championRank = numericScore >= 90 ? 'Juara 1' : numericScore >= 80 ? 'Juara 2' : numericScore >= 70 ? 'Juara 3' : 'Peserta Final';
-      } else if (examType === 'penyisihan') {
-        newP.penyisihanExam = examInfo;
-        newP.penyisihanAttempts = 1;
-        newP.qualificationStatus = numericScore >= 70 ? 'lolos' : 'tidak_lolos';
-      } else {
-        newP.simulatedExam = examInfo;
-        newP.simulatedAttempts = 1;
-      }
-      currentList.unshift(newP);
-      saveStoredParticipants(currentList);
-      return res.json({ success: true, data: newP });
+      updated = await saveParticipantToDb(newP);
     }
 
-    const p = currentList[idx];
-
-    if (examType === 'final') {
-      p.finalExam = examInfo;
-      p.finalAttempts = (p.finalAttempts || 0) + 1;
-      p.cbtStatus = violationReason
-        ? `Pelanggaran Final: ${violationReason}`
-        : `Selesai Ujian Final (${score}/100)`;
-      if (score >= 90) p.recommendedChampionRank = 'Juara 1';
-      else if (score >= 80) p.recommendedChampionRank = 'Juara 2';
-      else if (score >= 70) p.recommendedChampionRank = 'Juara 3';
-      else p.recommendedChampionRank = 'Peserta Final';
-
-      if (!p.championRank || p.championRank === 'Belum Dinilai') {
-        p.championRank = 'Belum Ditetapkan';
-      }
-    } else if (examType === 'penyisihan') {
-      p.penyisihanExam = examInfo;
-      p.penyisihanAttempts = (p.penyisihanAttempts || 0) + 1;
-      p.cbtStatus = violationReason
-        ? `Pelanggaran Penyisihan: ${violationReason}`
-        : `Selesai Babak Penyisihan (${score}/100)`;
-      if (score >= 70) {
-        p.qualificationStatus = 'lolos';
-        p.qualificationNote = 'Lolos Otomatis Berdasarkan Nilai Babak Penyisihan (≥70)';
-      } else {
-        p.qualificationStatus = 'tidak_lolos';
-        p.qualificationNote = 'Belum Memenuhi Passing Grade Babak Penyisihan (≥70)';
-      }
-    } else {
-      p.simulatedExam = examInfo;
-      p.simulatedAttempts = (p.simulatedAttempts || 0) + 1;
-      p.cbtStatus = violationReason
-        ? `Pelanggaran Simulasi: ${violationReason}`
-        : `Selesai Simulasi CBT (${score}/100)`;
-      if (!p.penyisihanExam && score >= 70) {
-        p.qualificationStatus = 'lolos';
-      }
-    }
-
-    if (violationReason) {
-      p.violationReason = violationReason;
-    }
-
-    currentList[idx] = p;
+    // Keep local fallback file updated
+    const currentList = getStoredParticipants();
+    const idx = currentList.findIndex((p: any) => p.id === participantId);
+    if (idx >= 0) currentList[idx] = updated;
+    else currentList.unshift(updated);
     saveStoredParticipants(currentList);
 
-    return res.json({ success: true, data: p });
+    return res.json({ success: true, message: 'Hasil ujian tercatat di Neon PostgreSQL.', data: updated });
   } catch (error: any) {
     console.error('Error in POST /api/participants/:id/exam:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal update status ujian.' });
@@ -661,19 +540,16 @@ app.patch('/api/participants/:id', (req: Request, res: Response) => {
 });
 
 // Delete participant
-app.delete('/api/participants/:id', (req: Request, res: Response) => {
+app.delete('/api/participants/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    await deleteParticipantFromDb(id);
+
     let currentList = getStoredParticipants();
-    const beforeLen = currentList.length;
     currentList = currentList.filter((p: any) => p.id !== id);
-
-    if (currentList.length === beforeLen) {
-      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
-    }
-
     saveStoredParticipants(currentList);
-    return res.json({ success: true, message: 'Peserta berhasil dihapus dari database.' });
+
+    return res.json({ success: true, message: 'Peserta berhasil dihapus dari Neon PostgreSQL & database.' });
   } catch (error: any) {
     console.error('Error in DELETE /api/participants/:id:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal menghapus peserta.' });

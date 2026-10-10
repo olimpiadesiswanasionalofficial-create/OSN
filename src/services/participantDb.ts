@@ -217,13 +217,7 @@ export function massBoostScores(stage: 'penyisihan' | 'final' | 'all' = 'penyisi
     return nextP;
   });
 
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    safeDispatchParticipantsUpdated();
-  } catch (err) {
-    console.error('Failed to save mass score boost:', err);
-  }
-
+  saveAllParticipants(updated);
   return { updatedCount: count, list: updated };
 }
 
@@ -248,13 +242,7 @@ export function autoQualifyParticipantsAbove60(): { qualifiedCount: number; list
     return p;
   });
 
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    safeDispatchParticipantsUpdated();
-  } catch (err) {
-    console.error('Failed to save auto qualify:', err);
-  }
-
+  saveAllParticipants(updated);
   return { qualifiedCount: count, list: updated };
 }
 
@@ -324,83 +312,42 @@ export function manualUpdateParticipantScoreAndTime(
   }
 
   all[idx] = p;
-
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    safeDispatchParticipantsUpdated();
-  } catch (err) {
-    console.error('Failed to save manual edit:', err);
-  }
-
+  saveAllParticipants(all);
   return p;
 }
 
 /**
- * Sync participants with backend server automatically
- * Intelligently merges server and local data so newly submitted exams or local edits are never lost
+ * Sync participants with hosting server & Neon PostgreSQL database
+ * Prioritizes server database as authoritative source of truth
  */
 export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]> {
   try {
-    const res = await fetch('/api/participants');
+    const res = await fetch(`/api/participants?_t=${Date.now()}`, {
+      headers: { 'Cache-Control': 'no-cache' },
+      cache: 'no-store'
+    });
     if (res.ok) {
       const json = await res.json();
-      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+      if (json.success && Array.isArray(json.data)) {
+        const serverData: ParticipantRecord[] = json.data;
         const local = getAllParticipants();
-        const mergedMap = new Map<string, ParticipantRecord>();
         
-        // Put server items in map
-        json.data.forEach((serverP: ParticipantRecord) => {
-          if (serverP.id) mergedMap.set(serverP.id, serverP);
-        });
+        // If local has extra records not yet on server, push them
+        const serverIdSet = new Set(serverData.map(p => p.id));
+        const unsavedLocal = local.filter(l => l.id && !serverIdSet.has(l.id));
 
-        const itemsToPushToServer: ParticipantRecord[] = [];
-
-        // Smart merge with local
-        local.forEach((localP: ParticipantRecord) => {
-          const serverP = mergedMap.get(localP.id);
-          if (!serverP) {
-            mergedMap.set(localP.id, localP);
-            itemsToPushToServer.push(localP);
-          } else {
-            // Merge preserving whichever side has completed exam data
-            const mergedItem: ParticipantRecord = {
-              ...serverP,
-              ...localP,
-              simulatedExam: localP.simulatedExam || serverP.simulatedExam,
-              penyisihanExam: localP.penyisihanExam || serverP.penyisihanExam,
-              finalExam: localP.finalExam || serverP.finalExam,
-              simulatedAttempts: Math.max(localP.simulatedAttempts || 0, serverP.simulatedAttempts || 0),
-              penyisihanAttempts: Math.max(localP.penyisihanAttempts || 0, serverP.penyisihanAttempts || 0),
-              finalAttempts: Math.max(localP.finalAttempts || 0, serverP.finalAttempts || 0),
-              qualificationStatus: localP.qualificationStatus || serverP.qualificationStatus || 'pending',
-              finalTicketPaymentStatus: localP.finalTicketPaymentStatus || serverP.finalTicketPaymentStatus || 'unpaid',
-              championRank: localP.championRank || serverP.championRank
-            };
-            mergedMap.set(localP.id, mergedItem);
-
-            // Sync back to server if local had exam results that server lacked
-            if (
-              (localP.simulatedExam && !serverP.simulatedExam) ||
-              (localP.penyisihanExam && !serverP.penyisihanExam) ||
-              (localP.finalExam && !serverP.finalExam)
-            ) {
-              itemsToPushToServer.push(mergedItem);
-            }
-          }
-        });
-
-        if (itemsToPushToServer.length > 0) {
+        if (unsavedLocal.length > 0) {
           fetch('/api/participants/bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ participants: itemsToPushToServer })
+            body: JSON.stringify({ participants: unsavedLocal })
           }).catch(() => {});
         }
 
-        const merged = Array.from(mergedMap.values());
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        // Host server / Neon PostgreSQL is the primary source of truth
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
         safeDispatchParticipantsUpdated();
-        return merged;
+        return serverData;
       }
     }
   } catch (err) {

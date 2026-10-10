@@ -14,11 +14,53 @@
       "destination": "/api/fetch-spreadsheet"
     },
     {
+      "source": "/api/participants/bulk",
+      "destination": "/api/participants/bulk"
+    },
+    {
+      "source": "/api/participants/clear",
+      "destination": "/api/participants/clear"
+    },
+    {
+      "source": "/api/participants/:id/exam",
+      "destination": "/api/participants/exam"
+    },
+    {
+      "source": "/api/participants/exam",
+      "destination": "/api/participants/exam"
+    },
+    {
+      "source": "/api/participants/:id",
+      "destination": "/api/participants/index"
+    },
+    {
+      "source": "/api/participants",
+      "destination": "/api/participants/index"
+    },
+    {
+      "source": "/api/sync/status",
+      "destination": "/api/sync/status"
+    },
+    {
+      "source": "/api/webhook",
+      "destination": "/api/webhook"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
