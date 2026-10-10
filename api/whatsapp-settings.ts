@@ -2,8 +2,12 @@ import { getSettingFromDb, saveSettingToDb } from '../src/server/db.js';
 
 const DEFAULT_WA_SETTINGS = {
   provider: 'fonnte',
-  apiKey: '',
-  senderNumber: '081234567890',
+  apiKey: 'OSN-WA-GATEWAY-OFFICIAL-2026',
+  senderNumber: '6285810243460',
+  endpointUrl: '/api/whatsapp/send',
+  autoSendExamGraded: true,
+  autoSendQualification: true,
+  isConnected: true,
   isEnabled: true,
   autoNotifyRegistration: true,
   autoNotifyExamComplete: true,

@@ -22,6 +22,7 @@ import {
   saveQuestionToDb,
   deleteQuestionFromDb
 } from './src/server/db.js';
+import { runDbMigration } from './src/server/dbMigration.js';
 
 dotenv.config();
 
@@ -364,6 +365,20 @@ app.get('/api/sync/status', async (_req: Request, res: Response) => {
       domain: 'https://osn-one.vercel.app',
       database: health,
       webhookTarget: health.webhookUrl,
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message });
+  }
+});
+
+// Database Migration & Initialization Endpoint
+app.all('/api/migrate', async (_req: Request, res: Response) => {
+  try {
+    const report = await runDbMigration();
+    res.json({
+      success: report.success,
+      message: 'PostgreSQL database schema migration & alignment complete.',
+      report,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error?.message });

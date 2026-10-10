@@ -262,6 +262,16 @@ export const AuthModal = ({
   const [adminAnnouncePage, setAdminAnnouncePage] = useState(1);
   const ADMIN_PAGE_SIZE = 10;
 
+  // Custom Gallery Images (Synchronized with Neon PostgreSQL server)
+  const [adminGalleryImages, setAdminGalleryImages] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem('osn_gallery_custom_images');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   // States for 3 Exam Report Tables (Laporan Simulasi, Penyisihan, Final)
   const [reportSimulasiSearch, setReportSimulasiSearch] = useState('');
   const [reportSimulasiMapel, setReportSimulasiMapel] = useState('Semua');
@@ -488,6 +498,18 @@ export const AuthModal = ({
         fetchWhatsAppApiSettingsFromServer().then(w => setWaSettings(w)).catch(() => {});
       } else if (adminTab === 'questions') {
         syncQuestionsWithServer().then(q => setQuestionsList(q)).catch(() => {});
+      } else if (adminTab === 'gallery') {
+        fetch('/api/gallery', { cache: 'no-store' })
+          .then(r => r.json())
+          .then(json => {
+            if (json.success && json.data) {
+              setAdminGalleryImages(json.data);
+              try {
+                localStorage.setItem('osn_gallery_custom_images', JSON.stringify(json.data));
+              } catch {}
+            }
+          })
+          .catch(() => {});
       } else if (adminTab === 'participants' || adminTab === 'report_simulasi' || adminTab === 'report_penyisihan' || adminTab === 'report_final') {
         syncParticipantsWithServer().then(p => setParticipantsList(p)).catch(() => {});
       }
@@ -2756,67 +2778,88 @@ export const AuthModal = ({
                   ) : (
                     /* Step 2: Layar Pengerjaan Seluruh 20 Soal Bergambar Sekaligus Dalam 1 Halaman */
                     <div className="space-y-6">
-                      {/* Exam Control Header - Flow naturally at top, NOT sticky, so questions and answers are NEVER blocked while scrolling */}
-                      <div className="relative bg-white p-4 sm:p-5 rounded-2xl border-2 border-[#D4AF37]/80 shadow-sm space-y-3">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                                examTypeMode === 'final'
-                                  ? 'bg-purple-100 text-purple-900 border border-purple-300'
-                                  : 'text-emerald-700 bg-emerald-100'
-                              }`}>
-                                {examTypeMode === 'final' ? '★ Babak Final CBT' : 'CBT 1 Halaman Penuh'}
-                              </span>
-                              <span className="text-xs font-bold text-[#1A1615]">
-                                Mata Pelajaran: {selectedSubjectForExam}
-                              </span>
-                              {examTypeMode === 'final' && isAntiCheatEnabled && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-200">
-                                  <ShieldAlert className="w-3 h-3 text-rose-600 animate-pulse" />
-                                  <span>Anti-Cheat Aktif</span>
-                                </span>
-                              )}
-                            </div>
-                            <h4 className="text-sm sm:text-base font-extrabold text-[#1A1615] mt-1">
-                              Lembar Soal Ujian (Menampilkan Seluruh {currentSubjectQuestions.length} Soal Tanpa Halangan)
-                            </h4>
+                      {/* Exam Control Header - Sleek, non-sticky, completely collapsible so it never obscures questions or answers */}
+                      {hideExamHeader ? (
+                        <div className="relative bg-[#1A1615] text-[#D4AF37] px-4 py-2.5 rounded-2xl border border-[#D4AF37]/50 shadow-sm flex items-center justify-between text-xs transition-all">
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <span className="font-extrabold text-white truncate">Mapel: {selectedSubjectForExam}</span>
+                            <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-200 font-bold shrink-0">
+                              Terjawab: {Object.keys(studentAnswers).length} / {currentSubjectQuestions.length}
+                            </span>
+                            <span className="text-[11px] font-mono text-white font-bold shrink-0 flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-[#D4AF37]" /> {formatTime(examTimer)}
+                            </span>
                           </div>
-
-                          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
-                            <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200">
-                              Terjawab: <strong className="text-emerald-700 text-sm font-black">{Object.keys(studentAnswers).length}</strong> / {currentSubjectQuestions.length}
-                            </div>
-
-                            <div className={`flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-xl shrink-0 shadow-sm ${
-                              examTimer <= 300
-                                ? 'bg-rose-600 text-white animate-pulse'
-                                : 'text-[#D4AF37] bg-[#1A1615]'
-                            }`}>
-                              <Clock className={`w-4 h-4 ${examTimer <= 300 ? 'text-white' : 'text-[#D4AF37]'}`} />
-                              <span>Sisa Waktu: {formatTime(examTimer)} (20 Menit)</span>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => setHideExamHeader(!hideExamHeader)}
-                              className="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-700 flex items-center gap-1 transition-all cursor-pointer"
-                              title={hideExamHeader ? 'Perluas tampilan header' : 'Sembunyikan header agar ruang baca soal lebih lega'}
-                            >
-                              {hideExamHeader ? <Eye className="w-3.5 h-3.5 text-amber-600" /> : <EyeOff className="w-3.5 h-3.5 text-neutral-500" />}
-                              <span>{hideExamHeader ? 'Buka Header' : 'Sembunyikan'}</span>
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setHideExamHeader(false)}
+                            className="text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-[#FFF2B2] flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors border border-white/20"
+                            title="Tampilkan panel header lengkap"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            <span>Buka Header</span>
+                          </button>
                         </div>
+                      ) : (
+                        <div className="relative bg-white p-4 sm:p-5 rounded-2xl border-2 border-[#D4AF37]/80 shadow-sm space-y-3">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                  examTypeMode === 'final'
+                                    ? 'bg-purple-100 text-purple-900 border border-purple-300'
+                                    : 'text-emerald-700 bg-emerald-100'
+                                }`}>
+                                  {examTypeMode === 'final' ? '★ Babak Final CBT' : 'CBT 1 Halaman Penuh'}
+                                </span>
+                                <span className="text-xs font-bold text-[#1A1615]">
+                                  Mata Pelajaran: {selectedSubjectForExam}
+                                </span>
+                                {examTypeMode === 'final' && isAntiCheatEnabled && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md border border-rose-200">
+                                    <ShieldAlert className="w-3 h-3 text-rose-600 animate-pulse" />
+                                    <span>Anti-Cheat Aktif</span>
+                                  </span>
+                                )}
+                              </div>
+                              <h4 className="text-sm sm:text-base font-extrabold text-[#1A1615] mt-1">
+                                Lembar Soal Ujian (Menampilkan Seluruh {currentSubjectQuestions.length} Soal Tanpa Halangan)
+                              </h4>
+                            </div>
 
-                        {/* Petunjuk pengerjaan (dapat diciutkan) */}
-                        {!hideExamHeader && (
+                            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+                              <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200">
+                                Terjawab: <strong className="text-emerald-700 text-sm font-black">{Object.keys(studentAnswers).length}</strong> / {currentSubjectQuestions.length}
+                              </div>
+
+                              <div className={`flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-xl shrink-0 shadow-sm ${
+                                examTimer <= 300
+                                  ? 'bg-rose-600 text-white animate-pulse'
+                                  : 'text-[#D4AF37] bg-[#1A1615]'
+                              }`}>
+                                <Clock className={`w-4 h-4 ${examTimer <= 300 ? 'text-white' : 'text-[#D4AF37]'}`} />
+                                <span>Sisa Waktu: {formatTime(examTimer)} (20 Menit)</span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => setHideExamHeader(true)}
+                                className="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border border-neutral-300 hover:bg-neutral-100 text-neutral-700 flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                                title="Sembunyikan panel header agar ruang baca soal dan jawaban lebih lega"
+                              >
+                                <EyeOff className="w-3.5 h-3.5 text-neutral-500" />
+                                <span>Sembunyikan Header</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Petunjuk pengerjaan */}
                           <div className="pt-2 border-t border-[#E8E2D9] text-[11px] text-[#756F68] flex items-center justify-between">
-                            <span>💡 Seluruh 20 soal dapat dijawab langsung pada halaman ini. Gulir ke bawah secara leluasa tanpa tertutup panel floating.</span>
+                            <span>💡 Seluruh 20 soal dapat dijawab langsung pada halaman ini tanpa tertutup panel atau tombol.</span>
                             <span className="font-semibold text-emerald-800">Bebas kuota pengerjaan aktif</span>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
 
                       {/* Quick Jump Bar to Any Question */}
                       <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] space-y-2">
@@ -2966,14 +3009,21 @@ export const AuthModal = ({
                         })}
                       </div>
 
-                      {/* Bottom Exam Action Button - Positioned naturally at the end of all questions, NOT sticky so it never covers choices A, B, C, D */}
-                      <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-[#1A1615] text-[#D4AF37] border-2 border-[#D4AF37] shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                      {/* Divider Ending All Questions */}
+                      <div className="pt-6 pb-2 border-t-2 border-dashed border-[#E8E2D9] text-center my-4">
+                        <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest bg-[#FAF8F5] px-4 py-1.5 rounded-full border border-[#E8E2D9]">
+                          ✓ Seluruh Lembar Soal Telah Tampil ({currentSubjectQuestions.length} Soal)
+                        </span>
+                      </div>
+
+                      {/* Bottom Exam Action Button - Positioned naturally at the very end of all questions, never sticky or covering options */}
+                      <div className="relative z-0 mt-4 mb-16 p-4 sm:p-5 rounded-2xl bg-[#1A1615] text-[#D4AF37] border-2 border-[#D4AF37] shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 clear-both">
                         <div className="text-xs">
                           <p className="font-extrabold text-white text-sm">
-                            Status Jawaban Anda: {Object.keys(studentAnswers).length} dari {currentSubjectQuestions.length} Soal Terjawab
+                            Status Jawaban: {Object.keys(studentAnswers).length} dari {currentSubjectQuestions.length} Soal Terjawab
                           </p>
                           <p className="text-[11px] text-neutral-300 mt-0.5">
-                            Pastikan Anda telah memeriksa seluruh jawaban sebelum menekan tombol selesaikan ujian.
+                            Periksa kembali seluruh jawaban Anda sebelum mengakhiri ujian.
                           </p>
                         </div>
 
@@ -3487,21 +3537,16 @@ export const AuthModal = ({
                                 <Trophy className="w-4 h-4 text-[#D4AF37]" />
                                 <span>Akses Ujian Babak Final CBT</span>
                               </span>
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-neutral-950">
-                                Percobaan: {activeStudent.finalAttempts || 0}/2
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white">
+                                Bebas Kuota Ujian: Aktif
                               </span>
                             </div>
                             <p className="text-[11px] text-neutral-700">
-                              Tiket Babak Final Anda telah <strong>Lunas (Closing Terverifikasi)</strong>. Durasi ujian: <strong>20 Menit</strong> dengan proteksi <strong>Sistem Anti-Kecurangan (Anti-Cheat) Aktif</strong>.
+                              Tiket Babak Final Anda telah <strong>Lunas (Closing Terverifikasi)</strong>. Durasi ujian: <strong>20 Menit</strong> dengan proteksi <strong>Sistem Anti-Kecurangan (Anti-Cheat) Aktif</strong>. Ujian dapat dikerjakan bebas tanpa batasan kuota.
                             </p>
                             <button
                               type="button"
                               onClick={() => {
-                                const attempts = activeStudent.finalAttempts || 0;
-                                if (attempts >= 1) {
-                                  showToast('warning', 'Batas Kuota', 'Anda sudah menyelesaikan Ujian Babak Final (1/1 percobaan). Batas maksimal kuota telah selesai.');
-                                  return;
-                                }
                                 setShowSimulatedExam(true);
                                 setExamTypeMode('final');
                                 setExamSubjectChosen(false);
@@ -3510,7 +3555,7 @@ export const AuthModal = ({
                               className="w-full py-3 px-4 rounded-xl bg-[#1A1615] hover:bg-[#2A2321] text-[#D4AF37] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border border-[#D4AF37]/60"
                             >
                               <BookOpen className="w-4 h-4" />
-                              <span>{(activeStudent.finalAttempts || 0) >= 1 ? 'Batas Ujian Final Telah Selesai (1/1)' : 'Mulai Ujian Babak Final Resmi (20 Menit)'}</span>
+                              <span>Mulai Ujian Babak Final Resmi (20 Menit)</span>
                             </button>
                           </div>
                         )}
@@ -6220,12 +6265,7 @@ export const AuthModal = ({
                     {/* Champions Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {APP_CONFIG.gallery.map((gal) => {
-                        let customImgs: Record<string, string> = {};
-                        try {
-                          const saved = localStorage.getItem('osn_gallery_custom_images');
-                          customImgs = saved ? JSON.parse(saved) : {};
-                        } catch {}
-                        const currentSrc = customImgs[gal.id] || gal.image;
+                        const currentSrc = adminGalleryImages[gal.id] || gal.image;
 
                         return (
                           <div
@@ -6275,11 +6315,16 @@ export const AuthModal = ({
                                       const res = uploadEvent.target?.result as string;
                                       if (res) {
                                         try {
-                                          const prev = JSON.parse(localStorage.getItem('osn_gallery_custom_images') || '{}');
-                                          prev[gal.id] = res;
-                                          localStorage.setItem('osn_gallery_custom_images', JSON.stringify(prev));
+                                          const updated = { ...adminGalleryImages, [gal.id]: res };
+                                          setAdminGalleryImages(updated);
+                                          localStorage.setItem('osn_gallery_custom_images', JSON.stringify(updated));
+                                          fetch('/api/gallery', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ images: updated })
+                                          }).catch((err) => console.warn('Failed to sync gallery to server:', err));
                                           window.dispatchEvent(new Event('storage'));
-                                          setAdminNotification(`Foto ${gal.studentName || gal.title} berhasil diperbarui!`);
+                                          setAdminNotification(`Foto ${gal.studentName || gal.title} berhasil diperbarui & disinkronkan ke hosting database!`);
                                           setTimeout(() => setAdminNotification(''), 3000);
                                         } catch (err) {
                                           console.error(err);
@@ -6291,16 +6336,22 @@ export const AuthModal = ({
                                 />
                               </label>
 
-                              {customImgs[gal.id] && (
+                              {adminGalleryImages[gal.id] && (
                                 <button
                                   type="button"
                                   onClick={() => {
                                     try {
-                                      const prev = JSON.parse(localStorage.getItem('osn_gallery_custom_images') || '{}');
-                                      delete prev[gal.id];
-                                      localStorage.setItem('osn_gallery_custom_images', JSON.stringify(prev));
+                                      const updated = { ...adminGalleryImages };
+                                      delete updated[gal.id];
+                                      setAdminGalleryImages(updated);
+                                      localStorage.setItem('osn_gallery_custom_images', JSON.stringify(updated));
+                                      fetch('/api/gallery', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ images: updated })
+                                      }).catch((err) => console.warn('Failed to sync gallery to server:', err));
                                       window.dispatchEvent(new Event('storage'));
-                                      setAdminNotification(`Foto ${gal.studentName || gal.title} direset ke default.`);
+                                      setAdminNotification(`Foto ${gal.studentName || gal.title} direset & disinkronkan ke hosting database.`);
                                       setTimeout(() => setAdminNotification(''), 3000);
                                     } catch (err) {
                                       console.error(err);

@@ -66,6 +66,10 @@
       "destination": "/api/settings"
     },
     {
+      "source": "/api/migrate",
+      "destination": "/api/migrate"
+    },
+    {
       "source": "/api/sync/status",
       "destination": "/api/sync/status"
     },
