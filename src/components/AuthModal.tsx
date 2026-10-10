@@ -555,9 +555,22 @@ export const AuthModal = ({
       }
     };
 
+    let blurTimeout: any = null;
     const handleWindowBlur = () => {
-      // Ketika pengguna klik keluar dari window browser
-      triggerViolation('Kamu terdeteksi melakukan kecurangan dalam ujian karena meninggalkan layar lembar ujian!');
+      // Debounce window blur to ensure real app/tab switch without false triggers
+      if (blurTimeout) clearTimeout(blurTimeout);
+      blurTimeout = setTimeout(() => {
+        if (document.visibilityState === 'hidden' || !document.hasFocus()) {
+          triggerViolation('Kamu terdeteksi melakukan kecurangan dalam ujian karena meninggalkan layar lembar ujian!');
+        }
+      }, 300);
+    };
+
+    const handleWindowFocus = () => {
+      if (blurTimeout) {
+        clearTimeout(blurTimeout);
+        blurTimeout = null;
+      }
     };
 
     // 2. Deteksi copy text / cut text
@@ -599,14 +612,17 @@ export const AuthModal = ({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
     document.addEventListener('copy', handleCopy);
     document.addEventListener('cut', handleCut);
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('contextmenu', handleContextMenu);
 
     return () => {
+      if (blurTimeout) clearTimeout(blurTimeout);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
       document.removeEventListener('copy', handleCopy);
       document.removeEventListener('cut', handleCut);
       document.removeEventListener('keydown', handleKeyDown);
@@ -795,7 +811,17 @@ export const AuthModal = ({
   };
 
   const startSimulation = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Kuota pengerjaan ujian telah dihapus: seluruh ujian (simulasi, penyisihan, final) bebas akses tanpa batas kuota
+    // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final.
+    // Peserta yang belum ditandai closing maka akses Babak Final masih di kunci.
+    if (mode === 'final' && activeStudent?.finalTicketPaymentStatus !== 'paid_closing') {
+      showToast(
+        'error',
+        'Akses Babak Final Terkunci',
+        'Akses ujian Babak Final masih dikunci karena status Anda belum ditandai Closing oleh panitia. Silakan lakukan konfirmasi pembayaran tiket promo Rp 99.000 ke rekening BCA panitia.'
+      );
+      return;
+    }
+
     setExamTypeMode(mode);
     setSelectedSubjectForExam(subject);
     setExamSubjectChosen(true);
@@ -807,7 +833,16 @@ export const AuthModal = ({
   };
 
   const handlePromptStartExam = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // Kuota pengerjaan ujian telah dihapus: seluruh peserta dapat mengikuti ujian tanpa batasan kuota
+    // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final
+    if (mode === 'final' && activeStudent?.finalTicketPaymentStatus !== 'paid_closing') {
+      showToast(
+        'error',
+        'Akses Babak Final Terkunci',
+        'Akses ujian Babak Final masih dikunci. Akses hanya dibuka untuk peserta yang telah ditandai Closing oleh panitia.'
+      );
+      return;
+    }
+
     setExamTypeMode(mode);
     setDisclaimerPendingSubject(subject);
     setShowExamDisclaimer(true);
@@ -828,6 +863,14 @@ export const AuthModal = ({
   };
 
   const finishExam = async (violation?: string) => {
+    // Hitung akurat waktu & durasi pengerjaan ujian yang sebenarnya
+    const totalExamSeconds = 20 * 60; // 1200 detik
+    const elapsedSeconds = Math.max(1, totalExamSeconds - examTimer);
+    const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+    const remainingSecs = elapsedSeconds % 60;
+    const computedDurationText = `${elapsedMinutes} Menit ${remainingSecs} Detik`;
+    const completedTimestamp = new Date().toISOString();
+
     // Calculate score
     let correctCount = 0;
     currentSubjectQuestions.forEach((q, idx) => {
@@ -872,7 +915,10 @@ export const AuthModal = ({
           score: calculatedScore,
           totalQuestions: currentSubjectQuestions.length,
           status: statusText,
-          violationReason: violation
+          violationReason: violation,
+          durationText: computedDurationText,
+          durationSeconds: elapsedSeconds,
+          completedAt: completedTimestamp,
         },
         {
           fullName: activeStudent.fullName,
@@ -887,7 +933,7 @@ export const AuthModal = ({
         setParticipantsList(getAllParticipants());
       }
 
-      // Explicitly POST to server and await so the score is saved in database before sync
+      // Explicitly POST to server and await so the score and accurate duration are saved in database before sync
       try {
         await fetch(`/api/participants/${encodeURIComponent(activeStudent.id)}/exam`, {
           method: 'POST',
@@ -897,7 +943,9 @@ export const AuthModal = ({
             subject: selectedSubjectForExam,
             score: calculatedScore,
             totalQuestions: currentSubjectQuestions.length,
-            completedAt: new Date().toISOString(),
+            completedAt: completedTimestamp,
+            durationText: computedDurationText,
+            durationSeconds: elapsedSeconds,
             violationReason: violation,
             fullName: activeStudent.fullName,
             whatsapp: activeStudent.whatsapp,
@@ -905,6 +953,18 @@ export const AuthModal = ({
             schoolName: activeStudent.schoolName
           })
         });
+
+        // Jika terdeteksi pelanggaran anti-cheat, kirim patch langsung agar status pelanggaran dan alasan tercatat permanen di PostgreSQL
+        if (violation) {
+          await fetch(`/api/participants/${encodeURIComponent(activeStudent.id)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              violationReason: violation,
+              cbtStatus: statusText,
+            })
+          });
+        }
       } catch (err) {
         console.warn('Direct server exam update error:', err);
       }
@@ -2527,23 +2587,42 @@ export const AuthModal = ({
                     <span>Mulai Babak Penyisihan CBT</span>
                   </button>
 
+                  {/* ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya, peserta yang belum ditandai closing maka akses babak final masih di kunci */}
                   {activeStudent?.qualificationStatus === 'lolos' && (
-                    <button
-                      onClick={() => {
-                        setShowSimulatedExam(true);
-                        setExamTypeMode('final');
-                        setExamSubjectChosen(false);
-                        setExamCompleted(false);
-                      }}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer ${
-                        showSimulatedExam && examTypeMode === 'final'
-                          ? 'bg-purple-700 text-white border-2 border-purple-900 shadow-md'
-                          : 'bg-purple-600 hover:bg-purple-700 text-white'
-                      }`}
-                    >
-                      <Trophy className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Mulai Babak Final CBT</span>
-                    </button>
+                    activeStudent.finalTicketPaymentStatus === 'paid_closing' ? (
+                      <button
+                        onClick={() => {
+                          setShowSimulatedExam(true);
+                          setExamTypeMode('final');
+                          setExamSubjectChosen(false);
+                          setExamCompleted(false);
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer ${
+                          showSimulatedExam && examTypeMode === 'final'
+                            ? 'bg-purple-700 text-white border-2 border-purple-900 shadow-md'
+                            : 'bg-purple-600 hover:bg-purple-700 text-white'
+                        }`}
+                      >
+                        <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Mulai Babak Final CBT</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          showToast(
+                            'error',
+                            'Akses Babak Final Terkunci',
+                            'Akses Babak Final masih terkunci. Anda belum ditandai Closing oleh panitia. Silakan lakukan konfirmasi pembayaran tiket promo Rp 99.000 via WhatsApp.'
+                          );
+                        }}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-neutral-100 hover:bg-neutral-200 text-neutral-500 border border-neutral-300 transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                        title="Akses Babak Final Masih Terkunci (Belum Ditandai Closing)"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Babak Final: Terkunci (Belum Closing)</span>
+                      </button>
+                    )
                   )}
 
                   {showSimulatedExam && (
@@ -3529,20 +3608,20 @@ export const AuthModal = ({
                           <span>Konfirmasi Pembayaran via WhatsApp</span>
                         </a>
 
-                        {/* Tombol Akses Babak Final CBT */}
-                        {activeStudent.finalTicketPaymentStatus === 'paid_closing' && (
-                          <div className="p-3.5 rounded-2xl bg-amber-500/10 border-2 border-[#D4AF37] space-y-2">
+                        {/* ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya, peserta yang belum ditandai closing maka akses babak final masih di kunci */}
+                        {activeStudent.finalTicketPaymentStatus === 'paid_closing' ? (
+                          <div className="p-3.5 rounded-2xl bg-amber-500/10 border-2 border-[#D4AF37] space-y-2 text-left">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                              <span className="text-xs font-black text-white flex items-center gap-1.5">
                                 <Trophy className="w-4 h-4 text-[#D4AF37]" />
-                                <span>Akses Ujian Babak Final CBT</span>
+                                <span>Akses Ujian Babak Final CBT: AKTIF</span>
                               </span>
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white">
-                                Bebas Kuota Ujian: Aktif
+                                Closing Terverifikasi
                               </span>
                             </div>
-                            <p className="text-[11px] text-neutral-700">
-                              Tiket Babak Final Anda telah <strong>Lunas (Closing Terverifikasi)</strong>. Durasi ujian: <strong>20 Menit</strong> dengan proteksi <strong>Sistem Anti-Kecurangan (Anti-Cheat) Aktif</strong>. Ujian dapat dikerjakan bebas tanpa batasan kuota.
+                            <p className="text-[11px] text-neutral-300">
+                              Tiket Babak Final Anda telah <strong>Lunas (Closing Terverifikasi)</strong>. Durasi ujian: <strong>20 Menit</strong> dengan proteksi <strong>Sistem Anti-Kecurangan (Anti-Cheat) Aktif</strong>.
                             </p>
                             <button
                               type="button"
@@ -3552,11 +3631,29 @@ export const AuthModal = ({
                                 setExamSubjectChosen(false);
                                 setExamCompleted(false);
                               }}
-                              className="w-full py-3 px-4 rounded-xl bg-[#1A1615] hover:bg-[#2A2321] text-[#D4AF37] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border border-[#D4AF37]/60"
+                              className="w-full py-3 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-neutral-950 font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
                             >
                               <BookOpen className="w-4 h-4" />
                               <span>Mulai Ujian Babak Final Resmi (20 Menit)</span>
                             </button>
+                          </div>
+                        ) : (
+                          <div className="p-3.5 rounded-2xl bg-neutral-900/90 border border-amber-500/30 space-y-2 text-left">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-black text-amber-400 flex items-center gap-1.5">
+                                <Lock className="w-4 h-4 text-amber-400" />
+                                <span>Akses Babak Final Masih Terkunci</span>
+                              </span>
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                Belum Ditandai Closing
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-neutral-300 leading-relaxed">
+                              Sesuai aturan resmi OSN 2026: <strong>peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya</strong>. Peserta yang belum ditandai closing maka akses babak final masih dikunci.
+                            </p>
+                            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] text-amber-200">
+                              🔒 Silakan transfer promo Rp 99.000 ke rekening BCA panitia dan konfirmasi WhatsApp di atas agar admin menandai Closing status Anda.
+                            </div>
                           </div>
                         )}
 
@@ -4891,6 +4988,7 @@ export const AuthModal = ({
               {adminTab === 'report_final' && (
                 <ReportFinalTable
                   participantsList={participantsList}
+                  onToggleFinalPaymentClosing={handleToggleFinalPaymentClosing}
                   onResetQuota={(p) => {
                     setResetQuotaParticipant(p);
                     setResetQuotaClearHistory(false);
@@ -6176,58 +6274,169 @@ export const AuthModal = ({
                     </div>
 
                     {/* Ringkasan Peserta dengan Riwayat Pelanggaran Anti-Cheat */}
-                    <div className="space-y-3 pt-2">
-                      <h5 className="text-xs font-extrabold text-[#1A1615] uppercase tracking-wider flex items-center gap-2">
-                        <span>Log Peserta yang Terdeteksi Pelanggaran Anti-Cheat</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-800 font-bold">
-                          {participantsList.filter(p => !!p.violationReason).length} Terdeteksi
-                        </span>
-                      </h5>
+                    {(() => {
+                      const violationList = participantsList.filter(
+                        p => !!(p.violationReason || p.finalExam?.violationReason || p.penyisihanExam?.violationReason || p.simulatedExam?.violationReason)
+                      );
 
-                      {participantsList.filter(p => !!p.violationReason).length === 0 ? (
-                        <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 text-center text-xs text-[#756F68]">
-                          Belum ada peserta yang tercatat melakukan pelanggaran anti-cheat. Seluruh peserta mematuhi tata tertib ujian.
+                      const handleExportViolationCsv = () => {
+                        const headers = [
+                          'No',
+                          'No. Peserta',
+                          'Nama Lengkap Siswa',
+                          'Asal Sekolah',
+                          'Jenjang Sekolah',
+                          'Nomor WhatsApp',
+                          'Babak Ujian',
+                          'Mata Pelajaran',
+                          'Alasan Pelanggaran Terdeteksi',
+                          'Waktu Pelanggaran',
+                          'Status Integritas'
+                        ];
+                        const rows = violationList.map((p, idx) => [
+                          idx + 1,
+                          p.id,
+                          p.fullName,
+                          p.schoolName,
+                          p.level,
+                          p.whatsapp,
+                          p.finalExam?.violationReason ? 'Babak Final' : p.penyisihanExam?.violationReason ? 'Babak Penyisihan' : 'Ujian CBT',
+                          p.finalExam?.subject || p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika',
+                          p.violationReason || p.finalExam?.violationReason || p.penyisihanExam?.violationReason || 'Pelanggaran Tata Tertib',
+                          p.finalExam?.completedAt ? new Date(p.finalExam.completedAt).toLocaleString('id-ID') : new Date().toLocaleString('id-ID'),
+                          p.cbtStatus || 'Terdeteksi Pelanggaran'
+                        ]);
+                        const escapeCsv = (val: any) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+                        const csvContent = [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\r\n');
+                        const blob = new Blob([new Uint8Array([0xef, 0xbb, 0xbf]), csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `Log_Pelanggaran_AntiCheat_OSN_2026_${new Date().toISOString().slice(0, 10)}.csv`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        showToast('success', 'Ekspor CSV Berhasil', `Log pelanggaran anti-cheat (${violationList.length} peserta) berhasil diunduh.`);
+                      };
+
+                      return (
+                        <div className="space-y-3 pt-2">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <h5 className="text-xs font-extrabold text-[#1A1615] uppercase tracking-wider flex items-center gap-2">
+                              <span>Log Peserta yang Terdeteksi Pelanggaran Anti-Cheat</span>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-800 font-bold">
+                                {violationList.length} Terdeteksi
+                              </span>
+                            </h5>
+
+                            {violationList.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={handleExportViolationCsv}
+                                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Ekspor Log Pelanggaran (CSV)</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {violationList.length === 0 ? (
+                            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-200 text-center text-xs text-[#756F68] space-y-1">
+                              <ShieldCheck className="w-6 h-6 text-emerald-600 mx-auto" />
+                              <p className="font-bold text-neutral-800">Tidak Ada Pelanggaran Terdeteksi</p>
+                              <p className="text-[11px]">Seluruh peserta mematuhi tata tertib ujian integritas anti-cheat CBT OSN 2026.</p>
+                            </div>
+                          ) : (
+                            <div className="border border-rose-200 rounded-2xl overflow-hidden shadow-xs">
+                              <table className="w-full text-left text-xs">
+                                <thead className="bg-rose-50 text-rose-900 font-bold text-[11px]">
+                                  <tr>
+                                    <th className="py-2.5 px-3">No. Peserta</th>
+                                    <th className="py-2.5 px-3">Nama Siswa & Sekolah</th>
+                                    <th className="py-2.5 px-3">Babak & Mapel</th>
+                                    <th className="py-2.5 px-3">Alasan Pelanggaran Terdeteksi</th>
+                                    <th className="py-2.5 px-3">Waktu Pelanggaran</th>
+                                    <th className="py-2.5 px-3 text-center">Aksi Admin</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-rose-100 bg-white">
+                                  {violationList.map(p => {
+                                    const reason = p.violationReason || p.finalExam?.violationReason || p.penyisihanExam?.violationReason || 'Pelanggaran Ujian';
+                                    const stage = p.finalExam?.violationReason ? 'Babak Final' : p.penyisihanExam?.violationReason ? 'Babak Penyisihan' : 'Simulasi';
+                                    const subject = p.finalExam?.subject || p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika';
+                                    const timeStr = p.finalExam?.completedAt || p.penyisihanExam?.completedAt;
+
+                                    return (
+                                      <tr key={p.id} className="hover:bg-rose-50/40 transition-colors">
+                                        <td className="py-2.5 px-3 font-mono font-bold text-[#1A1615] whitespace-nowrap">{p.id}</td>
+                                        <td className="py-2.5 px-3">
+                                          <div className="font-bold text-neutral-900">{p.fullName}</div>
+                                          <div className="text-[10px] text-neutral-500">{p.schoolName} ({p.level})</div>
+                                          <div className="text-[10px] text-emerald-700 font-mono font-medium">{p.whatsapp}</div>
+                                        </td>
+                                        <td className="py-2.5 px-3 whitespace-nowrap">
+                                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900 block mb-0.5 w-fit">
+                                            {stage}
+                                          </span>
+                                          <span className="text-[10px] text-neutral-600">{subject}</span>
+                                        </td>
+                                        <td className="py-2.5 px-3 text-rose-700 font-semibold max-w-xs leading-relaxed">
+                                          {reason}
+                                        </td>
+                                        <td className="py-2.5 px-3 text-[10px] text-neutral-500 whitespace-nowrap">
+                                          {timeStr ? new Date(timeStr).toLocaleString('id-ID') : '-'}
+                                        </td>
+                                        <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                                          <button
+                                            type="button"
+                                            onClick={async () => {
+                                              if (confirm(`Hapus catatan pelanggaran dan bersihkan sanksi untuk "${p.fullName}"?`)) {
+                                                resetParticipantAttempts(p.id, 'all', false);
+                                                try {
+                                                  await fetch(`/api/participants/${encodeURIComponent(p.id)}/reset`, {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ examType: 'all', clearHistory: false })
+                                                  });
+                                                  await fetch(`/api/participants/${encodeURIComponent(p.id)}`, {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                      violationReason: null,
+                                                      cbtStatus: 'Aktif (Sanksi Pelanggaran Dibersihkan Panitia)'
+                                                    })
+                                                  });
+                                                  const synced = await syncParticipantsWithServer();
+                                                  if (synced && synced.length > 0) {
+                                                    setParticipantsList(synced);
+                                                  } else {
+                                                    setParticipantsList(getAllParticipants());
+                                                  }
+                                                } catch {
+                                                  setParticipantsList(getAllParticipants());
+                                                }
+                                                setAdminNotification(`✓ Catatan pelanggaran untuk ${p.fullName} berhasil dibersihkan!`);
+                                                showToast('success', 'Pelanggaran Dibersihkan', `Catatan pelanggaran untuk ${p.fullName} berhasil dibersihkan.`);
+                                                setTimeout(() => setAdminNotification(''), 4000);
+                                              }
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg bg-white border border-rose-300 hover:bg-rose-50 text-[11px] font-bold text-rose-800 transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1"
+                                          >
+                                            <RotateCcw className="w-3 h-3 text-rose-600" />
+                                            <span>Bersihkan Sanksi</span>
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="border border-rose-200 rounded-2xl overflow-hidden">
-                          <table className="w-full text-left text-xs">
-                            <thead className="bg-rose-50 text-rose-900 font-bold text-[11px]">
-                              <tr>
-                                <th className="py-2.5 px-3">No. Peserta</th>
-                                <th className="py-2.5 px-3">Nama Siswa</th>
-                                <th className="py-2.5 px-3">Alasan Pelanggaran Terdeteksi</th>
-                                <th className="py-2.5 px-3 text-center">Aksi Admin</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-rose-100">
-                              {participantsList.filter(p => !!p.violationReason).map(p => (
-                                <tr key={p.id} className="hover:bg-rose-50/40">
-                                  <td className="py-2.5 px-3 font-mono font-bold text-[#1A1615]">{p.id}</td>
-                                  <td className="py-2.5 px-3 font-bold text-neutral-900">{p.fullName} ({p.schoolName})</td>
-                                  <td className="py-2.5 px-3 text-rose-700 font-semibold">{p.violationReason}</td>
-                                  <td className="py-2.5 px-3 text-center">
-                                    <button
-                                      type="button"
-                                      onClick={async () => {
-                                        if (confirm(`Hapus catatan pelanggaran dan reset kuota ujian untuk ${p.fullName}?`)) {
-                                          await resetParticipantAttempts(p.id);
-                                          setParticipantsList(getAllParticipants());
-                                          setAdminNotification(`Catatan pelanggaran untuk ${p.fullName} berhasil dibersihkan!`);
-                                          setTimeout(() => setAdminNotification(''), 4000);
-                                        }
-                                      }}
-                                      className="px-2.5 py-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 text-[11px] font-bold text-neutral-800 transition-colors shadow-xs cursor-pointer"
-                                    >
-                                      Bersihkan / Reset Kuota
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}

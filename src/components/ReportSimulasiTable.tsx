@@ -491,6 +491,13 @@ export const ReportSimulasiTable: React.FC<ReportSimulasiTableProps> = ({
                               <RotateCcw className="w-3 h-3" />
                             </button>
                           </div>
+
+                          {p.simulatedExam && (
+                            <div className="inline-flex items-center justify-center gap-1 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold text-amber-950 mt-0.5">
+                              <Clock className="w-2.5 h-2.5 text-amber-700" />
+                              <span>{p.simulatedExam.durationText || '20 Menit'}</span>
+                            </div>
+                          )}
                         </div>
                       </td>
 

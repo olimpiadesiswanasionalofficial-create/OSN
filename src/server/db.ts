@@ -90,9 +90,14 @@ export async function ensureDbSchema(): Promise<void> {
         recommended_champion_rank TEXT,
         certificate_issued_date TEXT,
         session_question_ids JSONB,
+        violation_reason TEXT,
+        violation_timestamp TIMESTAMPTZ,
         data JSONB,
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
+
+      ALTER TABLE participants ADD COLUMN IF NOT EXISTS violation_reason TEXT;
+      ALTER TABLE participants ADD COLUMN IF NOT EXISTS violation_timestamp TIMESTAMPTZ;
 
       CREATE TABLE IF NOT EXISTS cbt_questions (
         id VARCHAR(100) PRIMARY KEY,
@@ -204,6 +209,7 @@ function rowToParticipant(row: any): any {
     recommendedChampionRank: row.recommended_champion_rank || base.recommendedChampionRank,
     certificateIssuedDate: row.certificate_issued_date || base.certificateIssuedDate,
     sessionQuestionIds: row.session_question_ids || base.sessionQuestionIds,
+    violationReason: row.violation_reason || base.violationReason || row.final_exam?.violationReason || row.penyisihan_exam?.violationReason || undefined,
   };
 }
 
@@ -260,6 +266,7 @@ export async function saveParticipantToDb(record: any): Promise<any> {
   const recommendedChampionRank = record.recommendedChampionRank || null;
   const certificateIssuedDate = record.certificateIssuedDate || null;
   const sessionQuestionIds = record.sessionQuestionIds ? JSON.stringify(record.sessionQuestionIds) : null;
+  const violationReason = record.violationReason || null;
 
   const fullRecord = { ...record, id, fullName, whatsapp, registeredAt };
 
@@ -273,7 +280,7 @@ export async function saveParticipantToDb(record: any): Promise<any> {
         qualification_status, qualification_note, final_ticket_payment_status,
         final_ticket_paid_at, final_ticket_amount, champion_rank,
         recommended_champion_rank, certificate_issued_date, session_question_ids,
-        data, updated_at
+        violation_reason, data, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
         $8, $9, $10, $11, $12,
@@ -282,7 +289,7 @@ export async function saveParticipantToDb(record: any): Promise<any> {
         $19, $20, $21,
         $22, $23, $24,
         $25, $26, $27,
-        $28, NOW()
+        $28, $29, NOW()
       )
       ON CONFLICT (id) DO UPDATE SET
         full_name = EXCLUDED.full_name,
@@ -295,21 +302,22 @@ export async function saveParticipantToDb(record: any): Promise<any> {
         full_address = EXCLUDED.full_address,
         subjects = EXCLUDED.subjects,
         cbt_status = EXCLUDED.cbt_status,
-        simulated_exam = COALESCE(EXCLUDED.simulated_exam, participants.simulated_exam),
-        penyisihan_exam = COALESCE(EXCLUDED.penyisihan_exam, participants.penyisihan_exam),
-        final_exam = COALESCE(EXCLUDED.final_exam, participants.final_exam),
-        simulated_attempts = GREATEST(EXCLUDED.simulated_attempts, participants.simulated_attempts),
-        penyisihan_attempts = GREATEST(EXCLUDED.penyisihan_attempts, participants.penyisihan_attempts),
-        final_attempts = GREATEST(EXCLUDED.final_attempts, participants.final_attempts),
-        qualification_status = COALESCE(EXCLUDED.qualification_status, participants.qualification_status),
-        qualification_note = COALESCE(EXCLUDED.qualification_note, participants.qualification_note),
-        final_ticket_payment_status = COALESCE(EXCLUDED.final_ticket_payment_status, participants.final_ticket_payment_status),
-        final_ticket_paid_at = COALESCE(EXCLUDED.final_ticket_paid_at, participants.final_ticket_paid_at),
-        final_ticket_amount = COALESCE(EXCLUDED.final_ticket_amount, participants.final_ticket_amount),
-        champion_rank = COALESCE(EXCLUDED.champion_rank, participants.champion_rank),
-        recommended_champion_rank = COALESCE(EXCLUDED.recommended_champion_rank, participants.recommended_champion_rank),
-        certificate_issued_date = COALESCE(EXCLUDED.certificate_issued_date, participants.certificate_issued_date),
-        session_question_ids = COALESCE(EXCLUDED.session_question_ids, participants.session_question_ids),
+        simulated_exam = EXCLUDED.simulated_exam,
+        penyisihan_exam = EXCLUDED.penyisihan_exam,
+        final_exam = EXCLUDED.final_exam,
+        simulated_attempts = EXCLUDED.simulated_attempts,
+        penyisihan_attempts = EXCLUDED.penyisihan_attempts,
+        final_attempts = EXCLUDED.final_attempts,
+        qualification_status = EXCLUDED.qualification_status,
+        qualification_note = EXCLUDED.qualification_note,
+        final_ticket_payment_status = EXCLUDED.final_ticket_payment_status,
+        final_ticket_paid_at = EXCLUDED.final_ticket_paid_at,
+        final_ticket_amount = EXCLUDED.final_ticket_amount,
+        champion_rank = EXCLUDED.champion_rank,
+        recommended_champion_rank = EXCLUDED.recommended_champion_rank,
+        certificate_issued_date = EXCLUDED.certificate_issued_date,
+        session_question_ids = EXCLUDED.session_question_ids,
+        violation_reason = EXCLUDED.violation_reason,
         data = EXCLUDED.data,
         updated_at = NOW()
       RETURNING *;
@@ -323,6 +331,7 @@ export async function saveParticipantToDb(record: any): Promise<any> {
       qualificationStatus, qualificationNote, finalTicketPaymentStatus,
       finalTicketPaidAt, finalTicketAmount, championRank,
       recommendedChampionRank, certificateIssuedDate, sessionQuestionIds,
+      violationReason,
       JSON.stringify(fullRecord)
     ]);
 
@@ -369,6 +378,82 @@ export async function bulkSaveParticipantsToDb(records: any[]): Promise<{ insert
   postVercelWebhook('participants.bulk_sync', { count: records.length, total }).catch(() => {});
 
   return { inserted, updated, total };
+}
+
+/**
+ * Patch / update partial fields of a participant in Neon PostgreSQL
+ */
+export async function patchParticipantInDb(id: string, updates: any): Promise<any> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  const cleanId = String(id || updates?.id || '').trim();
+  if (!cleanId) throw new Error('ID peserta wajib diisi.');
+
+  const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
+  let existing: any = null;
+  if (res.rows.length > 0) {
+    existing = rowToParticipant(res.rows[0]);
+  } else {
+    const local = readLocalJsonParticipants().find(x => x.id === cleanId);
+    existing = local || {
+      id: cleanId,
+      fullName: updates.fullName || 'Peserta OSN',
+      whatsapp: updates.whatsapp || '-',
+      registeredAt: new Date().toISOString(),
+      cbtStatus: 'Aktif di Database'
+    };
+  }
+
+  const merged = { ...existing, ...updates, id: cleanId };
+  return await saveParticipantToDb(merged);
+}
+
+/**
+ * Reset participant attempts and clear violations
+ */
+export async function resetParticipantInDb(
+  participantId: string,
+  examType: string = 'all',
+  clearHistory: boolean = false
+): Promise<any> {
+  await ensureDbSchema();
+  const p = getDbPool();
+  const cleanId = String(participantId).trim();
+  const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
+  if (res.rows.length === 0) return null;
+
+  const current = rowToParticipant(res.rows[0]);
+  current.violationReason = undefined;
+
+  if (!examType || examType === 'all') {
+    current.simulatedAttempts = 0;
+    current.penyisihanAttempts = 0;
+    current.finalAttempts = 0;
+    current.cbtStatus = 'Aktif (Seluruh Kuota Ujian Direset: Bebas Pengerjaan)';
+    if (clearHistory) {
+      delete current.simulatedExam;
+      delete current.penyisihanExam;
+      delete current.finalExam;
+      current.qualificationStatus = 'pending';
+    }
+  } else if (examType === 'simulasi') {
+    current.simulatedAttempts = 0;
+    current.cbtStatus = 'Aktif (Simulasi Bebas Pengerjaan)';
+    if (clearHistory) delete current.simulatedExam;
+  } else if (examType === 'penyisihan') {
+    current.penyisihanAttempts = 0;
+    current.cbtStatus = 'Aktif (Penyisihan Direset)';
+    if (clearHistory) {
+      delete current.penyisihanExam;
+      current.qualificationStatus = 'pending';
+    }
+  } else if (examType === 'final') {
+    current.finalAttempts = 0;
+    current.cbtStatus = 'Aktif (Final Direset)';
+    if (clearHistory) delete current.finalExam;
+  }
+
+  return await saveParticipantToDb(current);
 }
 
 /**
@@ -421,6 +506,17 @@ export async function recordExamInDb(
   if (additionalUpdates?.qualificationStatus) newQualStatus = additionalUpdates.qualificationStatus;
   if (additionalUpdates?.championRank) newRank = additionalUpdates.championRank;
 
+  const baseData = existingRow.data && typeof existingRow.data === 'object' ? existingRow.data : {};
+  const mergedData = {
+    ...baseData,
+    [examType === 'simulasi' ? 'simulatedExam' : examType === 'penyisihan' ? 'penyisihanExam' : 'finalExam']: examResult,
+    cbtStatus: newCbtStatus,
+    qualificationStatus: newQualStatus,
+    qualificationNote: newQualNote,
+    championRank: newRank,
+    violationReason: examResult.violationReason || undefined,
+  };
+
   const updateQuery = `
     UPDATE participants SET
       ${column} = $1,
@@ -429,8 +525,10 @@ export async function recordExamInDb(
       qualification_status = $4,
       qualification_note = $5,
       champion_rank = $6,
+      violation_reason = $7,
+      data = $8,
       updated_at = NOW()
-    WHERE id = $7
+    WHERE id = $9
     RETURNING *;
   `;
 
@@ -441,6 +539,8 @@ export async function recordExamInDb(
     newQualStatus,
     newQualNote,
     newRank,
+    examResult.violationReason || null,
+    JSON.stringify(mergedData),
     participantId
   ]);
 

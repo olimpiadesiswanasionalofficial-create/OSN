@@ -581,6 +581,9 @@ export function updateParticipantExamResult(
     totalQuestions: number;
     status: string;
     violationReason?: string;
+    durationText?: string;
+    durationSeconds?: number;
+    completedAt?: string;
   },
   meta?: {
     fullName?: string;
@@ -631,7 +634,9 @@ export function updateParticipantExamResult(
     subject: result.subject,
     score: result.score,
     totalQuestions: result.totalQuestions,
-    completedAt: new Date().toISOString(),
+    completedAt: result.completedAt || new Date().toISOString(),
+    durationText: result.durationText || '20 Menit',
+    durationSeconds: result.durationSeconds || 1200,
     status: result.status,
     violationReason: result.violationReason,
     attemptsCount: currentAttempts
@@ -704,7 +709,13 @@ export function updateParticipantExamResult(
         score: result.score,
         totalQuestions: result.totalQuestions,
         completedAt: examInfo.completedAt,
-        violationReason: result.violationReason
+        durationText: examInfo.durationText,
+        durationSeconds: examInfo.durationSeconds,
+        violationReason: result.violationReason,
+        fullName: meta?.fullName || p.fullName,
+        whatsapp: meta?.whatsapp || p.whatsapp,
+        level: meta?.level || p.level,
+        schoolName: meta?.schoolName || p.schoolName
       })
     }).catch(() => {});
   } catch {}
@@ -754,7 +765,7 @@ export function updateParticipantField(
   }
 
   try {
-    fetch(`/api/participants/${participantId}`, {
+    fetch(`/api/participants/${encodeURIComponent(participantId)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(fields)
@@ -837,10 +848,15 @@ export function resetParticipantAttempts(
 
   // Sync to server in background
   try {
-    fetch(`/api/participants/${participantId}/reset`, {
+    fetch(`/api/participants/${encodeURIComponent(participantId)}/reset`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ examType, clearHistory })
+    }).catch(() => {});
+    fetch(`/api/participants/${encodeURIComponent(participantId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ violationReason: null, cbtStatus: p.cbtStatus })
     }).catch(() => {});
   } catch {}
 

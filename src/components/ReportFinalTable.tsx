@@ -29,6 +29,7 @@ import { logAdminAction } from '../services/adminAuditLogService';
 
 interface ReportFinalTableProps {
   participantsList: ParticipantRecord[];
+  onToggleFinalPaymentClosing?: (p: ParticipantRecord) => void;
   onResetQuota: (p: ParticipantRecord) => void;
   onViewDetail: (p: ParticipantRecord) => void;
   generateFollowUpWhatsAppUrl: (p: ParticipantRecord, type: 'simulasi' | 'penyisihan' | 'final' | 'reminder_h2' | 'reminder_h1') => string;
@@ -37,6 +38,7 @@ interface ReportFinalTableProps {
 
 export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
   participantsList,
+  onToggleFinalPaymentClosing,
   onResetQuota,
   onViewDetail,
   generateFollowUpWhatsAppUrl,
@@ -625,7 +627,7 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                           {/* Waktu Pengerjaan Final */}
                           <div className="inline-flex items-center justify-center gap-1 bg-neutral-50 border border-neutral-200 px-2 py-0.5 rounded text-[10px] font-bold text-neutral-800 mt-0.5">
                             <Clock className="w-2.5 h-2.5 text-neutral-500" />
-                            <span>{p.finalExam?.durationText || '19 Menit 10 Detik'}</span>
+                            <span>{p.finalExam?.durationText || (hasFinal ? '20 Menit' : '-')}</span>
                             <button
                               type="button"
                               onClick={() => handleManualEditDurationFinal(p)}
@@ -660,17 +662,38 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                         )}
                       </td>
 
-                      {/* Tiket Final BCA */}
+                      {/* Tiket Final BCA (Closing) */}
                       <td className="py-3 px-3 text-center">
-                        {isPaid ? (
-                          <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold text-[10px] inline-block shadow-2xs">
-                            ✓ LUNAS RP 99.000
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-neutral-500 font-medium">
-                            Belum Bayar
-                          </span>
-                        )}
+                        <div className="space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onToggleFinalPaymentClosing) {
+                                onToggleFinalPaymentClosing(p);
+                              } else {
+                                const isCurrentlyPaid = p.finalTicketPaymentStatus === 'paid_closing';
+                                updateParticipantField(p.id, {
+                                  finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
+                                  finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
+                                  finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
+                                  cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing Rp 99.000)'
+                                });
+                                safeDispatchParticipantsUpdated();
+                              }
+                            }}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
+                              isPaid
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'bg-neutral-100 text-neutral-600 hover:bg-purple-100 hover:text-purple-900 border border-neutral-300'
+                            }`}
+                            title="Tandai pembayaran tiket promo final Rp 99.000 (Rek BCA)"
+                          >
+                            {isPaid ? '★ CLOSING LUNAS' : '+ Tandai Rp99k'}
+                          </button>
+                          <div className="text-[9px] text-neutral-500 font-mono">
+                            {isPaid ? 'BCA Rp 99.000' : 'Belum Bayar'}
+                          </div>
+                        </div>
                       </td>
 
                       {/* Sertifikat & Aksi */}

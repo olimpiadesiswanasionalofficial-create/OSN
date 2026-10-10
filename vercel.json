@@ -22,6 +22,10 @@
       "destination": "/api/participants?action=clear"
     },
     {
+      "source": "/api/participants/:id/reset",
+      "destination": "/api/participants?action=reset&id=:id"
+    },
+    {
       "source": "/api/participants/:id/exam",
       "destination": "/api/participants?action=exam&id=:id"
     },

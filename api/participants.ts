@@ -5,6 +5,8 @@ import {
   deleteParticipantFromDb,
   clearAllParticipantsFromDb,
   recordExamInDb,
+  patchParticipantInDb,
+  resetParticipantInDb,
 } from '../src/server/db.js';
 
 export default async function handler(req: any, res: any) {
@@ -26,6 +28,7 @@ export default async function handler(req: any, res: any) {
   const isBulk = action === 'bulk' || url.includes('/bulk');
   const isClear = action === 'clear' || url.includes('/clear');
   const isExam = action === 'exam' || url.includes('/exam');
+  const isReset = action === 'reset' || url.includes('/reset');
 
   try {
     // 1. CLEAR ALL PARTICIPANTS
@@ -61,13 +64,38 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // 3. RECORD EXAM RESULT
+    // 3. RESET PARTICIPANT ATTEMPTS & VIOLATION LOG
+    if (isReset) {
+      const participantId =
+        req.query?.id ||
+        req.body?.id ||
+        (url.match(/\/participants\/([^\/\?]+)\/reset/)?.[1]);
+      if (!participantId) {
+        return res.status(400).json({ success: false, error: 'ID Peserta wajib diisi untuk reset kuota/pelanggaran.' });
+      }
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const updated = await resetParticipantInDb(
+        String(participantId),
+        body.examType || 'all',
+        body.clearHistory || false
+      );
+      return res.status(200).json({
+        success: true,
+        message: `Riwayat dan catatan pelanggaran anti-cheat untuk peserta ${participantId} berhasil dibersihkan.`,
+        data: updated,
+      });
+    }
+
+    // 4. RECORD EXAM RESULT
     if (isExam) {
       if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method Not Allowed' });
       }
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      const participantId = body.id || req.query?.id;
+      const participantId =
+        body.id ||
+        req.query?.id ||
+        (url.match(/\/participants\/([^\/\?]+)\/exam/)?.[1]);
       const {
         examType,
         examResult,
@@ -76,12 +104,14 @@ export default async function handler(req: any, res: any) {
         score,
         totalQuestions,
         completedAt,
+        durationText,
+        durationSeconds,
         violationReason,
         fullName,
         whatsapp,
         level,
         schoolName,
-      } = body;
+      } = body || {};
 
       if (!participantId) {
         return res.status(400).json({ success: false, error: 'ID Peserta wajib diisi.' });
@@ -102,6 +132,8 @@ export default async function handler(req: any, res: any) {
           score: numericScore,
           totalQuestions: totalQuestions || 20,
           completedAt: completedAt || new Date().toISOString(),
+          durationText: durationText || '20 Menit',
+          durationSeconds: durationSeconds || 1200,
           status: violationReason
             ? `Pelanggaran: ${violationReason}`
             : resolvedExamType === 'final'
@@ -135,18 +167,39 @@ export default async function handler(req: any, res: any) {
           simulatedExam: resolvedExamType === 'simulasi' ? resolvedExamInfo : undefined,
           penyisihanExam: resolvedExamType === 'penyisihan' ? resolvedExamInfo : undefined,
           finalExam: resolvedExamType === 'final' ? resolvedExamInfo : undefined,
+          violationReason: violationReason || undefined,
         };
         updatedParticipant = await saveParticipantToDb(newP);
       }
 
       return res.status(200).json({
         success: true,
-        message: 'Hasil ujian berhasil disimpan permanen di database server Neon PostgreSQL.',
+        message: 'Hasil ujian dan waktu pengerjaan berhasil disimpan permanen di database Neon PostgreSQL.',
         data: updatedParticipant,
       });
     }
 
-    // 4. STANDARD PARTICIPANTS CRUD
+    // 5. PATCH / UPDATE PARTICIPANT FIELDS (CLOSING, ATTEMPTS, DETAILS)
+    if (req.method === 'PATCH' || (req.method === 'POST' && (action === 'patch' || req.query?.patch))) {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+      const participantId =
+        req.query?.id ||
+        body.id ||
+        (url.match(/\/participants\/([^\/\?]+)/)?.[1]);
+
+      if (!participantId) {
+        return res.status(400).json({ success: false, error: 'ID Peserta wajib diisi untuk pembaruan data.' });
+      }
+
+      const updated = await patchParticipantInDb(String(participantId), body);
+      return res.status(200).json({
+        success: true,
+        message: `Data peserta ${participantId} berhasil diperbarui di Neon PostgreSQL.`,
+        data: updated,
+      });
+    }
+
+    // 6. STANDARD PARTICIPANTS CRUD
     if (req.method === 'GET') {
       const list = await getAllParticipantsFromDb();
       return res.status(200).json({

@@ -837,7 +837,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                           {/* Display Durasi Waktu Pengerjaan Ujian + Tombol Edit Admin */}
                           <div className="inline-flex items-center justify-center gap-1 bg-amber-50/90 border border-amber-300 px-2 py-0.5 rounded-md text-[10px] font-bold text-amber-950">
                             <Clock className="w-3 h-3 text-amber-700 shrink-0" />
-                            <span>{p.penyisihanExam?.durationText || '18 Menit 24 Detik'}</span>
+                            <span>{p.penyisihanExam?.durationText || (hasExam ? '20 Menit' : '-')}</span>
                             <button
                               type="button"
                               onClick={() => handleManualEditDuration(p)}
