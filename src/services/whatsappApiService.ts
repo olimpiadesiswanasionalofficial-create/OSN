@@ -93,7 +93,13 @@ export function saveWhatsAppApiSettings(settings: WhatsAppApiSettings): void {
 
 export async function fetchWhatsAppApiSettingsFromServer(): Promise<WhatsAppApiSettings> {
   try {
-    const res = await fetch('/api/whatsapp-settings', { cache: 'no-store' });
+    const res = await fetch(`/api/whatsapp-settings?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
     if (res.ok) {
       const json = await res.json();
       if (json.success && json.data) {

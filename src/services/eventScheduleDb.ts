@@ -80,7 +80,13 @@ export function saveEventSchedule(schedule: Partial<EventScheduleConfig>): Event
  */
 export async function fetchEventScheduleFromServer(): Promise<EventScheduleConfig> {
   try {
-    const res = await fetch('/api/schedule-config', { cache: 'no-store' });
+    const res = await fetch(`/api/schedule-config?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
     if (res.ok) {
       const json = await res.json();
       if (json.success && json.data) {

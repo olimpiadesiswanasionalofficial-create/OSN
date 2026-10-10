@@ -52,6 +52,7 @@ import { saveParticipant, saveMultipleParticipants, getAllParticipants, syncPart
 import { syncQuestionsWithServer } from './services/cbtQuestionsDb';
 import { getEventSchedule, EventScheduleConfig, DEFAULT_EVENT_SCHEDULE } from './services/eventScheduleDb';
 import { getMetaPixelConfig, applyMetaPixel, trackPixelEvent } from './services/metaPixelService';
+import { syncAllWithServer } from './services/serverSyncManager';
 
 export interface ChildParticipantForm {
   fullName: string;
@@ -221,23 +222,22 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
 
-    // Sync participants & questions database with server on initial load
+    // Robust Server-Side Data Synchronization: strictly prioritizes PostgreSQL / Neon state
+    syncAllWithServer().catch(() => {});
     syncParticipantsWithServer().then(synced => {
       if (Array.isArray(synced)) {
         setPublicParticipants(synced);
       }
     }).catch(() => {});
 
-    syncQuestionsWithServer().catch(() => {});
-
     // Periodic Automatic Real-Time Synchronization with hosting server database (every 15 seconds)
     const autoSyncInterval = setInterval(() => {
+      syncAllWithServer().catch(() => {});
       syncParticipantsWithServer().then(synced => {
         if (Array.isArray(synced)) {
           setPublicParticipants(synced);
         }
       }).catch(() => {});
-      syncQuestionsWithServer().catch(() => {});
     }, 15000);
 
     setLiveSchedule(getEventSchedule());

@@ -49,7 +49,13 @@ export function saveMetaPixelConfig(config: MetaPixelConfig): MetaPixelConfig {
 
 export async function fetchMetaPixelConfigFromServer(): Promise<MetaPixelConfig> {
   try {
-    const res = await fetch('/api/meta-pixel', { cache: 'no-store' });
+    const res = await fetch(`/api/meta-pixel?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
     if (res.ok) {
       const json = await res.json();
       if (json.success && json.data) {

@@ -92,6 +92,7 @@ import {
 import {
   getEventSchedule,
   saveEventSchedule,
+  fetchEventScheduleFromServer,
   DEFAULT_EVENT_SCHEDULE,
   EventScheduleConfig
 } from '../services/eventScheduleDb';
@@ -125,6 +126,7 @@ import {
   getStoredWhatsAppLogs,
   getWhatsAppApiSettings,
   saveWhatsAppApiSettings,
+  fetchWhatsAppApiSettingsFromServer,
   testWhatsAppApiConnection,
   WhatsAppNotificationLog,
   WhatsAppApiSettings
@@ -138,6 +140,7 @@ import { showToast } from './NotificationToast';
 import {
   getMetaPixelConfig,
   saveMetaPixelConfig,
+  fetchMetaPixelConfigFromServer,
   trackPixelEvent,
   MetaPixelConfig
 } from '../services/metaPixelService';
@@ -473,6 +476,23 @@ export const AuthModal = ({
       }
     }
   }, [isOpen, defaultRole, initialStudentData]);
+
+  // Real-time synchronization of authoritative PostgreSQL server state when admin switches tabs
+  useEffect(() => {
+    if (loggedInRole === 'admin') {
+      if (adminTab === 'schedule') {
+        fetchEventScheduleFromServer().then(s => setEventSchedule(s)).catch(() => {});
+      } else if (adminTab === 'pixel') {
+        fetchMetaPixelConfigFromServer().then(c => setPixelConfig(c)).catch(() => {});
+      } else if (adminTab === 'whatsapp_api') {
+        fetchWhatsAppApiSettingsFromServer().then(w => setWaSettings(w)).catch(() => {});
+      } else if (adminTab === 'questions') {
+        syncQuestionsWithServer().then(q => setQuestionsList(q)).catch(() => {});
+      } else if (adminTab === 'participants' || adminTab === 'report_simulasi' || adminTab === 'report_penyisihan' || adminTab === 'report_final') {
+        syncParticipantsWithServer().then(p => setParticipantsList(p)).catch(() => {});
+      }
+    }
+  }, [adminTab, loggedInRole]);
 
   // CBT Exam Timer Countdown (20 Menit)
   useEffect(() => {
