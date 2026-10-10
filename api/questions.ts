@@ -1,10 +1,4 @@
-import { getSettingFromDb, saveSettingToDb } from '../src/server/db.js';
-
-const DEFAULT_PIXEL_CONFIG = {
-  pixelId: '',
-  customScript: '',
-  isEnabled: false
-};
+import { getAllQuestionsFromDb, saveQuestionToDb, deleteQuestionFromDb } from '../src/server/db.js';
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -22,23 +16,36 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === 'GET') {
     try {
-      const data = await getSettingFromDb('meta_pixel', DEFAULT_PIXEL_CONFIG);
+      const data = await getAllQuestionsFromDb();
       return res.status(200).json({ success: true, data });
     } catch (err: any) {
-      return res.status(200).json({ success: true, data: DEFAULT_PIXEL_CONFIG });
+      return res.status(500).json({ success: false, error: err.message });
     }
   }
 
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      const config = body?.config || body;
-      const saved = await saveSettingToDb('meta_pixel', config);
+      const question = body?.question || body;
+      const saved = await saveQuestionToDb(question);
       return res.status(200).json({
         success: true,
-        message: 'Pengaturan Meta Pixel berhasil disimpan dan disinkronkan ke server database.',
+        message: 'Soal CBT berhasil disimpan dan disinkronkan ke server database.',
         data: saved
       });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  if (req.method === 'DELETE') {
+    try {
+      const id = req.query.id || req.body?.id;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'ID soal diperlukan.' });
+      }
+      const ok = await deleteQuestionFromDb(id);
+      return res.status(200).json({ success: true, deleted: ok });
     } catch (err: any) {
       return res.status(500).json({ success: false, error: err.message });
     }

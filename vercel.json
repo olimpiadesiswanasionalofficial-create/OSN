@@ -15,67 +15,71 @@
     },
     {
       "source": "/api/participants/bulk",
-      "destination": "/api/participants/bulk"
+      "destination": "/api/participants?action=bulk"
     },
     {
       "source": "/api/participants/clear",
-      "destination": "/api/participants/clear"
+      "destination": "/api/participants?action=clear"
     },
     {
       "source": "/api/participants/:id/exam",
-      "destination": "/api/participants/exam"
+      "destination": "/api/participants?action=exam&id=:id"
     },
     {
       "source": "/api/participants/exam",
-      "destination": "/api/participants/exam"
+      "destination": "/api/participants?action=exam"
     },
     {
       "source": "/api/participants/:id",
-      "destination": "/api/participants/index"
+      "destination": "/api/participants?id=:id"
     },
     {
       "source": "/api/participants",
-      "destination": "/api/participants/index"
+      "destination": "/api/participants"
     },
     {
       "source": "/api/schedule-config",
-      "destination": "/api/schedule-config"
+      "destination": "/api/config?key=schedule_config"
     },
     {
       "source": "/api/meta-pixel",
-      "destination": "/api/meta-pixel"
+      "destination": "/api/config?key=meta_pixel"
     },
     {
       "source": "/api/gallery",
-      "destination": "/api/gallery"
+      "destination": "/api/config?key=gallery_custom_images"
     },
     {
       "source": "/api/whatsapp-settings",
-      "destination": "/api/whatsapp-settings"
+      "destination": "/api/config?key=whatsapp_api"
     },
     {
       "source": "/api/questions/:id",
-      "destination": "/api/questions/index"
+      "destination": "/api/questions?id=:id"
     },
     {
       "source": "/api/questions",
-      "destination": "/api/questions/index"
+      "destination": "/api/questions"
     },
     {
       "source": "/api/settings",
-      "destination": "/api/settings"
+      "destination": "/api/config"
     },
     {
       "source": "/api/migrate",
-      "destination": "/api/migrate"
+      "destination": "/api/index?action=migrate"
     },
     {
       "source": "/api/sync/status",
-      "destination": "/api/sync/status"
+      "destination": "/api/index?action=status"
     },
     {
       "source": "/api/webhook",
-      "destination": "/api/webhook"
+      "destination": "/api/index?action=webhook"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/index"
     },
     {
       "source": "/((?!api/).*)",
