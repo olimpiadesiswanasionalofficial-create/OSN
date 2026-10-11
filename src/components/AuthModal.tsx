@@ -814,6 +814,8 @@ export const AuthModal = ({
   const handleLogout = () => {
     setIsLoggedIn(false);
     localStorage.removeItem('osn_admin_session');
+    localStorage.removeItem('osn_last_admin_email');
+    localStorage.removeItem('osn_active_validated_profile_session');
     setShowSimulatedExam(false);
     setExamSubjectChosen(false);
     setExamCompleted(false);
@@ -828,6 +830,7 @@ export const AuthModal = ({
     setAdminPassword('');
     setLoginError('');
     setEditingQuestion(null);
+    showToast('info', 'Logout Berhasil', 'Sesi admin telah ditutup dengan aman.');
   };
 
   // PDF Download Trigger
@@ -2264,7 +2267,12 @@ export const AuthModal = ({
                     if (adminSession === 'true') {
                       setLoggedInRole('admin');
                       setIsLoggedIn(true);
-                      setParticipantsList(getAllParticipants());
+                      const currentProfile = adminUser || localStorage.getItem('osn_last_admin_email') || 'admin';
+                      forceDashboardProfileValidation(currentProfile)
+                        .then((validated) => {
+                          if (validated && validated.length > 0) setParticipantsList(validated);
+                        })
+                        .catch(() => {});
                       setQuestionsList(getAllQuestions());
                     }
                   }}

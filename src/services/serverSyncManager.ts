@@ -351,3 +351,174 @@ export async function syncAllWithServer(): Promise<SyncStatusResult> {
 
   return status;
 }
+
+export interface PollingSyncComparisonReport {
+  timestamp: string;
+  scheduleChanged: boolean;
+  metaPixelChanged: boolean;
+  whatsappSettingsChanged: boolean;
+  participantsSynced: boolean;
+  singleSourceOfTruth: 'PostgreSQL/Neon';
+}
+
+let pollingTimer: any = null;
+let isPollingActive = false;
+
+/**
+ * Centralized Polling Mechanism:
+ * Compares local state against PostgreSQL/Neon for Event Schedules, Meta Pixel,
+ * and WhatsApp settings, ensuring the database is the absolute single source of truth.
+ * Any detected difference is immediately overwritten by the PostgreSQL server state.
+ */
+export async function pollAndCompareLocalAgainstServer(): Promise<PollingSyncComparisonReport> {
+  const report: PollingSyncComparisonReport = {
+    timestamp: new Date().toISOString(),
+    scheduleChanged: false,
+    metaPixelChanged: false,
+    whatsappSettingsChanged: false,
+    participantsSynced: false,
+    singleSourceOfTruth: 'PostgreSQL/Neon',
+  };
+
+  try {
+    // 1. EVENT SCHEDULE POLLING & COMPARISON
+    const serverSchedule = await fetchEventScheduleFromServer();
+    if (serverSchedule) {
+      const localScheduleRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('osn_event_schedule_config_2026') : null;
+      const localSchedule = localScheduleRaw ? JSON.parse(localScheduleRaw) : null;
+
+      const isDiff =
+        !localSchedule ||
+        localSchedule.registrationOpenDate !== serverSchedule.registrationOpenDate ||
+        localSchedule.penyisihanDate !== serverSchedule.penyisihanDate ||
+        localSchedule.finalDate !== serverSchedule.finalDate ||
+        localSchedule.announcementDate !== serverSchedule.announcementDate;
+
+      if (isDiff) {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('osn_event_schedule_config_2026', JSON.stringify(serverSchedule));
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_schedule_updated', { detail: serverSchedule }));
+        }
+        report.scheduleChanged = true;
+        logSyncEvent(
+          'info',
+          'SERVER_SYNC',
+          'Polling detected Event Schedule divergence: updated local state from PostgreSQL single source of truth.',
+          { serverSchedule }
+        );
+      }
+    }
+
+    // 2. META PIXEL POLLING & COMPARISON
+    const serverPixel = await fetchMetaPixelConfigFromServer();
+    if (serverPixel) {
+      const localPixelRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('osn_meta_pixel_config') : null;
+      const localPixel = localPixelRaw ? JSON.parse(localPixelRaw) : null;
+
+      const isDiff =
+        !localPixel ||
+        localPixel.pixelId !== serverPixel.pixelId ||
+        localPixel.isEnabled !== serverPixel.isEnabled ||
+        localPixel.customScript !== serverPixel.customScript;
+
+      if (isDiff) {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('osn_meta_pixel_config', JSON.stringify(serverPixel));
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_pixel_updated', { detail: serverPixel }));
+        }
+        report.metaPixelChanged = true;
+        logSyncEvent(
+          'info',
+          'SERVER_SYNC',
+          'Polling detected Meta Pixel divergence: updated local state from PostgreSQL single source of truth.',
+          { serverPixel }
+        );
+      }
+    }
+
+    // 3. WHATSAPP SETTINGS POLLING & COMPARISON
+    const serverWa = await fetchWhatsAppApiSettingsFromServer();
+    if (serverWa) {
+      const localWaRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('osn_whatsapp_api_settings') : null;
+      const localWa = localWaRaw ? JSON.parse(localWaRaw) : null;
+
+      const isDiff =
+        !localWa ||
+        localWa.apiKey !== serverWa.apiKey ||
+        localWa.provider !== serverWa.provider ||
+        localWa.senderNumber !== serverWa.senderNumber ||
+        localWa.endpointUrl !== serverWa.endpointUrl ||
+        localWa.autoSendExamGraded !== serverWa.autoSendExamGraded ||
+        localWa.autoSendQualification !== serverWa.autoSendQualification;
+
+      if (isDiff) {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('osn_whatsapp_api_settings', JSON.stringify(serverWa));
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('osn_whatsapp_settings_updated', { detail: serverWa }));
+        }
+        report.whatsappSettingsChanged = true;
+        logSyncEvent(
+          'info',
+          'SERVER_SYNC',
+          'Polling detected WhatsApp settings divergence: updated local state from PostgreSQL single source of truth.',
+          { serverWa }
+        );
+      }
+    }
+
+    // 4. PARTICIPANTS & COMPETITION DATA RECONCILIATION
+    const syncedParticipants = await syncParticipantsWithServer();
+    if (syncedParticipants && syncedParticipants.length > 0) {
+      report.participantsSynced = true;
+    }
+  } catch (err: any) {
+    logSyncEvent('warn', 'SERVER_SYNC', `Polling sync notice: ${err?.message}`, { error: err?.message });
+  }
+
+  return report;
+}
+
+/**
+ * Starts the centralized polling mechanism comparing local state against PostgreSQL/Neon
+ */
+export function startServerSyncPolling(intervalMs: number = 5000): () => void {
+  if (isPollingActive && pollingTimer) {
+    return stopServerSyncPolling;
+  }
+  isPollingActive = true;
+
+  // Initial immediate comparison
+  pollAndCompareLocalAgainstServer().catch(() => {});
+
+  pollingTimer = setInterval(() => {
+    pollAndCompareLocalAgainstServer().catch(() => {});
+  }, intervalMs);
+
+  logSyncEvent('info', 'SERVER_SYNC', `Centralized PostgreSQL/Neon polling mechanism started (${intervalMs}ms interval).`);
+
+  return stopServerSyncPolling;
+}
+
+/**
+ * Stops the centralized polling mechanism
+ */
+export function stopServerSyncPolling(): void {
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
+  }
+  isPollingActive = false;
+  logSyncEvent('info', 'SERVER_SYNC', 'Centralized PostgreSQL/Neon polling mechanism stopped.');
+}
+
+// Automatically initiate polling when loaded in a browser environment
+if (typeof window !== 'undefined') {
+  startServerSyncPolling(5000);
+}
+

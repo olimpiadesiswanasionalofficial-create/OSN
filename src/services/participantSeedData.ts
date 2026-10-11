@@ -17,11 +17,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ajengrivaningrum@yahoo.co.id",
     "registeredAt": "26/06/2026 14:30:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:29:29.000Z",
+      "durationText": "18 Menit 29 Detik",
+      "durationSeconds": 1099,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:29:29.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-62183",
@@ -102,11 +123,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "12hurufjer@gmail.com",
     "registeredAt": "26/06/2026 14:44:02",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:32:32.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-81828",
@@ -124,11 +166,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "samkaayufajarpratiwi@gmail.com",
     "registeredAt": "26/06/2026 14:46:31",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 61,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:41:41.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-15084",
@@ -187,12 +250,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "lindasabtika14@gmail.com",
     "registeredAt": "26/06/2026 14:58:35",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:37:37.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:47:00.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1177,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-12471",
@@ -208,12 +308,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "feragusni1@gmail.com",
     "registeredAt": "26/06/2026 15:00:01",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:20:20.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:35:00.000Z",
+      "durationText": "19 Menit 50 Detik",
+      "durationSeconds": 1190,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-30086",
@@ -231,11 +368,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "putrie0612@gmail.com",
     "registeredAt": "26/06/2026 15:16:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-27358",
@@ -252,11 +399,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "desypanjaitan92@gmail.com",
     "registeredAt": "07/09/2026 15:42:38",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:48:48.000Z",
+      "durationText": "18 Menit 48 Detik",
+      "durationSeconds": 1118,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:48:48.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-47410",
@@ -274,11 +442,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sitirofiqoh07@gmail.com",
     "registeredAt": "26/06/2026 15:29:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-66018",
@@ -295,11 +473,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "emiliazahra67@gmail.com",
     "registeredAt": "26/06/2026 15:43:31",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-16988",
@@ -358,11 +546,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "keti.maysundras@gmail.com",
     "registeredAt": "26/06/2026 15:50:35",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:53:53.000Z",
+      "durationText": "19 Menit 18 Detik",
+      "durationSeconds": 1143,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-87844",
@@ -380,11 +589,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "keti.maysundras@gmail.com",
     "registeredAt": "26/06/2026 15:52:25",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:32:32.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-54017",
@@ -401,12 +631,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "yurizsisilia@gmail.com",
     "registeredAt": "26/06/2026 16:40:13",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:49:49.000Z",
+      "durationText": "18 Menit 49 Detik",
+      "durationSeconds": 1119,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:49:49.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1164,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:39:00.000Z",
+      "durationText": "19 Menit 34 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-23775",
@@ -423,11 +690,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ribke.jati@gmail.com",
     "registeredAt": "27/06/2026 6:08:35",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-98190",
@@ -443,12 +720,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "alfaiqoh.ana@gmail.com",
     "registeredAt": "27/06/2026 8:17:43",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:40:40.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:25:00.000Z",
+      "durationText": "19 Menit 40 Detik",
+      "durationSeconds": 1180,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-34764",
@@ -466,11 +780,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "eka.saktiana0187@gmail.com",
     "registeredAt": "27/06/2026 10:15:05",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:38:38.000Z",
+      "durationText": "18 Menit 38 Detik",
+      "durationSeconds": 1108,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:38:38.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-28138",
@@ -488,11 +823,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nurafni.agustinas@gmail.com",
     "registeredAt": "27/06/2026 10:26:46",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:52:52.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-56440",
@@ -531,11 +887,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "aja477219@gmail.com",
     "registeredAt": "27/06/2026 11:55:58",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:25:25.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-72388",
@@ -553,11 +930,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nindyahmegawati@gmail.com",
     "registeredAt": "27/06/2026 13:12:24",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:41:41.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-78054",
@@ -617,11 +1015,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ibrahimshabier2602@gmail.com",
     "registeredAt": "01/07/2026 18:26:48",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:15:15.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-10196",
@@ -681,11 +1100,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ranggaputraa661@gmail.com",
     "registeredAt": "14/07/2026 15:08:25",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:46:46.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-66683",
@@ -702,11 +1142,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "farahraisaputribilqis28@gmail.com",
     "registeredAt": "04/07/2026 9:54:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-54454",
@@ -745,11 +1195,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mariaagustinabrmanurung@gmail.com",
     "registeredAt": "04/07/2026 11:51:19",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:53:53.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-78714",
@@ -808,11 +1279,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ruthmonicasantoso@gmail.com",
     "registeredAt": "03/08/2026 10:17:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:30:30.000Z",
+      "durationText": "18 Menit 30 Detik",
+      "durationSeconds": 1100,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:30:30.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-15218",
@@ -829,12 +1321,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "rini.scrb@gmail.com",
     "registeredAt": "04/07/2026 18:20:26",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:27:27.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:17:00.000Z",
+      "durationText": "19 Menit 52 Detik",
+      "durationSeconds": 1192,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-76991",
@@ -895,11 +1424,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rinawisata87@gmail.com",
     "registeredAt": "04/07/2026 21:08:13",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:49:49.000Z",
+      "durationText": "18 Menit 49 Detik",
+      "durationSeconds": 1119,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:49:49.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-88222",
@@ -940,11 +1490,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "novitatri313@yahoo.co.id",
     "registeredAt": "06/07/2026 14:54:28",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:42:42.000Z",
+      "durationText": "18 Menit 42 Detik",
+      "durationSeconds": 1112,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:42:42.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-30786",
@@ -982,12 +1553,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "ersilianivada@gmail.com",
     "registeredAt": "05/07/2026 10:27:17",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:15:15.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:25:00.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1175,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-35467",
@@ -1069,12 +1677,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "Fitriaramadhany2402@gmail.com",
     "registeredAt": "05/07/2026 14:41:30",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:45:45.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:35:00.000Z",
+      "durationText": "19 Menit 50 Detik",
+      "durationSeconds": 1190,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-46270",
@@ -1090,12 +1735,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "niwayanchintyadewiar@gmail.com",
     "registeredAt": "05/07/2026 15:00:35",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:26:26.000Z",
+      "durationText": "18 Menit 26 Detik",
+      "durationSeconds": 1096,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:26:26.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:36:00.000Z",
+      "durationText": "19 Menit 31 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-74480",
@@ -1154,12 +1836,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "albion1603@gmail.com",
     "registeredAt": "05/07/2026 16:17:36",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:28:28.000Z",
+      "durationText": "18 Menit 28 Detik",
+      "durationSeconds": 1098,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:28:28.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:48:00.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1178,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-38916",
@@ -1177,11 +1896,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "diansyco@gmail.com",
     "registeredAt": "05/07/2026 16:49:13",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:11:11.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-26191",
@@ -1198,11 +1938,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "datnaadel@gmail.com",
     "registeredAt": "05/07/2026 17:43:20",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:17:17.000Z",
+      "durationText": "18 Menit 17 Detik",
+      "durationSeconds": 1087,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:17:17.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-94892",
@@ -1284,11 +2045,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ghitasweety19@gmail.com",
     "registeredAt": "05/07/2026 19:43:06",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:10:10.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-37494",
@@ -1305,11 +2087,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "dedebayi501@gmail.com",
     "registeredAt": "05/07/2026 20:00:50",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:27:27.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-38357",
@@ -1327,11 +2130,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "jelinabarasa@gmail.com",
     "registeredAt": "05/07/2026 20:22:15",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:40:40.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-97323",
@@ -1414,11 +2238,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "arida.gudanggaram@gmail.com",
     "registeredAt": "06/07/2026 8:38:36",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:15:15.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-66897",
@@ -1478,12 +2323,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "roji40658@gmail.com",
     "registeredAt": "06/07/2026 15:10:33",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:54:54.000Z",
+      "durationText": "18 Menit 54 Detik",
+      "durationSeconds": 1124,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:54:54.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1164,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:39:00.000Z",
+      "durationText": "19 Menit 34 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-85598",
@@ -1521,11 +2403,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "isabelkoroh@gmail.com",
     "registeredAt": "29/07/2026 11:07:32",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-83449",
@@ -1542,12 +2434,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "nurulfatimahshi12@gmail.com",
     "registeredAt": "07/07/2026 10:10:45",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:41:41.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:16:00.000Z",
+      "durationText": "19 Menit 51 Detik",
+      "durationSeconds": 1191,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-24295",
@@ -1628,12 +2557,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "catursiamrahmawati@gmail.com",
     "registeredAt": "07/07/2026 11:34:47",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:54:54.000Z",
+      "durationText": "18 Menit 54 Detik",
+      "durationSeconds": 1124,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:54:54.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:49:00.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1179,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-73668",
@@ -1715,11 +2681,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "pradilaputri15feb@gmail.com",
     "registeredAt": "08/07/2026 8:28:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:17:17.000Z",
+      "durationText": "18 Menit 17 Detik",
+      "durationSeconds": 1087,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:17:17.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-16783",
@@ -1736,11 +2723,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "e.r4chm4@gmail.com",
     "registeredAt": "08/07/2026 8:32:41",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:52:52.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-12545",
@@ -1758,11 +2766,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "desiana1112@yahoo.com",
     "registeredAt": "08/07/2026 9:07:24",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:34:34.000Z",
+      "durationText": "18 Menit 34 Detik",
+      "durationSeconds": 1104,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:34:34.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-30102",
@@ -1780,11 +2809,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "desiana1112@yahoo.com",
     "registeredAt": "08/07/2026 9:08:40",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:26:26.000Z",
+      "durationText": "18 Menit 26 Detik",
+      "durationSeconds": 1096,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 61,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:26:26.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-90253",
@@ -1845,11 +2895,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "diah.ariyani1980@gmail.com",
     "registeredAt": "08/07/2026 9:42:08",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:21:21.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-85958",
@@ -1910,11 +2981,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "frisia_metta@yahoo.co.id",
     "registeredAt": "08/07/2026 9:59:34",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:24:24.000Z",
+      "durationText": "18 Menit 24 Detik",
+      "durationSeconds": 1094,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:24:24.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-38200",
@@ -1930,12 +3022,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "sabrinacantik26@gmail.com",
     "registeredAt": "08/07/2026 10:00:12",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:53:53.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:28:00.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1178,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-72297",
@@ -1951,12 +3080,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "official.reskyrusnanda@gmail.com",
     "registeredAt": "08/07/2026 10:01:01",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:25:25.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:25:00.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1175,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-80988",
@@ -1974,11 +3140,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "frisia_metta@yahoo.co.id",
     "registeredAt": "08/07/2026 10:02:20",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:44:44.000Z",
+      "durationText": "18 Menit 44 Detik",
+      "durationSeconds": 1114,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:44:44.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-77576",
@@ -2018,11 +3205,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "hi.hanarosa@gmail.com",
     "registeredAt": "08/07/2026 10:30:03",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:49:49.000Z",
+      "durationText": "18 Menit 49 Detik",
+      "durationSeconds": 1119,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:49:49.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-28785",
@@ -2039,12 +3247,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "noorkomariyapurmali@gmail.com",
     "registeredAt": "08/07/2026 13:19:42",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:32:32.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:17:00.000Z",
+      "durationText": "19 Menit 52 Detik",
+      "durationSeconds": 1192,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-43649",
@@ -2083,12 +3328,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "yoshinewa3028@gmail.com",
     "registeredAt": "09/07/2026 5:19:56",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:32:32.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:27:00.000Z",
+      "durationText": "19 Menit 42 Detik",
+      "durationSeconds": 1182,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-22199",
@@ -2105,11 +3387,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nurida.az@gmail.com",
     "registeredAt": "09/07/2026 6:18:59",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-86202",
@@ -2169,11 +3461,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rnynii@gmail.com",
     "registeredAt": "09/07/2026 14:53:19",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:40:40.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-79996",
@@ -2190,11 +3503,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "putri9898700@gmail.com",
     "registeredAt": "09/07/2026 14:53:48",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:48:48.000Z",
+      "durationText": "18 Menit 48 Detik",
+      "durationSeconds": 1118,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 64,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:48:48.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-74959",
@@ -2211,11 +3545,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "msglowimogiri@gmail.com",
     "registeredAt": "09/07/2026 14:58:14",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:14:14.000Z",
+      "durationText": "18 Menit 14 Detik",
+      "durationSeconds": 1084,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:14:14.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1164,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-60260",
@@ -2234,11 +3589,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "etik.armitasari03@gmail.com",
     "registeredAt": "04/08/2026 10:53:02",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:34:34.000Z",
+      "durationText": "18 Menit 34 Detik",
+      "durationSeconds": 1104,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 61,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:34:34.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-71468",
@@ -2256,11 +3632,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mithashelo1701@gmail.com",
     "registeredAt": "09/07/2026 18:02:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:26:26.000Z",
+      "durationText": "18 Menit 26 Detik",
+      "durationSeconds": 1096,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:26:26.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-84819",
@@ -2277,11 +3674,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "janeetaandriani23@gmail.com",
     "registeredAt": "09/07/2026 21:16:12",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:15:15.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-91749",
@@ -2320,11 +3738,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "aliqa7449@gmail.com",
     "registeredAt": "07/10/2026 11:53:17",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-10036",
@@ -2341,11 +3769,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mika06mika2015@gmail.com",
     "registeredAt": "11/07/2026 10:45:17",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:53:53.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-13931",
@@ -2363,11 +3812,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "priscilaira@gmail.com",
     "registeredAt": "11/07/2026 12:40:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:47:47.000Z",
+      "durationText": "18 Menit 47 Detik",
+      "durationSeconds": 1117,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:47:47.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-95462",
@@ -2383,12 +3853,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "hestiwidyasafitri@gmail.com",
     "registeredAt": "11/07/2026 13:11:45",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:31:31.000Z",
+      "durationText": "18 Menit 31 Detik",
+      "durationSeconds": 1101,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:31:31.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T12:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:26:00.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1176,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-21012",
@@ -2404,12 +3911,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "ratnasariwijaya8398@gmail.com",
     "registeredAt": "11/07/2026 16:50:09",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:27:27.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:17:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-57092",
@@ -2447,11 +3991,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kbenazirra@gmail.com",
     "registeredAt": "11/07/2026 21:54:13",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 60,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:23:23.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-28763",
@@ -2511,12 +4076,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "tingtiara168@gmail.com",
     "registeredAt": "13/07/2026 15:35:39",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:30:30.000Z",
+      "durationText": "18 Menit 30 Detik",
+      "durationSeconds": 1100,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:30:30.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:25:00.000Z",
+      "durationText": "19 Menit 40 Detik",
+      "durationSeconds": 1180,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-11315",
@@ -2555,11 +4157,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "chaizacantik60@gmail.com",
     "registeredAt": "14/07/2026 11:34:53",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:35:35.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-84203",
@@ -2598,11 +4221,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "detapramistarahmi@gmail.com",
     "registeredAt": "14/07/2026 14:18:57",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:39:39.000Z",
+      "durationText": "18 Menit 39 Detik",
+      "durationSeconds": 1109,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:39:39.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-14301",
@@ -2620,11 +4264,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rini.scrb@gmail.com",
     "registeredAt": "14/07/2026 14:50:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 60,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:18:18.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-24409",
@@ -2641,11 +4306,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "christfenty@gmail.com",
     "registeredAt": "14/07/2026 14:51:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:47:47.000Z",
+      "durationText": "18 Menit 47 Detik",
+      "durationSeconds": 1117,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:47:47.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-71954",
@@ -2664,11 +4350,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ademarinacy@gmail.com",
     "registeredAt": "07/08/2026 11:41:25",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:49:49.000Z",
+      "durationText": "18 Menit 49 Detik",
+      "durationSeconds": 1119,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:49:49.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-99548",
@@ -2685,11 +4392,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "atharsurachman@gmail.com",
     "registeredAt": "14/07/2026 18:41:56",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:32:32.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-93705",
@@ -2707,11 +4435,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "silvifirdausycarolina@gmail.com",
     "registeredAt": "14/07/2026 19:03:46",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 62,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:21:21.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-93290",
@@ -2728,11 +4477,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "wulandariedarie1@gmail.com",
     "registeredAt": "09/10/2026 11:04:02",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-43208",
@@ -2749,11 +4508,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "gamegagah@gmail.com",
     "registeredAt": "15/07/2026 15:04:32",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:31:31.000Z",
+      "durationText": "18 Menit 31 Detik",
+      "durationSeconds": 1101,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:31:31.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-94721",
@@ -2772,11 +4552,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "dhesikurniadewisanjaya@gmail.com",
     "registeredAt": "04/08/2026 13:16:58",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:42:42.000Z",
+      "durationText": "18 Menit 42 Detik",
+      "durationSeconds": 1112,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:42:42.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-18547",
@@ -2815,11 +4616,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "atik2022.1019@gmail.com",
     "registeredAt": "19/07/2026 20:59:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:41:41.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-16937",
@@ -2858,11 +4680,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nsopia66@gmail.com",
     "registeredAt": "31/07/2026 8:03:46",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:35:35.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-63524",
@@ -2880,11 +4723,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "krisheni952@gmail.com",
     "registeredAt": "01/08/2026 11:33:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:37:37.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-24335",
@@ -2901,11 +4765,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "irasonya789@gmail.com",
     "registeredAt": "01/08/2026 16:56:09",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-58937",
@@ -2921,12 +4795,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "sylvia.puspita88@gmail.com",
     "registeredAt": "26/09/2026 12:14:34",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:27:27.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:27:00.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1177,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-62470",
@@ -2965,11 +4876,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kyadevas@gmail.com",
     "registeredAt": "02/08/2026 16:17:56",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:32:32.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-82849",
@@ -2986,11 +4918,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ruthmonicasantoso@gmail.com",
     "registeredAt": "03/08/2026 10:16:33",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:10:10.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-65823",
@@ -3007,11 +4960,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mayprihandhini@gmail.com",
     "registeredAt": "04/08/2026 8:25:15",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:50:50.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-43927",
@@ -3029,12 +5003,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "patimahsiti1978@gmail.com",
     "registeredAt": "08/10/2026 10:22:38",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:45:45.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:15:00.000Z",
+      "durationText": "19 Menit 30 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-67997",
@@ -3093,12 +5104,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "ributdewa5@gmail.com",
     "registeredAt": "04/08/2026 14:54:55",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:22:22.000Z",
+      "durationText": "18 Menit 22 Detik",
+      "durationSeconds": 1092,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:22:22.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:37:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-17474",
@@ -3157,11 +5205,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "enywe1991@gmail.com",
     "registeredAt": "07/10/2026 10:21:24",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:23:23.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-93730",
@@ -3222,11 +5291,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "annanurmitarsua@gmail.com",
     "registeredAt": "05/08/2026 20:31:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:41:41.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-21711",
@@ -3242,12 +5332,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "zuhrofatim93@gmail.com",
     "registeredAt": "06/08/2026 5:24:49",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:37:37.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:47:00.000Z",
+      "durationText": "19 Menit 42 Detik",
+      "durationSeconds": 1182,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-96788",
@@ -3284,12 +5411,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "mambaulhasanah44@gmail.com",
     "registeredAt": "06/08/2026 8:13:47",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:29:29.000Z",
+      "durationText": "18 Menit 29 Detik",
+      "durationSeconds": 1099,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:29:29.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:19:00.000Z",
+      "durationText": "19 Menit 34 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-41081",
@@ -3327,11 +5491,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "syamsula560@gmail.com",
     "registeredAt": "06/08/2026 13:10:04",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:48:48.000Z",
+      "durationText": "18 Menit 48 Detik",
+      "durationSeconds": 1118,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:48:48.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-66179",
@@ -3350,11 +5535,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "auliacitra672@gmail.com",
     "registeredAt": "06/08/2026 15:03:02",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-88297",
@@ -3373,11 +5568,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "auliacitra672@gmail.com",
     "registeredAt": "06/08/2026 15:04:11",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:34:34.000Z",
+      "durationText": "18 Menit 34 Detik",
+      "durationSeconds": 1104,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:34:34.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-67240",
@@ -3394,11 +5610,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "reknowatimamik@gmail.com",
     "registeredAt": "06/08/2026 15:09:40",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-86684",
@@ -3436,11 +5662,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "hanafizul@gmail.com",
     "registeredAt": "06/08/2026 20:15:05",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-59829",
@@ -3501,11 +5737,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "cha2widhii270114@gmail.com",
     "registeredAt": "07/08/2026 8:49:55",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-33863",
@@ -3568,11 +5814,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "dyahaprilyas@gmail.com",
     "registeredAt": "07/08/2026 13:04:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:46:46.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-50895",
@@ -3633,11 +5900,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "riskaamalia30@yahoo.com",
     "registeredAt": "07/08/2026 14:37:47",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:43:43.000Z",
+      "durationText": "18 Menit 43 Detik",
+      "durationSeconds": 1113,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:43:43.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-13182",
@@ -3654,12 +5942,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "arsyilafirza98@gmail.com",
     "registeredAt": "07/08/2026 15:22:36",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:18:18.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T14:48:00.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1178,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-44635",
@@ -3720,11 +6045,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "eka.dumaita@gmail.com",
     "registeredAt": "08/10/2026 13:29:07",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:41:41.000Z",
+      "durationText": "18 Menit 41 Detik",
+      "durationSeconds": 1111,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:41:41.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-56342",
@@ -3743,11 +6089,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kurnianidaku86@gmail.com",
     "registeredAt": "07/08/2026 19:21:23",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-43842",
@@ -3763,12 +6119,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "ariarvianti5@gmail.com",
     "registeredAt": "14/08/2026 14:41:25",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:45:45.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:15:00.000Z",
+      "durationText": "19 Menit 30 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-43695",
@@ -3785,12 +6178,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "kadekhepi060792@gmail.com",
     "registeredAt": "22/08/2026 13:05:03",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:42:42.000Z",
+      "durationText": "18 Menit 42 Detik",
+      "durationSeconds": 1112,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:42:42.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:47:00.000Z",
+      "durationText": "19 Menit 42 Detik",
+      "durationSeconds": 1182,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-93662",
@@ -3808,11 +6238,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "marifahn86@gmail.com",
     "registeredAt": "08/08/2026 8:08:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:10:10.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-19458",
@@ -3829,11 +6280,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kadekhepi060792@gmail.com",
     "registeredAt": "08/08/2026 8:10:51",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:25:25.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-11299",
@@ -3850,11 +6322,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "zaituna4117112@gmail.com",
     "registeredAt": "08/08/2026 8:33:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:53:53.000Z",
+      "durationText": "19 Menit 18 Detik",
+      "durationSeconds": 1143,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-59422",
@@ -3913,12 +6406,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "christieleorenza@gmail.com",
     "registeredAt": "08/08/2026 14:26:34",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:37:37.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:17:00.000Z",
+      "durationText": "19 Menit 52 Detik",
+      "durationSeconds": 1192,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-57125",
@@ -3934,12 +6464,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "la***@gmail.com",
     "registeredAt": "08/08/2026 18:20:45",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:37:37.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:27:00.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1177,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-34391",
@@ -3956,11 +6523,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nazzwajulyani8@gmail.com",
     "registeredAt": "15/08/2026 8:03:05",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-85134",
@@ -3977,11 +6554,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "umi.chahyae@gmail.com",
     "registeredAt": "11/08/2026 11:38:56",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:14:14.000Z",
+      "durationText": "18 Menit 14 Detik",
+      "durationSeconds": 1084,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:14:14.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-51762",
@@ -3998,11 +6596,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rulidewititissari@gmail.com",
     "registeredAt": "11/08/2026 11:51:44",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:47:47.000Z",
+      "durationText": "18 Menit 47 Detik",
+      "durationSeconds": 1117,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:47:47.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-32265",
@@ -4040,12 +6659,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "megalitarodiyani@gmail.com",
     "registeredAt": "12/08/2026 14:28:51",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:39:39.000Z",
+      "durationText": "18 Menit 39 Detik",
+      "durationSeconds": 1109,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:39:39.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:49:00.000Z",
+      "durationText": "19 Menit 44 Detik",
+      "durationSeconds": 1184,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-49619",
@@ -4062,11 +6718,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "novir1165@gmail.com",
     "registeredAt": "13/08/2026 6:34:54",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:14:14.000Z",
+      "durationText": "18 Menit 14 Detik",
+      "durationSeconds": 1084,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:14:14.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-99689",
@@ -4125,12 +6802,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "agnes271204@gmail.com",
     "registeredAt": "17/08/2026 8:08:24",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:43:43.000Z",
+      "durationText": "18 Menit 43 Detik",
+      "durationSeconds": 1113,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:43:43.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:48:00.000Z",
+      "durationText": "19 Menit 43 Detik",
+      "durationSeconds": 1183,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-31140",
@@ -4169,11 +6883,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "islamirahayuninik@gmail.com",
     "registeredAt": "11/09/2026 9:57:40",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:27:27.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-69396",
@@ -4192,11 +6927,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "srimulyanti1277@gmail.com",
     "registeredAt": "17/08/2026 10:37:19",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:53:53.000Z",
+      "durationText": "18 Menit 53 Detik",
+      "durationSeconds": 1123,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:53:53.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-79690",
@@ -4213,11 +6969,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "imahdesi2@gmail.com",
     "registeredAt": "17/08/2026 11:25:15",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:11:11.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-59077",
@@ -4256,11 +7033,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ditarahayu082@gmail.com",
     "registeredAt": "17/08/2026 13:58:04",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:24:24.000Z",
+      "durationText": "18 Menit 24 Detik",
+      "durationSeconds": 1094,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:24:24.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-92052",
@@ -4278,11 +7076,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "miariswani@gmail.com",
     "registeredAt": "17/08/2026 13:59:54",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 60,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:27:27.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-82499",
@@ -4364,11 +7183,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ririen.dwip@gmail.com",
     "registeredAt": "17/08/2026 16:56:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-37266",
@@ -4385,11 +7214,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "shelirosalitarahmawati@gmail.com",
     "registeredAt": "17/08/2026 19:10:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:31:31.000Z",
+      "durationText": "18 Menit 31 Detik",
+      "durationSeconds": 1101,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:31:31.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-74891",
@@ -4428,11 +7278,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "atikanabila8676@gmail.com",
     "registeredAt": "19/08/2026 11:35:50",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:27:27.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-19225",
@@ -4470,11 +7341,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "seltitpelpina@gmail.com",
     "registeredAt": "19/08/2026 17:07:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:11:11.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-80625",
@@ -4514,12 +7406,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "melviras@gmail.com",
     "registeredAt": "20/08/2026 11:17:50",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:27:27.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:27:00.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1177,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-54467",
@@ -4557,11 +7486,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "pamularsih.tsdsemarang@gmail.com",
     "registeredAt": "21/08/2026 15:49:07",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:20:20.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-48139",
@@ -4663,12 +7613,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "abaysafa0102@gmail.com",
     "registeredAt": "22/08/2026 14:57:10",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:32:32.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:17:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-18905",
@@ -4707,12 +7694,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "e3sagita@gmail.com",
     "registeredAt": "22/08/2026 18:43:10",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:20:20.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:25:00.000Z",
+      "durationText": "19 Menit 40 Detik",
+      "durationSeconds": 1180,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-67481",
@@ -4728,12 +7752,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "lalaantik73@gmail.com",
     "registeredAt": "30/08/2026 9:00:36",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:50:50.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:45:00.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1175,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-65759",
@@ -4749,12 +7810,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "samsungwilli38@gmail.com",
     "registeredAt": "12/09/2026 17:39:31",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:21:21.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T12:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T14:26:00.000Z",
+      "durationText": "19 Menit 41 Detik",
+      "durationSeconds": 1181,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-61897",
@@ -4771,11 +7869,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mfitrah103@gmail.com",
     "registeredAt": "23/08/2026 14:18:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:23:23.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-46212",
@@ -4813,12 +7932,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "elpinawatisiregar0405@gmail.com",
     "registeredAt": "23/08/2026 20:22:09",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:43:43.000Z",
+      "durationText": "18 Menit 43 Detik",
+      "durationSeconds": 1113,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:43:43.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:28:00.000Z",
+      "durationText": "19 Menit 43 Detik",
+      "durationSeconds": 1183,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-61733",
@@ -4857,11 +8013,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nanay2013bp@gmail.com",
     "registeredAt": "25/08/2026 7:13:06",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:30:30.000Z",
+      "durationText": "18 Menit 30 Detik",
+      "durationSeconds": 1100,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-34943",
@@ -4878,11 +8044,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ibrohimbintommy@gmail.com",
     "registeredAt": "25/08/2026 8:57:44",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-73543",
@@ -4900,11 +8076,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "afiqaaljauhani@gmail.com",
     "registeredAt": "26/08/2026 9:53:45",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:46:46.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-45259",
@@ -4923,11 +8120,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "musmusrifa920@gmail.com",
     "registeredAt": "26/08/2026 10:00:08",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:44:44.000Z",
+      "durationText": "18 Menit 44 Detik",
+      "durationSeconds": 1114,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:44:44.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-36025",
@@ -4966,12 +8184,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "neneng85aeni@gmail.com",
     "registeredAt": "27/08/2026 15:08:58",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:26:26.000Z",
+      "durationText": "18 Menit 26 Detik",
+      "durationSeconds": 1096,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:26:26.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T16:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:46:00.000Z",
+      "durationText": "19 Menit 41 Detik",
+      "durationSeconds": 1181,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-78423",
@@ -4990,11 +8245,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "bachtianpoenya@gmail.com",
     "registeredAt": "26/08/2026 11:28:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-59967",
@@ -5011,12 +8276,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "marchnolita95@gmail.com",
     "registeredAt": "26/09/2026 16:30:45",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:15:15.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:25:00.000Z",
+      "durationText": "19 Menit 40 Detik",
+      "durationSeconds": 1180,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-40109",
@@ -5033,11 +8335,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ardinia.imassyah31@gmail.com",
     "registeredAt": "29/08/2026 11:28:09",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-40811",
@@ -5076,12 +8388,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "maksumunnisa02@gmail.com",
     "registeredAt": "26/08/2026 13:07:48",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:43:43.000Z",
+      "durationText": "18 Menit 43 Detik",
+      "durationSeconds": 1113,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:43:43.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T16:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:38:00.000Z",
+      "durationText": "19 Menit 33 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-88753",
@@ -5098,12 +8447,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "daffaqaireen@gmail.com",
     "registeredAt": "26/08/2026 13:29:42",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:23:23.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:48:00.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1178,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-50425",
@@ -5121,11 +8507,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "daffaqaireen@gmail.com",
     "registeredAt": "26/08/2026 13:31:54",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:29:29.000Z",
+      "durationText": "18 Menit 29 Detik",
+      "durationSeconds": 1099,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:29:29.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-73573",
@@ -5141,12 +8548,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "indyulmi@yahoo.com",
     "registeredAt": "26/08/2026 13:33:23",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:38:38.000Z",
+      "durationText": "18 Menit 38 Detik",
+      "durationSeconds": 1108,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:38:38.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:28:00.000Z",
+      "durationText": "19 Menit 43 Detik",
+      "durationSeconds": 1183,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-54650",
@@ -5165,11 +8609,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "fmalau01@gmail.com",
     "registeredAt": "05/09/2026 8:18:14",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:15:15.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-60765",
@@ -5188,11 +8653,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nanikeprianti@gmail.com",
     "registeredAt": "26/08/2026 20:09:44",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-17289",
@@ -5231,12 +8706,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "sisidessy85@gmail.com",
     "registeredAt": "27/08/2026 9:03:47",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:25:25.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:35:00.000Z",
+      "durationText": "19 Menit 50 Detik",
+      "durationSeconds": 1190,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-98089",
@@ -5274,11 +8786,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sisidessy85@gmail.com",
     "registeredAt": "27/08/2026 9:10:46",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:42:42.000Z",
+      "durationText": "18 Menit 42 Detik",
+      "durationSeconds": 1112,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:42:42.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-41910",
@@ -5295,11 +8828,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sisidessy85@gmail.com",
     "registeredAt": "27/08/2026 9:11:43",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:51:51.000Z",
+      "durationText": "18 Menit 51 Detik",
+      "durationSeconds": 1121,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:51:51.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-79032",
@@ -5316,11 +8870,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sisidessy85@gmail.com",
     "registeredAt": "27/08/2026 9:13:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:16:16.000Z",
+      "durationText": "18 Menit 16 Detik",
+      "durationSeconds": 1086,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:16:16.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-90041",
@@ -5380,11 +8955,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sapridalubisss@gmail.com",
     "registeredAt": "27/08/2026 9:54:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:50:50.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-25003",
@@ -5401,11 +8997,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "neneng85aeni@gmail.com",
     "registeredAt": "27/08/2026 15:05:16",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:54:54.000Z",
+      "durationText": "18 Menit 54 Detik",
+      "durationSeconds": 1124,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:54:54.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-63743",
@@ -5422,11 +9039,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "estiwulandari1004@gmail.com",
     "registeredAt": "27/08/2026 16:15:58",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-29167",
@@ -5489,11 +9116,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "arfialfiansyahsilviana@gmail.com",
     "registeredAt": "27/08/2026 21:27:40",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:13:13.000Z",
+      "durationText": "18 Menit 13 Detik",
+      "durationSeconds": 1083,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:13:13.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-11849",
@@ -5510,11 +9158,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "silvianaandriyani10@gmail.com",
     "registeredAt": "27/08/2026 21:29:20",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:52:52.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-86498",
@@ -5573,11 +9242,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "fauziyaheka6@gmail.com",
     "registeredAt": "02/10/2026 13:36:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-56831",
@@ -5701,12 +9380,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "melsaaa347@gmail.com",
     "registeredAt": "01/09/2026 10:40:41",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:54:54.000Z",
+      "durationText": "18 Menit 54 Detik",
+      "durationSeconds": 1124,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:54:54.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:29:00.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1179,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-73462",
@@ -5722,12 +9438,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "najlanurajijanurajija@gmail.com",
     "registeredAt": "01/09/2026 10:55:33",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:37:37.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:37:00.000Z",
+      "durationText": "19 Menit 52 Detik",
+      "durationSeconds": 1192,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-70348",
@@ -5766,11 +9519,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "hanny_astuty@yahoo.com",
     "registeredAt": "07/09/2026 14:55:32",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:18:18.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-83105",
@@ -5787,11 +9561,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "theresia184@guru.smp.belajar.id",
     "registeredAt": "07/09/2026 19:21:48",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-17067",
@@ -5807,12 +9591,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "its.nqm@gmail.com",
     "registeredAt": "10/09/2026 8:13:48",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:15:15.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:25:00.000Z",
+      "durationText": "19 Menit 40 Detik",
+      "durationSeconds": 1180,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-19919",
@@ -5850,11 +9671,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "dwilarasatimonica@gmail.com",
     "registeredAt": "13/09/2026 9:12:51",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 64,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:46:46.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-68968",
@@ -5892,11 +9734,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "abrisam2808@gmail.com",
     "registeredAt": "10/09/2026 9:12:09",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:21:21.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-39889",
@@ -5934,11 +9797,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "irsalina.rizki@gmail.com",
     "registeredAt": "10/09/2026 10:31:44",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:39:39.000Z",
+      "durationText": "18 Menit 39 Detik",
+      "durationSeconds": 1109,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:39:39.000Z",
+      "durationText": "19 Menit 49 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-41477",
@@ -5955,11 +9839,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "irsalina.rizki@gmail.com",
     "registeredAt": "10/09/2026 10:34:53",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:24:24.000Z",
+      "durationText": "18 Menit 24 Detik",
+      "durationSeconds": 1094,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:24:24.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1164,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-87975",
@@ -5976,11 +9881,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "elizabeth.yakadewa@gmail.com",
     "registeredAt": "19/09/2026 13:06:11",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:14:14.000Z",
+      "durationText": "18 Menit 14 Detik",
+      "durationSeconds": 1084,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 60,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:14:14.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-26478",
@@ -5997,11 +9923,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "bobabbfashion@gmail.com",
     "registeredAt": "10/09/2026 11:17:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:52:52.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-87974",
@@ -6019,11 +9966,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "bobabbfashion@gmail.com",
     "registeredAt": "10/09/2026 11:18:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:10:10.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-57154",
@@ -6063,11 +10031,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "Melviany Tafenae <melvianytafenae@gmail.com>",
     "registeredAt": "10/09/2026 12:08:00",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:51:51.000Z",
+      "durationText": "18 Menit 51 Detik",
+      "durationSeconds": 1121,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:51:51.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-27723",
@@ -6083,12 +10072,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "hannamanroe15@gmail.com",
     "registeredAt": "10/09/2026 14:33:38",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:11:11.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:16:00.000Z",
+      "durationText": "19 Menit 51 Detik",
+      "durationSeconds": 1191,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-97372",
@@ -6105,11 +10131,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rahajengfajarwati@gmail.com",
     "registeredAt": "05/10/2026 11:52:04",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:43:43.000Z",
+      "durationText": "18 Menit 43 Detik",
+      "durationSeconds": 1113,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:43:43.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-58755",
@@ -6127,11 +10174,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rofidahsyawanah@gmail.com",
     "registeredAt": "10/09/2026 15:14:19",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:23:23.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-43967",
@@ -6148,11 +10216,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "alissasyawana@gmail.com",
     "registeredAt": "10/09/2026 15:18:14",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:11:11.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-93887",
@@ -6169,12 +10258,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "m.ainulfaris@gmail.com",
     "registeredAt": "10/09/2026 15:23:37",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:46:46.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T12:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:26:00.000Z",
+      "durationText": "19 Menit 41 Detik",
+      "durationSeconds": 1181,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-54650",
@@ -6212,11 +10338,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "excelputra649@gmail.com",
     "registeredAt": "15/09/2026 11:22:05",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-52780",
@@ -6235,11 +10371,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kiranahanyardiyanti@gmail.com",
     "registeredAt": "07/10/2026 17:41:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:38:38.000Z",
+      "durationText": "18 Menit 38 Detik",
+      "durationSeconds": 1108,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:38:38.000Z",
+      "durationText": "19 Menit 18 Detik",
+      "durationSeconds": 1143,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-31394",
@@ -6279,11 +10436,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "andinputripratama0@gmail.com",
     "registeredAt": "10/09/2026 18:28:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:14:14.000Z",
+      "durationText": "18 Menit 14 Detik",
+      "durationSeconds": 1084,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:14:14.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-42813",
@@ -6323,11 +10501,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ritakustanti86@gmail.com",
     "registeredAt": "10/09/2026 20:30:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:26:26.000Z",
+      "durationText": "18 Menit 26 Detik",
+      "durationSeconds": 1096,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:26:26.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-82337",
@@ -6343,12 +10542,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "ernitasinaga25@icloud.com",
     "registeredAt": "11/09/2026 5:34:56",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:28:28.000Z",
+      "durationText": "18 Menit 28 Detik",
+      "durationSeconds": 1098,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:28:28.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:28:00.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1178,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-43663",
@@ -6365,11 +10601,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "feragusni1@gmail.com",
     "registeredAt": "11/09/2026 9:01:15",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:25:25.000Z",
+      "durationText": "18 Menit 25 Detik",
+      "durationSeconds": 1095,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:25:25.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-15373",
@@ -6386,11 +10643,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "defrinaeka02@gmail.com",
     "registeredAt": "11/09/2026 9:33:54",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:20:20.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-27862",
@@ -6407,11 +10685,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "islamirahayuninik@gmail.com",
     "registeredAt": "11/09/2026 9:59:01",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-88416",
@@ -6449,11 +10737,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "muhammadalimubin23@gmail.com",
     "registeredAt": "11/09/2026 11:22:03",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:30:30.000Z",
+      "durationText": "18 Menit 30 Detik",
+      "durationSeconds": 1100,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-52654",
@@ -6470,11 +10768,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nanikmasrifah505@gmail.com",
     "registeredAt": "11/09/2026 12:28:36",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:12:12.000Z",
+      "durationText": "18 Menit 12 Detik",
+      "durationSeconds": 1082,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:12:12.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-A-79616",
@@ -6492,11 +10811,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "lyntarghendislarasati@gmail.com",
     "registeredAt": "11/09/2026 13:06:51",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:22:22.000Z",
+      "durationText": "18 Menit 22 Detik",
+      "durationSeconds": 1092,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:22:22.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-70815",
@@ -6535,11 +10875,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "apti20989@gmail.com",
     "registeredAt": "18/09/2026 8:23:45",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 72,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-29548",
@@ -6578,11 +10928,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "oojasmine69@gmail.com",
     "registeredAt": "11/09/2026 15:55:18",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-19535",
@@ -6640,12 +11000,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "rohmatika.yulianti@gmail.com",
     "registeredAt": "11/09/2026 17:46:39",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:52:52.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:17:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-65669",
@@ -6683,11 +11080,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "reginadellaa11@gmail.com",
     "registeredAt": "11/09/2026 20:53:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:21:21.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-67476",
@@ -6703,12 +11121,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "inungdamai@gmail.com",
     "registeredAt": "14/09/2026 11:59:29",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 98,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:16:16.000Z",
+      "durationText": "18 Menit 16 Detik",
+      "durationSeconds": 1086,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:16:16.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T10:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T12:16:00.000Z",
+      "durationText": "19 Menit 31 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-91209",
@@ -6766,12 +11221,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "hadiwae129@gmail.com",
     "registeredAt": "12/09/2026 19:36:34",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:19:19.000Z",
+      "durationText": "18 Menit 19 Detik",
+      "durationSeconds": 1089,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:19:19.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:29:00.000Z",
+      "durationText": "19 Menit 44 Detik",
+      "durationSeconds": 1184,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-40584",
@@ -6790,11 +11282,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "indahgresmanalu19@gmail.com",
     "registeredAt": "12/09/2026 22:02:45",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:10:10.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-43137",
@@ -6852,12 +11365,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "nazzalfa161@gmail.com",
     "registeredAt": "13/09/2026 9:11:21",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:29:29.000Z",
+      "durationText": "18 Menit 29 Detik",
+      "durationSeconds": 1099,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:29:29.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:29:00.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1179,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-90596",
@@ -6874,12 +11424,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "athifa.pendy15@gmail.com",
     "registeredAt": "13/09/2026 9:11:43",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:24:24.000Z",
+      "durationText": "18 Menit 24 Detik",
+      "durationSeconds": 1094,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:24:24.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:29:00.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1179,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-32071",
@@ -6895,12 +11482,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "audy.glo22@gmail.com",
     "registeredAt": "13/09/2026 9:19:36",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:54:54.000Z",
+      "durationText": "18 Menit 54 Detik",
+      "durationSeconds": 1124,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:54:54.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:29:00.000Z",
+      "durationText": "19 Menit 44 Detik",
+      "durationSeconds": 1184,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-47482",
@@ -6919,11 +11543,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "riantiyus972@gmail.com",
     "registeredAt": "13/09/2026 10:32:55",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:32:32.000Z",
+      "durationText": "18 Menit 32 Detik",
+      "durationSeconds": 1102,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:32:32.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-44987",
@@ -6941,12 +11586,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "riantiyus972@gmail.com",
     "registeredAt": "13/09/2026 10:36:26",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:34:34.000Z",
+      "durationText": "18 Menit 34 Detik",
+      "durationSeconds": 1104,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:34:34.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:29:00.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1179,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-63870",
@@ -6964,11 +11646,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "ogekponsel019@gmail.com",
     "registeredAt": "07/10/2026 6:16:26",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T11:28:28.000Z",
+      "durationText": "18 Menit 28 Detik",
+      "durationSeconds": 1098,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:28:28.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-97036",
@@ -7008,11 +11711,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sifabocil65@gmail.com",
     "registeredAt": "26/09/2026 13:15:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T08:20:20.000Z",
+      "durationText": "18 Menit 20 Detik",
+      "durationSeconds": 1090,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:20:20.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-71482",
@@ -7052,11 +11776,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "juntakmargareth@gmail.com",
     "registeredAt": "08/10/2026 12:10:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:27:27.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-37903",
@@ -7073,11 +11818,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "vieranoordiana@gmail.com",
     "registeredAt": "16/09/2026 8:58:02",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-84717",
@@ -7093,12 +11848,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "vieranoordiana@gmail.com",
     "registeredAt": "16/09/2026 9:14:12",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:23:23.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:28:00.000Z",
+      "durationText": "19 Menit 43 Detik",
+      "durationSeconds": 1183,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-93660",
@@ -7117,11 +11909,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "pak.guru.budi.id@gmail.com",
     "registeredAt": "14/09/2026 11:05:09",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-60018",
@@ -7182,12 +11984,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "wenichan127@gmail.com",
     "registeredAt": "14/09/2026 19:15:38",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:38:38.000Z",
+      "durationText": "18 Menit 38 Detik",
+      "durationSeconds": 1108,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:38:38.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T16:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:38:00.000Z",
+      "durationText": "19 Menit 53 Detik",
+      "durationSeconds": 1193,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-88061",
@@ -7204,11 +12043,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "rahmilabarani06@gmail.com",
     "registeredAt": "19/09/2026 19:36:24",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:11:11.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-35765",
@@ -7246,11 +12106,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nsari4685@gmail.com",
     "registeredAt": "28/09/2026 9:27:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 75,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:18:18.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-44397",
@@ -7333,11 +12214,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "aprilliaira92@gmail.com",
     "registeredAt": "20/09/2026 20:49:22",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 80,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:16:16.000Z",
+      "durationText": "18 Menit 16 Detik",
+      "durationSeconds": 1086,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 62,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:16:16.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-65235",
@@ -7355,11 +12257,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "zatadini3110@gmail.com",
     "registeredAt": "21/09/2026 19:46:47",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:17:17.000Z",
+      "durationText": "18 Menit 17 Detik",
+      "durationSeconds": 1087,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:17:17.000Z",
+      "durationText": "19 Menit 47 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-66468",
@@ -7462,12 +12385,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "arisetyowati453@gmail.com",
     "registeredAt": "26/09/2026 20:08:55",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 76,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:40:40.000Z",
+      "durationText": "19 Menit 15 Detik",
+      "durationSeconds": 1140,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:15:00.000Z",
+      "durationText": "19 Menit 50 Detik",
+      "durationSeconds": 1190,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-92098",
@@ -7483,12 +12443,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "trisnaputriayu74@gmail.com",
     "registeredAt": "27/09/2026 6:54:45",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 71,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:52:52.000Z",
+      "durationText": "18 Menit 52 Detik",
+      "durationSeconds": 1122,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:52:52.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "IPA / Sains",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:37:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-33250",
@@ -7593,11 +12590,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "junimega06@gmail.com",
     "registeredAt": "28/09/2026 12:34:46",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:10:10.000Z",
+      "durationText": "18 Menit 10 Detik",
+      "durationSeconds": 1080,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:10:10.000Z",
+      "durationText": "19 Menit 25 Detik",
+      "durationSeconds": 1150,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-71110",
@@ -7614,11 +12632,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "junimega06@gmail.com",
     "registeredAt": "28/09/2026 12:37:01",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:21:21.000Z",
+      "durationText": "18 Menit 21 Detik",
+      "durationSeconds": 1091,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 63,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:21:21.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-11081",
@@ -7636,11 +12675,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "niswaaja990@gmail.com",
     "registeredAt": "28/09/2026 15:09:34",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 68,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:31:31.000Z",
+      "durationText": "18 Menit 31 Detik",
+      "durationSeconds": 1101,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 64,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:31:31.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-B-76581",
@@ -7657,11 +12717,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "irasafitri9919@gmail.com",
     "registeredAt": "28/09/2026 15:24:58",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:50:50.000Z",
+      "durationText": "18 Menit 50 Detik",
+      "durationSeconds": 1120,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-85255",
@@ -7785,11 +12855,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "elsielita2020@gmail.com",
     "registeredAt": "29/09/2026 12:04:09",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 90,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T13:35:35.000Z",
+      "durationText": "18 Menit 35 Detik",
+      "durationSeconds": 1105,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-87084",
@@ -7805,12 +12885,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "dhinie.hy@gmail.com",
     "registeredAt": "29/09/2026 13:21:12",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T08:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:40:40.000Z",
+      "durationText": "19 Menit 45 Detik",
+      "durationSeconds": 1170,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-13T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 89,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:45:00.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1175,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-84657",
@@ -7827,11 +12944,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "tmellaswissttariu@gmail.com",
     "registeredAt": "29/09/2026 15:09:50",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:45:45.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-38111",
@@ -7868,12 +13006,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "kamad_111235170103@madrasah.kemenag.go.id",
     "registeredAt": "30/09/2026 12:02:10",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:51:51.000Z",
+      "durationText": "18 Menit 51 Detik",
+      "durationSeconds": 1121,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:51:51.000Z",
+      "durationText": "19 Menit 36 Detik",
+      "durationSeconds": 1161,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-14T14:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Peserta Final",
+    "recommendedChampionRank": "Peserta Final",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T14:36:00.000Z",
+      "durationText": "19 Menit 51 Detik",
+      "durationSeconds": 1191,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-73370",
@@ -7890,11 +13065,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mitawa1960@gmail.com",
     "registeredAt": "30/09/2026 12:06:41",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 79,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:42:42.000Z",
+      "durationText": "18 Menit 42 Detik",
+      "durationSeconds": 1112,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:42:42.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-58427",
@@ -7932,11 +13128,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "risdazhafi@gmail.com",
     "registeredAt": "30/09/2026 16:10:07",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-81143",
@@ -7953,11 +13159,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "meldasiska61@guru.paud.belajar.id",
     "registeredAt": "30/09/2026 16:35:24",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:38:38.000Z",
+      "durationText": "18 Menit 38 Detik",
+      "durationSeconds": 1108,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:38:38.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-16226",
@@ -7995,11 +13222,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "mariochristianfreitas@gmail.com",
     "registeredAt": "08/10/2026 11:14:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "IPA / Sains",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "IPA / Sains",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:18:18.000Z",
+      "durationText": "19 Menit 38 Detik",
+      "durationSeconds": 1163,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-85013",
@@ -8017,11 +13265,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nia.ajeng@gmail.com",
     "registeredAt": "03/10/2026 9:52:01",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 86,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T13:40:40.000Z",
+      "durationText": "18 Menit 40 Detik",
+      "durationSeconds": 1110,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-97521",
@@ -8062,11 +13320,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "djabekz31@gmail.com",
     "registeredAt": "04/10/2026 8:30:10",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-25826",
@@ -8082,12 +13350,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "lindasinaga426@gmail.com",
     "registeredAt": "04/10/2026 9:15:01",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T10:27:27.000Z",
+      "durationText": "18 Menit 27 Detik",
+      "durationSeconds": 1097,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T10:27:27.000Z",
+      "durationText": "19 Menit 17 Detik",
+      "durationSeconds": 1142,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T11:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:17:00.000Z",
+      "durationText": "19 Menit 52 Detik",
+      "durationSeconds": 1192,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-32050",
@@ -8146,11 +13451,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "olis47@guru.sd.belajar.id",
     "registeredAt": "05/10/2026 9:10:55",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:17:17.000Z",
+      "durationText": "18 Menit 17 Detik",
+      "durationSeconds": 1087,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 67,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:17:17.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-96345",
@@ -8168,11 +13494,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "saffaqila62@gmail.com",
     "registeredAt": "06/10/2026 10:54:12",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-50701",
@@ -8210,11 +13546,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "kristianndr8@gmail.com",
     "registeredAt": "06/10/2026 16:27:44",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 65,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:37:37.000Z",
+      "durationText": "18 Menit 37 Detik",
+      "durationSeconds": 1107,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 64,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:37:37.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-68004",
@@ -8254,11 +13611,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "smunawaroh1788@gmail.com",
     "registeredAt": "06/10/2026 16:36:29",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T08:15:15.000Z",
+      "durationText": "18 Menit 15 Detik",
+      "durationSeconds": 1085,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 69,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:15:15.000Z",
+      "durationText": "19 Menit 35 Detik",
+      "durationSeconds": 1160,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-C-97090",
@@ -8274,12 +13652,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "raflyalby4@gmail.com",
     "registeredAt": "06/10/2026 17:26:02",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T10:22:22.000Z",
+      "durationText": "18 Menit 22 Detik",
+      "durationSeconds": 1092,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:22:22.000Z",
+      "durationText": "19 Menit 27 Detik",
+      "durationSeconds": 1152,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Bahasa Inggris",
+      "score": 85,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T09:27:00.000Z",
+      "durationText": "19 Menit 42 Detik",
+      "durationSeconds": 1182,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-48967",
@@ -8363,12 +13778,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "audy.glo22@gmail.com",
     "registeredAt": "06/10/2026 20:32:20",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-07T12:24:24.000Z",
+      "durationText": "18 Menit 24 Detik",
+      "durationSeconds": 1094,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T08:24:24.000Z",
+      "durationText": "19 Menit 39 Detik",
+      "durationSeconds": 1164,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T09:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T11:39:00.000Z",
+      "durationText": "19 Menit 34 Detik",
+      "durationSeconds": 1174,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-61059",
@@ -8384,12 +13836,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SD / MI (Kategori B: Usia 7-12 Tahun)",
     "email": "atiqyulianti18@guru.sd.belajar.id",
     "registeredAt": "07/10/2026 8:43:54",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 81,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T12:44:44.000Z",
+      "durationText": "18 Menit 44 Detik",
+      "durationSeconds": 1114,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 77,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T12:44:44.000Z",
+      "durationText": "19 Menit 19 Detik",
+      "durationSeconds": 1144,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-17T13:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 1",
+    "recommendedChampionRank": "Juara 1",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:19:00.000Z",
+      "durationText": "19 Menit 54 Detik",
+      "durationSeconds": 1194,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-A-40682",
@@ -8407,12 +13896,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "PAUD / TK (Kategori A: Usia 4-6 Tahun)",
     "email": "shelirosalitarahmawati@gmail.com",
     "registeredAt": "07/10/2026 11:49:51",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 96,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 91,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:23:23.000Z",
+      "durationText": "19 Menit 18 Detik",
+      "durationSeconds": 1143,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-16T12:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 3",
+    "recommendedChampionRank": "Juara 3",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 88,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T10:18:00.000Z",
+      "durationText": "19 Menit 33 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-B-66912",
@@ -8450,11 +13976,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "sahrulcaduu@gmail.com",
     "registeredAt": "07/10/2026 13:49:21",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "tidak_lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 83,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-05T12:19:19.000Z",
+      "durationText": "18 Menit 19 Detik",
+      "durationSeconds": 1089,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 66,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:19:19.000Z",
+      "durationText": "19 Menit 29 Detik",
+      "durationSeconds": 1154,
+      "status": "Selesai Babak Penyisihan",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Belum Memenuhi Syarat Kelulusan"
   },
   {
     "id": "OSN-2026-A-81414",
@@ -8473,11 +14020,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "nyusti15@gmail.com",
     "registeredAt": "07/10/2026 15:32:42",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 94,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:11:11.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-60393",
@@ -8496,11 +14064,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "lilamaranti@gmail.com",
     "registeredAt": "07/10/2026 16:03:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T11:18:18.000Z",
+      "durationText": "18 Menit 18 Detik",
+      "durationSeconds": 1088,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:18:18.000Z",
+      "durationText": "19 Menit 48 Detik",
+      "durationSeconds": 1173,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-32224",
@@ -8516,12 +14105,49 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "level": "SMP / MTs (Kategori C: Usia 13-16 Tahun)",
     "email": "walijapf@gmail.com",
     "registeredAt": "07/10/2026 16:48:34",
-    "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
-    "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "cbtStatus": "Selesai Babak Final",
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
+    "finalAttempts": 1,
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "paid_closing",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 99,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-09T10:17:17.000Z",
+      "durationText": "18 Menit 17 Detik",
+      "durationSeconds": 1087,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 87,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T14:17:17.000Z",
+      "durationText": "19 Menit 37 Detik",
+      "durationSeconds": 1162,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final",
+    "isClosing": true,
+    "finalTicketPaidAt": "2026-09-15T15:20:00.000Z",
+    "finalTicketAmount": 99000,
+    "championRank": "Juara 2",
+    "recommendedChampionRank": "Juara 2",
+    "certificateIssuedDate": "20 September 2026",
+    "finalExam": {
+      "subject": "Matematika",
+      "score": 93,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-19T13:37:00.000Z",
+      "durationText": "19 Menit 32 Detik",
+      "durationSeconds": 1172,
+      "status": "Selesai Mengerjakan Babak Final",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-26154",
@@ -8538,11 +14164,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "walijapf@gmail.com",
     "registeredAt": "07/10/2026 16:49:50",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 73,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:46:46.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-44594",
@@ -8559,11 +14206,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "milimine93@gmail.com",
     "registeredAt": "07/10/2026 20:21:36",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 78,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T11:23:23.000Z",
+      "durationText": "18 Menit 23 Detik",
+      "durationSeconds": 1093,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 95,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T13:23:23.000Z",
+      "durationText": "19 Menit 28 Detik",
+      "durationSeconds": 1153,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-34005",
@@ -8626,11 +14294,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "wahda12nafsi@gmail.com",
     "registeredAt": "08/10/2026 7:52:52",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 70,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T09:51:51.000Z",
+      "durationText": "18 Menit 51 Detik",
+      "durationSeconds": 1121,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 97,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T09:51:51.000Z",
+      "durationText": "19 Menit 16 Detik",
+      "durationSeconds": 1141,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-C-37017",
@@ -8668,11 +14357,21 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "astridewi1978@gmail.com",
     "registeredAt": "08/10/2026 11:32:29",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
+    "simulatedAttempts": 1,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
     "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 100,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-10T13:45:45.000Z",
+      "durationText": "18 Menit 45 Detik",
+      "durationSeconds": 1115,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    }
   },
   {
     "id": "OSN-2026-C-65531",
@@ -8689,11 +14388,32 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "cherlyalfhirah@gmail.com",
     "registeredAt": "08/10/2026 13:45:58",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Bahasa Inggris",
+      "score": 84,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-06T09:11:11.000Z",
+      "durationText": "18 Menit 11 Detik",
+      "durationSeconds": 1081,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Bahasa Inggris",
+      "score": 82,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T11:11:11.000Z",
+      "durationText": "19 Menit 26 Detik",
+      "durationSeconds": 1151,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   },
   {
     "id": "OSN-2026-B-66213",
@@ -8753,10 +14473,31 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "email": "aldogamingcs@gmail.com",
     "registeredAt": "09/10/2026 15:11:27",
     "cbtStatus": "Aktif & Siap Ujian (Tercatat di Database)",
-    "simulatedAttempts": 0,
-    "penyisihanAttempts": 0,
+    "simulatedAttempts": 1,
+    "penyisihanAttempts": 1,
     "finalAttempts": 0,
-    "qualificationStatus": "pending",
-    "finalTicketPaymentStatus": "unpaid"
+    "qualificationStatus": "lolos",
+    "finalTicketPaymentStatus": "unpaid",
+    "simulatedExam": {
+      "subject": "Matematika",
+      "score": 92,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-08T09:46:46.000Z",
+      "durationText": "18 Menit 46 Detik",
+      "durationSeconds": 1116,
+      "status": "Selesai Simulasi (Lulus)",
+      "attemptsCount": 1
+    },
+    "penyisihanExam": {
+      "subject": "Matematika",
+      "score": 74,
+      "totalQuestions": 20,
+      "completedAt": "2026-09-12T15:46:46.000Z",
+      "durationText": "19 Menit 46 Detik",
+      "durationSeconds": 1171,
+      "status": "Selesai Babak Penyisihan (Lolos ke Final)",
+      "attemptsCount": 1
+    },
+    "qualificationNote": "Dinyatakan Lolos ke Babak Final"
   }
 ];

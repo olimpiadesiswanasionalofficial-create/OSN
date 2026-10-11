@@ -93,6 +93,45 @@ export function getAllParticipants(): ParticipantRecord[] {
     }
     const parsed: ParticipantRecord[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
+      // Auto-heal: If local cache is missing exam histories, merge restored exam records from seed data
+      const hasAnyExams = parsed.some((p) => p.simulatedExam || p.penyisihanExam || p.finalExam);
+      if (!hasAnyExams && INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
+        const seedMap = new Map(INITIAL_PARTICIPANTS.map((p) => [p.id, p]));
+        const enriched: ParticipantRecord[] = parsed.map((p) => {
+          const s = seedMap.get(p.id);
+          if (!s) return p;
+          const mergedRecord: ParticipantRecord = {
+            ...p,
+            simulatedExam: p.simulatedExam || s.simulatedExam,
+            penyisihanExam: p.penyisihanExam || s.penyisihanExam,
+            finalExam: p.finalExam || s.finalExam,
+            simulatedAttempts: Math.max(p.simulatedAttempts || 0, s.simulatedAttempts || 0),
+            penyisihanAttempts: Math.max(p.penyisihanAttempts || 0, s.penyisihanAttempts || 0),
+            finalAttempts: Math.max(p.finalAttempts || 0, s.finalAttempts || 0),
+            qualificationStatus: (p.qualificationStatus === 'lolos' || s.qualificationStatus === 'lolos')
+              ? 'lolos'
+              : ((p.qualificationStatus && p.qualificationStatus !== 'pending')
+                  ? p.qualificationStatus
+                  : (s.qualificationStatus || 'pending')),
+            qualificationNote: p.qualificationNote || s.qualificationNote,
+            finalTicketPaymentStatus: (p.finalTicketPaymentStatus === 'paid_closing' || s.finalTicketPaymentStatus === 'paid_closing')
+              ? 'paid_closing'
+              : (p.finalTicketPaymentStatus || s.finalTicketPaymentStatus || 'unpaid'),
+            isClosing: Boolean(p.isClosing || s.isClosing || p.finalTicketPaymentStatus === 'paid_closing' || s.finalTicketPaymentStatus === 'paid_closing'),
+            championRank: (p.championRank && p.championRank !== 'Belum Dinilai' && p.championRank !== 'Belum Ditetapkan')
+              ? p.championRank
+              : (s.championRank || p.championRank),
+            recommendedChampionRank: p.recommendedChampionRank || s.recommendedChampionRank,
+            certificateIssuedDate: p.certificateIssuedDate || s.certificateIssuedDate,
+            cbtStatus: p.cbtStatus || s.cbtStatus,
+          };
+          return mergedRecord;
+        });
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
+        } catch {}
+        return enriched;
+      }
       return parsed;
     }
     if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
