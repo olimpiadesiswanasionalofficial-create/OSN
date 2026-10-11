@@ -57,8 +57,10 @@ export interface ParticipantRecord {
 
 const STORAGE_KEY = 'osn_participants_database_2026';
 
-// Seluruh data peserta dan riwayat ujian telah dikosongkan sesuai instruksi
-export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [];
+import { INITIAL_PARTICIPANTS as SEED_PARTICIPANTS } from './participantSeedData';
+
+// Stored participant database seed
+export const INITIAL_PARTICIPANTS: ParticipantRecord[] = SEED_PARTICIPANTS;
 
 export function normalizePhone(phone: string): string {
   if (!phone) return '';
@@ -79,12 +81,29 @@ function normalizeName(name: string): string {
 export function getAllParticipants(): ParticipantRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PARTICIPANTS));
+        } catch {}
+        return INITIAL_PARTICIPANTS;
+      }
+      return [];
+    }
     const parsed: ParticipantRecord[] = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+    if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PARTICIPANTS));
+      } catch {}
+      return INITIAL_PARTICIPANTS;
+    }
+    return [];
   } catch (err) {
     console.error('Failed to read participants database:', err);
-    return [];
+    return INITIAL_PARTICIPANTS || [];
   }
 }
 
@@ -328,14 +347,45 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
     });
     if (res.ok) {
       const json = await res.json();
-      if (json.success && Array.isArray(json.data)) {
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         const serverData: ParticipantRecord[] = json.data;
         const local = getAllParticipants();
-        
-        // If local has extra records not yet on server, push them
+
+        // Intelligent bidirectional merge: keep all participants, preserve completed exams & latest status
+        const mergedMap = new Map<string, ParticipantRecord>();
+
+        // 1. Local records first
+        for (const p of local) {
+          if (p.id) mergedMap.set(p.id, p);
+        }
+
+        // 2. Merge server records
+        for (const s of serverData) {
+          if (!s.id) continue;
+          const loc = mergedMap.get(s.id);
+          if (!loc) {
+            mergedMap.set(s.id, s);
+          } else {
+            mergedMap.set(s.id, {
+              ...loc,
+              ...s,
+              simulatedExam: s.simulatedExam || loc.simulatedExam,
+              penyisihanExam: s.penyisihanExam || loc.penyisihanExam,
+              finalExam: s.finalExam || loc.finalExam,
+              finalTicketPaymentStatus: s.finalTicketPaymentStatus || loc.finalTicketPaymentStatus,
+              violationReason: s.violationReason ?? loc.violationReason,
+              cbtStatus: s.cbtStatus || loc.cbtStatus,
+              qualificationStatus: s.qualificationStatus && s.qualificationStatus !== 'pending' ? s.qualificationStatus : (loc.qualificationStatus || s.qualificationStatus),
+              simulatedAttempts: Math.max(s.simulatedAttempts || 0, loc.simulatedAttempts || 0),
+              penyisihanAttempts: Math.max(s.penyisihanAttempts || 0, loc.penyisihanAttempts || 0),
+              finalAttempts: Math.max(s.finalAttempts || 0, loc.finalAttempts || 0),
+            });
+          }
+        }
+
+        // Push any local-only records to server in background
         const serverIdSet = new Set(serverData.map(p => p.id));
         const unsavedLocal = local.filter(l => l.id && !serverIdSet.has(l.id));
-
         if (unsavedLocal.length > 0) {
           fetch('/api/participants/bulk', {
             method: 'POST',
@@ -344,10 +394,20 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
           }).catch(() => {});
         }
 
-        // Host server / Neon PostgreSQL is the primary source of truth
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
+        const mergedList = Array.from(mergedMap.values());
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedList));
         safeDispatchParticipantsUpdated();
-        return serverData;
+        return mergedList;
+      } else if (json.success && Array.isArray(json.data) && json.data.length === 0) {
+        // Server database is empty -> push local seed participants to populate server!
+        const local = getAllParticipants();
+        if (local.length > 0) {
+          fetch('/api/participants/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ participants: local })
+          }).catch(() => {});
+        }
       }
     }
   } catch (err) {

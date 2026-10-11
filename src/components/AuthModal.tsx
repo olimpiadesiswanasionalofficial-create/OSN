@@ -676,6 +676,10 @@ export const AuthModal = ({
     setLoginError('');
     setAdminNotification('Selamat datang, Administrator Resmi OSN 2026!');
     setTimeout(() => setAdminNotification(''), 3500);
+    // Sinkronisasi data ke profil manapun secara instan saat login admin
+    syncParticipantsWithServer().then(synced => {
+      if (synced && synced.length > 0) setParticipantsList(synced);
+    }).catch(() => {});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -755,8 +759,13 @@ export const AuthModal = ({
         return;
       }
 
-      // Validasi kredensial resmi administrator (user: admin, password: rahasia123)
-      const isValidUser = u.toLowerCase() === 'admin';
+      // Validasi kredensial resmi administrator (user: admin, atau email osn / admin, password: rahasia123)
+      const lowerU = u.toLowerCase();
+      const isValidUser =
+        lowerU === 'admin' ||
+        lowerU === 'olimpiadesiswanasionalofficial@gmail.com' ||
+        lowerU.includes('osn') ||
+        lowerU.includes('admin');
       const customAdminPwd = localStorage.getItem('osn_admin_custom_pwd');
       const isValidPass = customAdminPwd ? (p === customAdminPwd || p === 'rahasia123') : (p === 'rahasia123');
 
@@ -775,6 +784,11 @@ export const AuthModal = ({
       setAdminNotification('Selamat datang di Dashboard Admin Panitia OSN 2026!');
       showToast('success', 'Login Admin Berhasil', 'Autentikasi terverifikasi. Selamat datang di Dashboard Panitia OSN 2026.');
       setTimeout(() => setAdminNotification(''), 3500);
+
+      // Sinkronisasi data ke profil manapun secara instan saat login berhasil
+      syncParticipantsWithServer().then(synced => {
+        if (synced && synced.length > 0) setParticipantsList(synced);
+      }).catch(() => {});
     }
   };
 

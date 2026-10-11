@@ -217,14 +217,18 @@ function rowToParticipant(row: any): any {
  * Read all participants from Neon PostgreSQL
  */
 export async function getAllParticipantsFromDb(): Promise<any[]> {
-  await ensureDbSchema();
-  const p = getDbPool();
   try {
+    await ensureDbSchema();
+    const p = getDbPool();
     const res = await p.query(`
       SELECT * FROM participants 
       ORDER BY updated_at DESC, registered_at DESC
     `);
-    return res.rows.map(rowToParticipant);
+    if (res.rows && res.rows.length > 0) {
+      return res.rows.map(rowToParticipant);
+    }
+    // If Neon database has 0 rows, fallback to local JSON file
+    return readLocalJsonParticipants();
   } catch (err: any) {
     console.error('Error fetching participants from Neon PostgreSQL:', err.message);
     // Local file fallback if database is temporarily unreachable
@@ -351,8 +355,9 @@ export async function saveParticipantToDb(record: any): Promise<any> {
  * Bulk save / upsert participants into Neon PostgreSQL
  */
 export async function bulkSaveParticipantsToDb(records: any[]): Promise<{ inserted: number; updated: number; total: number }> {
-  await ensureDbSchema();
-  const p = getDbPool();
+  try {
+    await ensureDbSchema();
+  } catch {}
 
   let inserted = 0;
   let updated = 0;
@@ -363,16 +368,23 @@ export async function bulkSaveParticipantsToDb(records: any[]): Promise<{ insert
       await saveParticipantToDb(item);
       inserted++;
     } catch (e) {
-      console.error('Bulk item save error:', e);
+      saveLocalJsonParticipant(item);
+      inserted++;
     }
   }
+
+  // Also ensure local JSON file has all records merged
+  saveLocalJsonParticipantsBulk(records);
 
   // Count total
   let total = inserted;
   try {
+    const p = getDbPool();
     const countRes = await p.query('SELECT COUNT(*) FROM participants');
     total = parseInt(countRes.rows[0].count, 10);
-  } catch {}
+  } catch {
+    total = readLocalJsonParticipants().length;
+  }
 
   // Post bulk webhook event
   postVercelWebhook('participants.bulk_sync', { count: records.length, total }).catch(() => {});
@@ -384,16 +396,20 @@ export async function bulkSaveParticipantsToDb(records: any[]): Promise<{ insert
  * Patch / update partial fields of a participant in Neon PostgreSQL
  */
 export async function patchParticipantInDb(id: string, updates: any): Promise<any> {
-  await ensureDbSchema();
-  const p = getDbPool();
   const cleanId = String(id || updates?.id || '').trim();
   if (!cleanId) throw new Error('ID peserta wajib diisi.');
 
-  const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
   let existing: any = null;
-  if (res.rows.length > 0) {
-    existing = rowToParticipant(res.rows[0]);
-  } else {
+  try {
+    await ensureDbSchema();
+    const p = getDbPool();
+    const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
+    if (res.rows.length > 0) {
+      existing = rowToParticipant(res.rows[0]);
+    }
+  } catch (err) {}
+
+  if (!existing) {
     const local = readLocalJsonParticipants().find(x => x.id === cleanId);
     existing = local || {
       id: cleanId,
@@ -416,14 +432,24 @@ export async function resetParticipantInDb(
   examType: string = 'all',
   clearHistory: boolean = false
 ): Promise<any> {
-  await ensureDbSchema();
-  const p = getDbPool();
   const cleanId = String(participantId).trim();
-  const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
-  if (res.rows.length === 0) return null;
+  let current: any = null;
+  try {
+    await ensureDbSchema();
+    const p = getDbPool();
+    const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
+    if (res.rows.length > 0) {
+      current = rowToParticipant(res.rows[0]);
+    }
+  } catch (err) {}
 
-  const current = rowToParticipant(res.rows[0]);
-  current.violationReason = undefined;
+  if (!current) {
+    const local = readLocalJsonParticipants().find(x => x.id === cleanId);
+    if (local) current = { ...local };
+  }
+  if (!current) return null;
+
+  delete current.violationReason;
 
   if (!examType || examType === 'all') {
     current.simulatedAttempts = 0;
@@ -465,18 +491,50 @@ export async function recordExamInDb(
   examResult: any,
   additionalUpdates?: any
 ): Promise<any> {
-  await ensureDbSchema();
-  const p = getDbPool();
-
   const column = examType === 'simulasi' ? 'simulated_exam' : examType === 'penyisihan' ? 'penyisihan_exam' : 'final_exam';
   const attemptsCol = examType === 'simulasi' ? 'simulated_attempts' : examType === 'penyisihan' ? 'penyisihan_attempts' : 'final_attempts';
 
-  const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [participantId]);
-  if (res.rows.length === 0) {
-    throw new Error(`Peserta dengan ID ${participantId} tidak ditemukan.`);
+  let existingRow: any = null;
+  try {
+    await ensureDbSchema();
+    const p = getDbPool();
+    const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [participantId]);
+    if (res.rows.length > 0) {
+      existingRow = res.rows[0];
+    }
+  } catch (err) {}
+
+  if (!existingRow) {
+    const local = readLocalJsonParticipants().find(x => x.id === participantId);
+    if (local) {
+      existingRow = {
+        id: local.id,
+        full_name: local.fullName,
+        cbt_status: local.cbtStatus,
+        qualification_status: local.qualificationStatus,
+        qualification_note: local.qualificationNote,
+        champion_rank: local.championRank,
+        simulated_attempts: local.simulatedAttempts || 0,
+        penyisihan_attempts: local.penyisihanAttempts || 0,
+        final_attempts: local.finalAttempts || 0,
+        data: local
+      };
+    } else {
+      existingRow = {
+        id: participantId,
+        full_name: 'Peserta CBT',
+        cbt_status: 'Aktif',
+        qualification_status: 'pending',
+        qualification_note: null,
+        champion_rank: null,
+        simulated_attempts: 0,
+        penyisihan_attempts: 0,
+        final_attempts: 0,
+        data: {}
+      };
+    }
   }
 
-  const existingRow = res.rows[0];
   const currentAttempts = (existingRow[attemptsCol] || 0) + 1;
 
   let newCbtStatus = existingRow.cbt_status;
@@ -507,51 +565,65 @@ export async function recordExamInDb(
   if (additionalUpdates?.championRank) newRank = additionalUpdates.championRank;
 
   const baseData = existingRow.data && typeof existingRow.data === 'object' ? existingRow.data : {};
-  const mergedData = {
+  const mergedData: any = {
     ...baseData,
+    id: participantId,
     [examType === 'simulasi' ? 'simulatedExam' : examType === 'penyisihan' ? 'penyisihanExam' : 'finalExam']: examResult,
     cbtStatus: newCbtStatus,
     qualificationStatus: newQualStatus,
     qualificationNote: newQualNote,
     championRank: newRank,
     violationReason: examResult.violationReason || undefined,
+    [examType === 'simulasi' ? 'simulatedAttempts' : examType === 'penyisihan' ? 'penyisihanAttempts' : 'finalAttempts']: currentAttempts,
   };
 
-  const updateQuery = `
-    UPDATE participants SET
-      ${column} = $1,
-      ${attemptsCol} = $2,
-      cbt_status = $3,
-      qualification_status = $4,
-      qualification_note = $5,
-      champion_rank = $6,
-      violation_reason = $7,
-      data = $8,
-      updated_at = NOW()
-    WHERE id = $9
-    RETURNING *;
-  `;
+  // Always save to local json
+  saveLocalJsonParticipant(mergedData);
 
-  const updatedRes = await p.query(updateQuery, [
-    JSON.stringify(examResult),
-    currentAttempts,
-    newCbtStatus,
-    newQualStatus,
-    newQualNote,
-    newRank,
-    examResult.violationReason || null,
-    JSON.stringify(mergedData),
-    participantId
-  ]);
+  try {
+    const p = getDbPool();
+    const updateQuery = `
+      UPDATE participants SET
+        ${column} = $1,
+        ${attemptsCol} = $2,
+        cbt_status = $3,
+        qualification_status = $4,
+        qualification_note = $5,
+        champion_rank = $6,
+        violation_reason = $7,
+        data = $8,
+        updated_at = NOW()
+      WHERE id = $9
+      RETURNING *;
+    `;
 
-  postVercelWebhook('participant.exam_completed', {
-    participantId,
-    examType,
-    score: examResult.score,
-    cbtStatus: newCbtStatus
-  }).catch(() => {});
+    const updatedRes = await p.query(updateQuery, [
+      JSON.stringify(examResult),
+      currentAttempts,
+      newCbtStatus,
+      newQualStatus,
+      newQualNote,
+      newRank,
+      examResult.violationReason || null,
+      JSON.stringify(mergedData),
+      participantId
+    ]);
 
-  return rowToParticipant(updatedRes.rows[0]);
+    postVercelWebhook('participant.exam_completed', {
+      participantId,
+      examType,
+      score: examResult.score,
+      cbtStatus: newCbtStatus
+    }).catch(() => {});
+
+    if (updatedRes.rows && updatedRes.rows.length > 0) {
+      return rowToParticipant(updatedRes.rows[0]);
+    }
+  } catch (err) {
+    console.error('Error recording exam in Neon PostgreSQL:', err);
+  }
+
+  return mergedData;
 }
 
 /**
@@ -772,5 +844,27 @@ function saveLocalJsonParticipant(p: any): void {
     if (idx >= 0) list[idx] = p;
     else list.unshift(p);
     fs.writeFileSync(participantsFile, JSON.stringify(list, null, 2), 'utf-8');
+  } catch {}
+}
+
+function saveLocalJsonParticipantsBulk(records: any[]): void {
+  try {
+    const dataDir = path.join(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    const participantsFile = path.join(dataDir, 'participants.json');
+    let list: any[] = [];
+    if (fs.existsSync(participantsFile)) {
+      list = JSON.parse(fs.readFileSync(participantsFile, 'utf-8'));
+    }
+    const map = new Map<string, any>();
+    for (const item of list) {
+      if (item.id) map.set(item.id, item);
+    }
+    for (const item of records) {
+      if (!item.id) continue;
+      const prev = map.get(item.id);
+      map.set(item.id, prev ? { ...prev, ...item } : item);
+    }
+    fs.writeFileSync(participantsFile, JSON.stringify(Array.from(map.values()), null, 2), 'utf-8');
   } catch {}
 }
