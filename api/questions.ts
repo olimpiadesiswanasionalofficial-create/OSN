@@ -53,3 +53,11 @@ export default async function handler(req: any, res: any) {
 
   return res.status(405).json({ success: false, error: 'Method Not Allowed' });
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+};

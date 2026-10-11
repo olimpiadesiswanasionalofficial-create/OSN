@@ -33,7 +33,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Middleware to gracefully handle any payload too large or body parser errors
+app.use((err: any, _req: Request, res: Response, next: any) => {
+  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.name === 'PayloadTooLargeError')) {
+    console.warn('[Server] PayloadTooLarge caught and handled:', err.message);
+    return res.status(413).json({
+      success: false,
+      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 50MB).',
+      details: err.message
+    });
+  }
+  next(err);
+});
 
 // Enable CORS allowing https://osn-one.vercel.app and all production origins
 app.use((req: Request, res: Response, next) => {

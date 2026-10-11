@@ -1591,9 +1591,15 @@ export const AuthModal = ({
       } else if (type === 'payment') {
         const val = (customVal as any) || batchPaymentValue;
         updated.finalTicketPaymentStatus = val;
+        updated.isClosing = val === 'paid_closing';
         if (val === 'paid_closing') {
           updated.finalTicketPaidAt = new Date().toISOString();
           updated.finalTicketAmount = 99000;
+          updated.cbtStatus = 'Tiket Final Lunas (Closing BCA Rp 99.000)';
+        } else {
+          updated.finalTicketPaidAt = undefined;
+          updated.finalTicketAmount = 0;
+          updated.cbtStatus = 'Tercatat di Database';
         }
       } else if (type === 'qualification') {
         const val = (customVal as any) || batchQualificationValue;
@@ -2081,9 +2087,10 @@ export const AuthModal = ({
 
   const handleToggleFinalPaymentClosing = (participant: ParticipantRecord) => {
     try {
-      const isCurrentlyPaid = participant.finalTicketPaymentStatus === 'paid_closing';
+      const isCurrentlyPaid = Boolean(participant.finalTicketPaymentStatus === 'paid_closing' || participant.isClosing);
       const updated = updateParticipantField(participant.id, {
         finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
+        isClosing: !isCurrentlyPaid,
         finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
         finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
         cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing BCA Rp 99.000)'
@@ -2632,7 +2639,7 @@ export const AuthModal = ({
 
                   {/* ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya, peserta yang belum ditandai closing maka akses babak final masih di kunci */}
                   {activeStudent?.qualificationStatus === 'lolos' && (
-                    activeStudent.finalTicketPaymentStatus === 'paid_closing' ? (
+                    (activeStudent.isClosing || activeStudent.finalTicketPaymentStatus === 'paid_closing') ? (
                       <button
                         onClick={() => {
                           setShowSimulatedExam(true);
@@ -3254,8 +3261,8 @@ export const AuthModal = ({
                               Percobaan: {activeStudent.simulatedAttempts || 1}/2
                             </span>
                           </div>
-                          <span className="font-bold text-amber-900 font-mono text-xs">
-                            Nilai: {activeStudent.simulatedExam.score}/100
+                          <span className="font-bold text-emerald-800 text-xs">
+                            Selesai Dikerjakan
                           </span>
                         </div>
                       )}
@@ -3278,8 +3285,8 @@ export const AuthModal = ({
                               </span>
                             </div>
                           </div>
-                          <span className="font-black text-emerald-800 font-mono text-sm">
-                            Nilai: {activeStudent.penyisihanExam.score}/100
+                          <span className="font-bold text-emerald-800 text-xs">
+                            Tersimpan di Sistem
                           </span>
                         </div>
                       )}
@@ -3298,8 +3305,8 @@ export const AuthModal = ({
                               </span>
                             </div>
                           </div>
-                          <span className="font-black text-purple-900 font-mono text-sm">
-                            Nilai: {activeStudent.finalExam.score}/100
+                          <span className="font-bold text-purple-900 text-xs">
+                            Tersimpan di Sistem
                           </span>
                         </div>
                       )}
@@ -3373,131 +3380,6 @@ export const AuthModal = ({
                 </div>
 
               </div>
-
-              {/* FITUR UTAMA: SERTIFIKAT DIGITAL RESMI KELULUSAN & PRESTASI SISWA (PDF) */}
-              {activeStudent && (activeStudent.qualificationStatus === 'lolos' ||
-                (activeStudent.penyisihanExam && activeStudent.penyisihanExam.score >= 60) ||
-                activeStudent.finalExam ||
-                (activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai')) && (
-                <div className="bg-gradient-to-br from-amber-50/90 via-white to-amber-100/60 rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] shadow-lg space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[#D4AF37] text-white flex items-center justify-center shadow-md shrink-0">
-                        <Award className="w-7 h-7" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/90 px-2.5 py-0.5 rounded-full inline-block border border-amber-300">
-                            Dokumen Resmi Terverifikasi
-                          </span>
-                          <span className="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                            ✓ Terbit Otomatis
-                          </span>
-                        </div>
-                        <h4 className="text-base sm:text-lg font-black text-[#1A1615] mt-1">
-                          Sertifikat Digital Kelulusan & Prestasi Siswa
-                        </h4>
-                        <p className="text-xs text-[#756F68]">
-                          Telah diterbitkan secara resmi oleh <strong>LKP Prestasi Nusantara</strong> & Komite Nasional OSN 2026.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-xs">
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
-                        <span>STATUS: RESMI LULUS SELEKSI</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Rincian Data Peserta yang Terintegrasi di Sertifikat */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/95 p-4 rounded-2xl border border-amber-200 text-xs shadow-2xs">
-                    <div>
-                      <span className="text-[10px] font-bold text-[#756F68] block">Nama Lengkap Peserta:</span>
-                      <strong className="text-sm text-[#1A1615] block truncate mt-0.5">{activeStudent.fullName}</strong>
-                      <span className="text-[10px] text-neutral-500 font-mono">ID: {activeStudent.id}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] font-bold text-[#756F68] block">Asal Sekolah & Jenjang:</span>
-                      <strong className="text-xs text-[#1A1615] block truncate mt-0.5">{activeStudent.schoolName}</strong>
-                      <span className="text-[10px] text-neutral-500">{activeStudent.level.split('(')[0]}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] font-bold text-[#756F68] block">Mata Pelajaran Ujian:</span>
-                      <strong className="text-xs text-[#1A1615] block mt-0.5">
-                        {activeStudent.penyisihanExam?.subject || activeStudent.finalExam?.subject || activeStudent.subjects?.[0] || 'Matematika'}
-                      </strong>
-                      <span className="text-[10px] text-neutral-500">{activeStudent.cityProvince || 'Indonesia'}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] font-bold text-[#756F68] block">Nilai Ujian & Predikat:</span>
-                      <div className="flex items-baseline gap-1.5 mt-0.5">
-                        <span className="text-base font-black text-emerald-700 font-mono">
-                          {activeStudent.finalExam?.score ?? activeStudent.penyisihanExam?.score ?? activeStudent.simulatedExam?.score ?? 85} / 100
-                        </span>
-                        <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded">
-                          Grade A
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-emerald-800 font-semibold block truncate">
-                        {activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai'
-                          ? activeStudent.championRank
-                          : 'Lolos Babak Final (Finalis)'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Tombol Unduh Sertifikat & Notifikasi WhatsApp */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-                    <div className="text-[11px] text-[#756F68] flex items-center gap-1.5">
-                      <span className="text-emerald-700 font-bold">✓</span>
-                      <span>Format PDF A4 Landscape kualitas cetak resolusi tinggi lengkap dengan NIP & QR-Verification.</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const scoreVal = activeStudent.finalExam?.score ?? activeStudent.penyisihanExam?.score ?? activeStudent.simulatedExam?.score ?? 85;
-                          const subjectVal = activeStudent.penyisihanExam?.subject || activeStudent.finalExam?.subject || activeStudent.subjects?.[0] || 'Matematika';
-                          const rankTitle = activeStudent.championRank && activeStudent.championRank !== 'Belum Dinilai'
-                            ? activeStudent.championRank
-                            : 'Lolos Babak Final (Finalis Nasional)';
-                          generateDigitalCertificatePdf({
-                            student: activeStudent,
-                            score: scoreVal,
-                            subject: subjectVal,
-                            rankTitle,
-                            stageTitle: activeStudent.finalExam ? 'BABAK FINAL NASIONAL' : 'BABAK PENYISIHAN NASIONAL'
-                          });
-                        }}
-                        className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer border border-[#D4AF37]"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span>Unduh Sertifikat Digital Resmi (PDF)</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await triggerQualificationReleasedNotification(activeStudent, 'lolos');
-                          setAdminNotification(`Notifikasi WhatsApp kelulusan & link sertifikat berhasil dikirim ke ${activeStudent.whatsapp}!`);
-                          setTimeout(() => setAdminNotification(''), 4000);
-                        }}
-                        className="w-full sm:w-auto px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                        title="Kirim Notifikasi Kelulusan & Link Sertifikat ke WhatsApp Peserta"
-                      >
-                        <MessageCircle className="w-4 h-4 text-emerald-200" />
-                        <span>Kirim ke WA</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* PENGUMUMAN KELULUSAN & PEMBELIAN TIKET BABAK FINAL SECARA MANDIRI */}
               {activeStudent && (
@@ -3601,13 +3483,13 @@ export const AuthModal = ({
 
                         <div>
                           <h6 className="text-sm font-extrabold text-white">Status Tiket Final Anda:</h6>
-                          {activeStudent.finalTicketPaymentStatus === 'paid_closing' ? (
+                          {(activeStudent.isClosing || activeStudent.finalTicketPaymentStatus === 'paid_closing') ? (
                             <div className="mt-2 space-y-1">
                               <span className="inline-block px-3 py-1 rounded-full text-xs font-black bg-emerald-500 text-white shadow-sm">
                                 ✓ LUNAS (CLOSING TIKET FINAL)
                               </span>
                               <p className="text-[11px] text-emerald-300">
-                                Pembayaran Rp 99.000 telah terverifikasi oleh panitia. Anda berhak mengikuti Babak Final dan menerima sertifikat resmi.
+                                Pembayaran Rp 99.000 telah terverifikasi oleh panitia. Anda berhak mengikuti Babak Final.
                               </p>
                             </div>
                           ) : (
@@ -3652,7 +3534,7 @@ export const AuthModal = ({
                         </a>
 
                         {/* ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya, peserta yang belum ditandai closing maka akses babak final masih di kunci */}
-                        {activeStudent.finalTicketPaymentStatus === 'paid_closing' ? (
+                        {(activeStudent.isClosing || activeStudent.finalTicketPaymentStatus === 'paid_closing') ? (
                           <div className="p-3.5 rounded-2xl bg-amber-500/10 border-2 border-[#D4AF37] space-y-2 text-left">
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-black text-white flex items-center gap-1.5">
@@ -3698,18 +3580,6 @@ export const AuthModal = ({
                               🔒 Silakan transfer promo Rp 99.000 ke rekening BCA panitia dan konfirmasi WhatsApp di atas agar admin menandai Closing status Anda.
                             </div>
                           </div>
-                        )}
-
-                        {/* Sertifikat Babak Final jika sudah dinilai / juara */}
-                        {activeStudent.finalTicketPaymentStatus === 'paid_closing' && (
-                          <button
-                            type="button"
-                            onClick={() => generateFinalCertificatePdf({ student: activeStudent, rankTitle: activeStudent.championRank || 'Peserta Final' })}
-                            className="w-full py-2.5 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
-                          >
-                            <Download className="w-4 h-4" />
-                            <span>Unduh Sertifikat Final Resmi (PDF)</span>
-                          </button>
                         )}
                       </div>
                     </div>

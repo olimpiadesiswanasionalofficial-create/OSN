@@ -79,8 +79,21 @@ function normalizeName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
+export const CURRENT_DATASET_VERSION = 'osn_2026_dataset_v5_clean_spreadsheet_synced';
+
 export function getAllParticipants(): ParticipantRecord[] {
   try {
+    const syncVersion = localStorage.getItem('osn_dataset_sync_version');
+    if (syncVersion !== CURRENT_DATASET_VERSION) {
+      localStorage.setItem('osn_dataset_sync_version', CURRENT_DATASET_VERSION);
+      if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PARTICIPANTS));
+        } catch {}
+        return INITIAL_PARTICIPANTS;
+      }
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
@@ -93,45 +106,6 @@ export function getAllParticipants(): ParticipantRecord[] {
     }
     const parsed: ParticipantRecord[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Auto-heal: If local cache is missing exam histories, merge restored exam records from seed data
-      const hasAnyExams = parsed.some((p) => p.simulatedExam || p.penyisihanExam || p.finalExam);
-      if (!hasAnyExams && INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
-        const seedMap = new Map(INITIAL_PARTICIPANTS.map((p) => [p.id, p]));
-        const enriched: ParticipantRecord[] = parsed.map((p) => {
-          const s = seedMap.get(p.id);
-          if (!s) return p;
-          const mergedRecord: ParticipantRecord = {
-            ...p,
-            simulatedExam: p.simulatedExam || s.simulatedExam,
-            penyisihanExam: p.penyisihanExam || s.penyisihanExam,
-            finalExam: p.finalExam || s.finalExam,
-            simulatedAttempts: Math.max(p.simulatedAttempts || 0, s.simulatedAttempts || 0),
-            penyisihanAttempts: Math.max(p.penyisihanAttempts || 0, s.penyisihanAttempts || 0),
-            finalAttempts: Math.max(p.finalAttempts || 0, s.finalAttempts || 0),
-            qualificationStatus: (p.qualificationStatus === 'lolos' || s.qualificationStatus === 'lolos')
-              ? 'lolos'
-              : ((p.qualificationStatus && p.qualificationStatus !== 'pending')
-                  ? p.qualificationStatus
-                  : (s.qualificationStatus || 'pending')),
-            qualificationNote: p.qualificationNote || s.qualificationNote,
-            finalTicketPaymentStatus: (p.finalTicketPaymentStatus === 'paid_closing' || s.finalTicketPaymentStatus === 'paid_closing')
-              ? 'paid_closing'
-              : (p.finalTicketPaymentStatus || s.finalTicketPaymentStatus || 'unpaid'),
-            isClosing: Boolean(p.isClosing || s.isClosing || p.finalTicketPaymentStatus === 'paid_closing' || s.finalTicketPaymentStatus === 'paid_closing'),
-            championRank: (p.championRank && p.championRank !== 'Belum Dinilai' && p.championRank !== 'Belum Ditetapkan')
-              ? p.championRank
-              : (s.championRank || p.championRank),
-            recommendedChampionRank: p.recommendedChampionRank || s.recommendedChampionRank,
-            certificateIssuedDate: p.certificateIssuedDate || s.certificateIssuedDate,
-            cbtStatus: p.cbtStatus || s.cbtStatus,
-          };
-          return mergedRecord;
-        });
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
-        } catch {}
-        return enriched;
-      }
       return parsed;
     }
     if (INITIAL_PARTICIPANTS && INITIAL_PARTICIPANTS.length > 0) {
@@ -389,67 +363,12 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         const serverData: ParticipantRecord[] = json.data;
-        const local = getAllParticipants();
-
-        // Intelligent bidirectional merge: keep all participants, preserve completed exams & latest status
-        const mergedMap = new Map<string, ParticipantRecord>();
-
-        // 1. Local records first
-        for (const p of local) {
-          if (p.id) mergedMap.set(p.id, p);
-        }
-
-        // 2. Merge server records
-        for (const s of serverData) {
-          if (!s.id) continue;
-          const loc = mergedMap.get(s.id);
-          if (!loc) {
-            mergedMap.set(s.id, s);
-          } else {
-            mergedMap.set(s.id, {
-              ...loc,
-              ...s,
-              simulatedExam: s.simulatedExam?.score !== undefined ? ((loc.simulatedExam?.score !== undefined && loc.simulatedExam.score > s.simulatedExam.score) ? loc.simulatedExam : s.simulatedExam) : (s.simulatedExam || loc.simulatedExam),
-              penyisihanExam: s.penyisihanExam?.score !== undefined ? ((loc.penyisihanExam?.score !== undefined && loc.penyisihanExam.score > s.penyisihanExam.score) ? loc.penyisihanExam : s.penyisihanExam) : (s.penyisihanExam || loc.penyisihanExam),
-              finalExam: s.finalExam?.score !== undefined ? ((loc.finalExam?.score !== undefined && loc.finalExam.score > s.finalExam.score) ? loc.finalExam : s.finalExam) : (s.finalExam || loc.finalExam),
-              finalTicketPaymentStatus: (s.finalTicketPaymentStatus === 'paid_closing' || loc.finalTicketPaymentStatus === 'paid_closing') ? 'paid_closing' : (s.finalTicketPaymentStatus || loc.finalTicketPaymentStatus || 'unpaid'),
-              isClosing: Boolean(s.isClosing || loc.isClosing || s.finalTicketPaymentStatus === 'paid_closing' || loc.finalTicketPaymentStatus === 'paid_closing'),
-              violationReason: s.violationReason ?? loc.violationReason,
-              cbtStatus: s.cbtStatus || loc.cbtStatus,
-              qualificationStatus: (s.qualificationStatus === 'lolos' || loc.qualificationStatus === 'lolos') ? 'lolos' : ((s.qualificationStatus && s.qualificationStatus !== 'pending') ? s.qualificationStatus : (loc.qualificationStatus || s.qualificationStatus)),
-              championRank: (s.championRank && s.championRank !== 'Belum Dinilai' && s.championRank !== 'Belum Ditetapkan') ? s.championRank : (loc.championRank || s.championRank),
-              simulatedAttempts: Math.max(s.simulatedAttempts || 0, loc.simulatedAttempts || 0),
-              penyisihanAttempts: Math.max(s.penyisihanAttempts || 0, loc.penyisihanAttempts || 0),
-              finalAttempts: Math.max(s.finalAttempts || 0, loc.finalAttempts || 0),
-            });
-          }
-        }
-
-        // Push any local-only records to server in background
-        const serverIdSet = new Set(serverData.map(p => p.id));
-        const unsavedLocal = local.filter(l => l.id && !serverIdSet.has(l.id));
-        if (unsavedLocal.length > 0) {
-          fetch('/api/participants/bulk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ participants: unsavedLocal })
-          }).catch(() => {});
-        }
-
-        const mergedList = Array.from(mergedMap.values());
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedList));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
+          localStorage.setItem('osn_dataset_sync_version', CURRENT_DATASET_VERSION);
+        } catch {}
         safeDispatchParticipantsUpdated();
-        return mergedList;
-      } else if (json.success && Array.isArray(json.data) && json.data.length === 0) {
-        // Server database is empty -> push local seed participants to populate server!
-        const local = getAllParticipants();
-        if (local.length > 0) {
-          fetch('/api/participants/bulk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ participants: local })
-          }).catch(() => {});
-        }
+        return serverData;
       }
     }
   } catch (err) {
@@ -856,11 +775,23 @@ export function updateParticipantField(
   if (idx === -1) return null;
 
   const prev = all[idx];
-  // Safeguard: never wipe existing exam results, scores, or closing flag during partial updates
+  const nextIsClosing = fields.isClosing !== undefined
+    ? Boolean(fields.isClosing)
+    : (fields.finalTicketPaymentStatus !== undefined
+        ? (fields.finalTicketPaymentStatus === 'paid_closing')
+        : prev.isClosing);
+  const nextPaymentStatus = fields.finalTicketPaymentStatus !== undefined
+    ? fields.finalTicketPaymentStatus
+    : (fields.isClosing !== undefined
+        ? (fields.isClosing ? 'paid_closing' : 'unpaid')
+        : prev.finalTicketPaymentStatus);
+
+  // Safeguard: never wipe existing exam results, scores during partial updates
   all[idx] = {
     ...prev,
     ...fields,
-    isClosing: fields.isClosing ?? (fields.finalTicketPaymentStatus === 'paid_closing' ? true : prev.isClosing),
+    isClosing: nextIsClosing,
+    finalTicketPaymentStatus: nextPaymentStatus,
     simulatedExam: fields.simulatedExam !== undefined ? fields.simulatedExam : prev.simulatedExam,
     penyisihanExam: fields.penyisihanExam !== undefined ? fields.penyisihanExam : prev.penyisihanExam,
     finalExam: fields.finalExam !== undefined ? fields.finalExam : prev.finalExam,

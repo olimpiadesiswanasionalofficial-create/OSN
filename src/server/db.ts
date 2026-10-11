@@ -244,7 +244,9 @@ function rowToParticipant(row: any): any {
     certificateIssuedDate: row.certificate_issued_date || base.certificateIssuedDate,
     sessionQuestionIds: row.session_question_ids || base.sessionQuestionIds,
     violationReason: row.violation_reason || base.violationReason || row.final_exam?.violationReason || row.penyisihan_exam?.violationReason || undefined,
-    isClosing: Boolean(row.is_closing === true || row.final_ticket_payment_status === 'paid_closing' || base.isClosing),
+    isClosing: row.is_closing !== null && row.is_closing !== undefined
+      ? Boolean(row.is_closing)
+      : Boolean(row.final_ticket_payment_status === 'paid_closing' || base.isClosing),
   };
 }
 
@@ -362,15 +364,15 @@ export async function saveParticipantToDb(record: any): Promise<any> {
             final_exam = COALESCE(EXCLUDED.final_exam, participants.final_exam),
             simulated_attempts = GREATEST(COALESCE(EXCLUDED.simulated_attempts, 0), COALESCE(participants.simulated_attempts, 0)),
             penyisihan_attempts = GREATEST(COALESCE(EXCLUDED.penyisihan_attempts, 0), COALESCE(participants.penyisihan_attempts, 0)),
-            final_attempts = GREATEST(COALESCE(EXCLUDED.final_attempts, 0), COALESCE(participants.final_attempts, 0)),
-            qualification_status = CASE WHEN EXCLUDED.qualification_status = 'lolos' OR participants.qualification_status = 'lolos' THEN 'lolos' ELSE COALESCE(NULLIF(EXCLUDED.qualification_status, 'pending'), participants.qualification_status, EXCLUDED.qualification_status) END,
+            final_attempts = COALESCE(EXCLUDED.final_attempts, participants.final_attempts, 0),
+            qualification_status = COALESCE(EXCLUDED.qualification_status, participants.qualification_status),
             qualification_note = COALESCE(EXCLUDED.qualification_note, participants.qualification_note),
-            final_ticket_payment_status = CASE WHEN EXCLUDED.final_ticket_payment_status = 'paid_closing' OR participants.final_ticket_payment_status = 'paid_closing' THEN 'paid_closing' ELSE COALESCE(EXCLUDED.final_ticket_payment_status, participants.final_ticket_payment_status) END,
-            is_closing = CASE WHEN EXCLUDED.is_closing = TRUE OR participants.is_closing = TRUE OR EXCLUDED.final_ticket_payment_status = 'paid_closing' OR participants.final_ticket_payment_status = 'paid_closing' THEN TRUE ELSE COALESCE(EXCLUDED.is_closing, participants.is_closing, FALSE) END,
-            final_ticket_paid_at = COALESCE(EXCLUDED.final_ticket_paid_at, participants.final_ticket_paid_at),
+            final_ticket_payment_status = COALESCE(EXCLUDED.final_ticket_payment_status, participants.final_ticket_payment_status),
+            is_closing = COALESCE(EXCLUDED.is_closing, participants.is_closing, FALSE),
+            final_ticket_paid_at = EXCLUDED.final_ticket_paid_at,
             final_ticket_amount = COALESCE(EXCLUDED.final_ticket_amount, participants.final_ticket_amount),
-            champion_rank = CASE WHEN EXCLUDED.champion_rank IS NOT NULL AND EXCLUDED.champion_rank NOT IN ('Belum Dinilai', 'Belum Ditetapkan') THEN EXCLUDED.champion_rank ELSE COALESCE(participants.champion_rank, EXCLUDED.champion_rank) END,
-            recommended_champion_rank = COALESCE(EXCLUDED.recommended_champion_rank, participants.recommended_champion_rank),
+            champion_rank = COALESCE(EXCLUDED.champion_rank, participants.champion_rank),
+            recommended_champion_rank = EXCLUDED.recommended_champion_rank,
             certificate_issued_date = COALESCE(EXCLUDED.certificate_issued_date, participants.certificate_issued_date),
             session_question_ids = COALESCE(EXCLUDED.session_question_ids, participants.session_question_ids),
             violation_reason = COALESCE(EXCLUDED.violation_reason, participants.violation_reason),
@@ -477,18 +479,31 @@ export async function patchParticipantInDb(id: string, updates: any): Promise<an
     };
   }
 
+  const nextIsClosing = updates.isClosing !== undefined
+    ? Boolean(updates.isClosing)
+    : (updates.finalTicketPaymentStatus !== undefined
+        ? (updates.finalTicketPaymentStatus === 'paid_closing')
+        : existing.isClosing);
+
+  const nextPaymentStatus = updates.finalTicketPaymentStatus !== undefined
+    ? updates.finalTicketPaymentStatus
+    : (updates.isClosing !== undefined
+        ? (updates.isClosing ? 'paid_closing' : 'unpaid')
+        : existing.finalTicketPaymentStatus);
+
   const merged = {
     ...existing,
     ...updates,
     id: cleanId,
-    // Safeguard: preserve existing exam results, scores, and closing flag
+    // Safeguard: preserve existing exam results for simulasi & penyisihan
     simulatedExam: updates.simulatedExam !== undefined ? updates.simulatedExam : existing.simulatedExam,
     penyisihanExam: updates.penyisihanExam !== undefined ? updates.penyisihanExam : existing.penyisihanExam,
     finalExam: updates.finalExam !== undefined ? updates.finalExam : existing.finalExam,
-    isClosing: updates.isClosing !== undefined ? updates.isClosing : (updates.finalTicketPaymentStatus === 'paid_closing' ? true : existing.isClosing),
-    finalTicketPaymentStatus: (updates.finalTicketPaymentStatus === 'paid_closing' || existing.finalTicketPaymentStatus === 'paid_closing') ? 'paid_closing' : (updates.finalTicketPaymentStatus || existing.finalTicketPaymentStatus),
-    qualificationStatus: (updates.qualificationStatus === 'lolos' || existing.qualificationStatus === 'lolos') ? 'lolos' : (updates.qualificationStatus || existing.qualificationStatus),
-    championRank: (updates.championRank && updates.championRank !== 'Belum Dinilai' && updates.championRank !== 'Belum Ditetapkan') ? updates.championRank : (existing.championRank || updates.championRank),
+    finalAttempts: updates.finalAttempts !== undefined ? updates.finalAttempts : existing.finalAttempts,
+    isClosing: nextIsClosing,
+    finalTicketPaymentStatus: nextPaymentStatus,
+    qualificationStatus: updates.qualificationStatus !== undefined ? updates.qualificationStatus : existing.qualificationStatus,
+    championRank: updates.championRank !== undefined ? updates.championRank : existing.championRank,
   };
   return await saveParticipantToDb(merged);
 }
@@ -1125,16 +1140,28 @@ function saveLocalJsonParticipant(p: any): void {
     const idx = list.findIndex((item) => item.id === p.id);
     if (idx >= 0) {
       const prev = list[idx];
+      const nextIsClosing = p.isClosing !== undefined
+        ? Boolean(p.isClosing)
+        : (p.finalTicketPaymentStatus !== undefined
+            ? (p.finalTicketPaymentStatus === 'paid_closing')
+            : prev.isClosing);
+      const nextPaymentStatus = p.finalTicketPaymentStatus !== undefined
+        ? p.finalTicketPaymentStatus
+        : (p.isClosing !== undefined
+            ? (p.isClosing ? 'paid_closing' : 'unpaid')
+            : prev.finalTicketPaymentStatus);
+
       list[idx] = {
         ...prev,
         ...p,
         simulatedExam: p.simulatedExam !== undefined ? p.simulatedExam : prev.simulatedExam,
         penyisihanExam: p.penyisihanExam !== undefined ? p.penyisihanExam : prev.penyisihanExam,
         finalExam: p.finalExam !== undefined ? p.finalExam : prev.finalExam,
-        isClosing: p.isClosing !== undefined ? p.isClosing : (p.finalTicketPaymentStatus === 'paid_closing' ? true : prev.isClosing),
-        finalTicketPaymentStatus: (p.finalTicketPaymentStatus === 'paid_closing' || prev.finalTicketPaymentStatus === 'paid_closing') ? 'paid_closing' : (p.finalTicketPaymentStatus || prev.finalTicketPaymentStatus || 'unpaid'),
-        qualificationStatus: (p.qualificationStatus === 'lolos' || prev.qualificationStatus === 'lolos') ? 'lolos' : (p.qualificationStatus || prev.qualificationStatus),
-        championRank: (p.championRank && p.championRank !== 'Belum Dinilai' && p.championRank !== 'Belum Ditetapkan') ? p.championRank : (prev.championRank || p.championRank),
+        finalAttempts: p.finalAttempts !== undefined ? p.finalAttempts : (p.finalExam === null || p.finalExam === undefined ? 0 : prev.finalAttempts),
+        isClosing: nextIsClosing,
+        finalTicketPaymentStatus: nextPaymentStatus,
+        qualificationStatus: p.qualificationStatus !== undefined ? p.qualificationStatus : prev.qualificationStatus,
+        championRank: p.championRank !== undefined ? p.championRank : prev.championRank,
       };
     } else {
       list.unshift(p);
@@ -1160,16 +1187,28 @@ function saveLocalJsonParticipantsBulk(records: any[]): void {
       if (!item.id) continue;
       const prev = map.get(item.id);
       if (prev) {
+        const nextIsClosing = item.isClosing !== undefined
+          ? Boolean(item.isClosing)
+          : (item.finalTicketPaymentStatus !== undefined
+              ? (item.finalTicketPaymentStatus === 'paid_closing')
+              : prev.isClosing);
+        const nextPaymentStatus = item.finalTicketPaymentStatus !== undefined
+          ? item.finalTicketPaymentStatus
+          : (item.isClosing !== undefined
+              ? (item.isClosing ? 'paid_closing' : 'unpaid')
+              : prev.finalTicketPaymentStatus);
+
         map.set(item.id, {
           ...prev,
           ...item,
           simulatedExam: item.simulatedExam !== undefined ? item.simulatedExam : prev.simulatedExam,
           penyisihanExam: item.penyisihanExam !== undefined ? item.penyisihanExam : prev.penyisihanExam,
           finalExam: item.finalExam !== undefined ? item.finalExam : prev.finalExam,
-          isClosing: item.isClosing !== undefined ? item.isClosing : (item.finalTicketPaymentStatus === 'paid_closing' ? true : prev.isClosing),
-          finalTicketPaymentStatus: (item.finalTicketPaymentStatus === 'paid_closing' || prev.finalTicketPaymentStatus === 'paid_closing') ? 'paid_closing' : (item.finalTicketPaymentStatus || prev.finalTicketPaymentStatus || 'unpaid'),
-          qualificationStatus: (item.qualificationStatus === 'lolos' || prev.qualificationStatus === 'lolos') ? 'lolos' : (item.qualificationStatus || prev.qualificationStatus),
-          championRank: (item.championRank && item.championRank !== 'Belum Dinilai' && item.championRank !== 'Belum Ditetapkan') ? item.championRank : (prev.championRank || item.championRank),
+          finalAttempts: item.finalAttempts !== undefined ? item.finalAttempts : (item.finalExam === null || item.finalExam === undefined ? 0 : prev.finalAttempts),
+          isClosing: nextIsClosing,
+          finalTicketPaymentStatus: nextPaymentStatus,
+          qualificationStatus: item.qualificationStatus !== undefined ? item.qualificationStatus : prev.qualificationStatus,
+          championRank: item.championRank !== undefined ? item.championRank : prev.championRank,
         });
       } else {
         map.set(item.id, item);

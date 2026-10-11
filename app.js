@@ -25,7 +25,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Middleware to gracefully handle payload too large
+app.use((err, _req, res, next) => {
+  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.name === 'PayloadTooLargeError')) {
+    console.warn('[Server] PayloadTooLarge caught and handled:', err.message);
+    return res.status(413).json({
+      success: false,
+      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 50MB).',
+      details: err.message
+    });
+  }
+  next(err);
+});
 
 // Inisialisasi Google Gen AI Client dengan telemetry header
 const ai = new GoogleGenAI({

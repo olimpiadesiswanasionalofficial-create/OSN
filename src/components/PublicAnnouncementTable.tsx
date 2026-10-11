@@ -253,15 +253,13 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
                   <th className="py-4 px-3">Jenjang & Sekolah</th>
                   <th className="py-4 px-3">Kota / Provinsi</th>
                   <th className="py-4 px-3">Mata Pelajaran</th>
-                  <th className="py-4 px-3 text-center">Nilai CBT</th>
-                  <th className="py-4 px-3 text-center">Waktu Pengerjaan</th>
                   <th className="py-4 px-3 text-center">Status Kelulusan / Predikat</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E8E2D9]">
                 {paginatedList.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-neutral-500">
+                    <td colSpan={7} className="py-12 text-center text-neutral-500">
                       <p className="text-sm font-bold text-[#1A1615]">Tidak ditemukan peserta yang sesuai pencarian.</p>
                       <p className="text-xs mt-1">Coba periksa ejaan nama atau gunakan Nomor ID Peserta lengkap.</p>
                     </td>
@@ -271,7 +269,6 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
                     const rowNumber = (currentPage - 1) * itemsPerPage + idx + 1;
                     const exam = activeTab === 'penyisihan' ? p.penyisihanExam : p.finalExam;
                     const score = exam ? exam.score : (p.simulatedExam ? p.simulatedExam.score : 0);
-                    const duration = exam?.durationText || '18 Menit 25 Detik';
                     const isQualified = p.qualificationStatus === 'lolos' || score >= 60;
 
                     return (
@@ -324,29 +321,6 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
                           <div className="flex items-center gap-1 text-[11px] font-bold text-[#1A1615]">
                             <BookOpen className="w-3 h-3 text-[#D4AF37] shrink-0" />
                             <span>{exam?.subject || p.subjects?.[0] || 'Matematika'}</span>
-                          </div>
-                        </td>
-
-                        {/* Nilai CBT */}
-                        <td className="py-3 px-3 text-center whitespace-nowrap">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-black shadow-2xs ${
-                              score >= 85
-                                ? 'bg-emerald-600 text-white'
-                                : score >= 70
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
-                            }`}
-                          >
-                            {score} / 100
-                          </span>
-                        </td>
-
-                        {/* Waktu Pengerjaan */}
-                        <td className="py-3 px-3 text-center whitespace-nowrap">
-                          <div className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-700 bg-neutral-50 px-2 py-0.5 rounded-md border border-neutral-200">
-                            <Clock className="w-3 h-3 text-[#9E7D15]" />
-                            <span>{duration}</span>
                           </div>
                         </td>
 

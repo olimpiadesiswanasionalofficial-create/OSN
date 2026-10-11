@@ -671,9 +671,10 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                               if (onToggleFinalPaymentClosing) {
                                 onToggleFinalPaymentClosing(p);
                               } else {
-                                const isCurrentlyPaid = p.finalTicketPaymentStatus === 'paid_closing';
+                                const isCurrentlyPaid = Boolean(p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing);
                                 updateParticipantField(p.id, {
                                   finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
+                                  isClosing: !isCurrentlyPaid,
                                   finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
                                   finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
                                   cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing Rp 99.000)'
