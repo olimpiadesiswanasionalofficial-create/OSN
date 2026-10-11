@@ -7,6 +7,8 @@ import {
   recordExamInDb,
   patchParticipantInDb,
   resetParticipantInDb,
+  isQuotaError,
+  verifyFinalRoundExamAccess
 } from '../src/server/db.js';
 
 export default async function handler(req: any, res: any) {
@@ -247,7 +249,9 @@ export default async function handler(req: any, res: any) {
 
     return res.status(405).json({ success: false, error: 'Method Not Allowed' });
   } catch (error: any) {
-    console.error('API Error in /api/participants:', error);
+    if (!isQuotaError(error)) {
+      console.warn('API notice in /api/participants:', error?.message);
+    }
     return res.status(500).json({
       success: false,
       error: error?.message || 'Database server error',

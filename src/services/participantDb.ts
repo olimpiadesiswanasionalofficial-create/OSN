@@ -45,6 +45,7 @@ export interface ParticipantRecord {
   qualificationNote?: string;
   // Tiket Final Payment Closing Status
   finalTicketPaymentStatus?: 'unpaid' | 'pending_verification' | 'paid_closing';
+  isClosing?: boolean;
   finalTicketPaidAt?: string;
   finalTicketAmount?: number;
   // Final Award / Certificate Champion Title (DITENTUKAN OLEH ADMIN, SISTEM HANYA MEMBERIKAN REKOMENDASI)
@@ -55,7 +56,7 @@ export interface ParticipantRecord {
   sessionQuestionIds?: { [examKey: string]: string[] };
 }
 
-const STORAGE_KEY = 'osn_participants_database_2026';
+export const STORAGE_KEY = 'osn_participants_database_2026';
 
 import { INITIAL_PARTICIPANTS as SEED_PARTICIPANTS } from './participantSeedData';
 
@@ -369,13 +370,15 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
             mergedMap.set(s.id, {
               ...loc,
               ...s,
-              simulatedExam: s.simulatedExam || loc.simulatedExam,
-              penyisihanExam: s.penyisihanExam || loc.penyisihanExam,
-              finalExam: s.finalExam || loc.finalExam,
-              finalTicketPaymentStatus: s.finalTicketPaymentStatus || loc.finalTicketPaymentStatus,
+              simulatedExam: s.simulatedExam?.score !== undefined ? ((loc.simulatedExam?.score !== undefined && loc.simulatedExam.score > s.simulatedExam.score) ? loc.simulatedExam : s.simulatedExam) : (s.simulatedExam || loc.simulatedExam),
+              penyisihanExam: s.penyisihanExam?.score !== undefined ? ((loc.penyisihanExam?.score !== undefined && loc.penyisihanExam.score > s.penyisihanExam.score) ? loc.penyisihanExam : s.penyisihanExam) : (s.penyisihanExam || loc.penyisihanExam),
+              finalExam: s.finalExam?.score !== undefined ? ((loc.finalExam?.score !== undefined && loc.finalExam.score > s.finalExam.score) ? loc.finalExam : s.finalExam) : (s.finalExam || loc.finalExam),
+              finalTicketPaymentStatus: (s.finalTicketPaymentStatus === 'paid_closing' || loc.finalTicketPaymentStatus === 'paid_closing') ? 'paid_closing' : (s.finalTicketPaymentStatus || loc.finalTicketPaymentStatus || 'unpaid'),
+              isClosing: Boolean(s.isClosing || loc.isClosing || s.finalTicketPaymentStatus === 'paid_closing' || loc.finalTicketPaymentStatus === 'paid_closing'),
               violationReason: s.violationReason ?? loc.violationReason,
               cbtStatus: s.cbtStatus || loc.cbtStatus,
-              qualificationStatus: s.qualificationStatus && s.qualificationStatus !== 'pending' ? s.qualificationStatus : (loc.qualificationStatus || s.qualificationStatus),
+              qualificationStatus: (s.qualificationStatus === 'lolos' || loc.qualificationStatus === 'lolos') ? 'lolos' : ((s.qualificationStatus && s.qualificationStatus !== 'pending') ? s.qualificationStatus : (loc.qualificationStatus || s.qualificationStatus)),
+              championRank: (s.championRank && s.championRank !== 'Belum Dinilai' && s.championRank !== 'Belum Ditetapkan') ? s.championRank : (loc.championRank || s.championRank),
               simulatedAttempts: Math.max(s.simulatedAttempts || 0, loc.simulatedAttempts || 0),
               penyisihanAttempts: Math.max(s.penyisihanAttempts || 0, loc.penyisihanAttempts || 0),
               finalAttempts: Math.max(s.finalAttempts || 0, loc.finalAttempts || 0),
@@ -813,9 +816,15 @@ export function updateParticipantField(
   const idx = all.findIndex(p => p.id === participantId);
   if (idx === -1) return null;
 
+  const prev = all[idx];
+  // Safeguard: never wipe existing exam results, scores, or closing flag during partial updates
   all[idx] = {
-    ...all[idx],
-    ...fields
+    ...prev,
+    ...fields,
+    isClosing: fields.isClosing ?? (fields.finalTicketPaymentStatus === 'paid_closing' ? true : prev.isClosing),
+    simulatedExam: fields.simulatedExam !== undefined ? fields.simulatedExam : prev.simulatedExam,
+    penyisihanExam: fields.penyisihanExam !== undefined ? fields.penyisihanExam : prev.penyisihanExam,
+    finalExam: fields.finalExam !== undefined ? fields.finalExam : prev.finalExam,
   };
 
   try {
@@ -839,6 +848,7 @@ export function updateParticipantField(
 export function confirmFinalTicketPayment(participantId: string, amount: number = 99000): ParticipantRecord | null {
   return updateParticipantField(participantId, {
     finalTicketPaymentStatus: 'paid_closing',
+    isClosing: true,
     finalTicketPaidAt: new Date().toISOString(),
     finalTicketAmount: amount,
     cbtStatus: 'Tiket Final Lunas (Siap Ujian Final)'

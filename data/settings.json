@@ -1,0 +1,27 @@
+{
+  "schedule": {
+    "registrationOpenDate": "25 Agustus – 11 September 2026",
+    "registrationDesc": "Pendaftaran online mudah & praktis. Terbuka untuk seluruh siswa di Indonesia tanpa kuota zonasi.",
+    "penyisihanDate": "12 September 2026",
+    "penyisihanDesc": "Ujian online aman dari rumah via sistem CBT mutakhir anti-kecurangan. Penyisihan GRATIS untuk semua peserta.",
+    "finalDate": "19 September 2026",
+    "finalDesc": "Babak penentuan medalis nasional dan perebutan gelar Juara Umum OSN tingkat nasional.",
+    "announcementDate": "20 September 2026",
+    "announcementDesc": "Pengumuman resmi juara, penerbitan sertifikat QR-Code & pengiriman paket piala/medali fisik ke alamat pemenang."
+  },
+  "whatsapp_api": {
+    "provider": "fonnte",
+    "apiKey": "",
+    "senderNumber": "081234567890",
+    "isEnabled": true,
+    "autoNotifyRegistration": true,
+    "autoNotifyExamComplete": true,
+    "autoNotifyQualification": true
+  },
+  "meta_pixel": {
+    "pixelId": "",
+    "customScript": "",
+    "isEnabled": false
+  },
+  "gallery": {}
+}

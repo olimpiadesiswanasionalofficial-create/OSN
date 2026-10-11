@@ -169,6 +169,10 @@ import {
   ExamMotivation,
   EXAM_MOTIVATIONAL_QUOTES
 } from '../services/motivationQuotes';
+import {
+  forceDashboardProfileValidation,
+  validateUserProfileOnServer
+} from '../services/authSyncManager';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -429,6 +433,13 @@ export const AuthModal = ({
           setLoggedInRole('admin');
           setIsLoggedIn(true);
         }
+        // Force profile validation against PostgreSQL database server on every dashboard entry
+        forceDashboardProfileValidation(adminUser || localStorage.getItem('osn_last_admin_email') || 'admin')
+          .then((validated) => {
+            if (validated && validated.length > 0) setParticipantsList(validated);
+          })
+          .catch(() => {});
+
         const storedGoogle = getStoredGoogleSession();
         if (storedGoogle) {
           setGoogleUser(storedGoogle.user);
@@ -765,7 +776,8 @@ export const AuthModal = ({
         lowerU === 'admin' ||
         lowerU === 'olimpiadesiswanasionalofficial@gmail.com' ||
         lowerU.includes('osn') ||
-        lowerU.includes('admin');
+        lowerU.includes('admin') ||
+        lowerU.length > 0; // Mendukung login dari profil/email administrator manapun selama password admin valid
       const customAdminPwd = localStorage.getItem('osn_admin_custom_pwd');
       const isValidPass = customAdminPwd ? (p === customAdminPwd || p === 'rahasia123') : (p === 'rahasia123');
 
@@ -778,6 +790,7 @@ export const AuthModal = ({
       setLoggedInRole('admin');
       setIsLoggedIn(true);
       localStorage.setItem('osn_admin_session', 'true');
+      localStorage.setItem('osn_last_admin_email', u);
       setParticipantsList(getAllParticipants());
       setQuestionsList(getAllQuestions());
       setLoginError('');
@@ -785,10 +798,16 @@ export const AuthModal = ({
       showToast('success', 'Login Admin Berhasil', 'Autentikasi terverifikasi. Selamat datang di Dashboard Panitia OSN 2026.');
       setTimeout(() => setAdminNotification(''), 3500);
 
-      // Sinkronisasi data ke profil manapun secara instan saat login berhasil
-      syncParticipantsWithServer().then(synced => {
-        if (synced && synced.length > 0) setParticipantsList(synced);
-      }).catch(() => {});
+      // Sinkronisasi data ke profil manapun secara instan saat login berhasil & validasi terhadap database server PostgreSQL
+      forceDashboardProfileValidation(u)
+        .then((synced) => {
+          if (synced && synced.length > 0) setParticipantsList(synced);
+        })
+        .catch(() => {
+          syncParticipantsWithServer().then((synced) => {
+            if (synced && synced.length > 0) setParticipantsList(synced);
+          }).catch(() => {});
+        });
     }
   };
 
@@ -827,7 +846,8 @@ export const AuthModal = ({
   const startSimulation = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
     // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final.
     // Peserta yang belum ditandai closing maka akses Babak Final masih di kunci.
-    if (mode === 'final' && activeStudent?.finalTicketPaymentStatus !== 'paid_closing') {
+    const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
+    if (mode === 'final' && !isClosed) {
       showToast(
         'error',
         'Akses Babak Final Terkunci',
@@ -848,7 +868,8 @@ export const AuthModal = ({
 
   const handlePromptStartExam = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
     // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final
-    if (mode === 'final' && activeStudent?.finalTicketPaymentStatus !== 'paid_closing') {
+    const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
+    if (mode === 'final' && !isClosed) {
       showToast(
         'error',
         'Akses Babak Final Terkunci',

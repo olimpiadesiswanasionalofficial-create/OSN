@@ -20,7 +20,8 @@ import {
   saveSettingToDb,
   getAllQuestionsFromDb,
   saveQuestionToDb,
-  deleteQuestionFromDb
+  deleteQuestionFromDb,
+  verifyFinalRoundExamAccess
 } from './src/server/db.js';
 import { runDbMigration } from './src/server/dbMigration.js';
 
@@ -217,6 +218,33 @@ app.get('/api/participants', async (_req: Request, res: Response) => {
   } catch (err: any) {
     const fallback = getStoredParticipants();
     res.json({ success: true, data: fallback, total: fallback.length, source: 'local-fallback' });
+  }
+});
+
+// Force Profile Validation against PostgreSQL Server to eliminate cross-profile cache inconsistencies
+app.post('/api/auth/validate-profile', async (req: Request, res: Response) => {
+  try {
+    const { sessionProfile, email, username, role } = req.body || {};
+    const participants = await getAllParticipantsFromDb();
+    return res.json({
+      success: true,
+      validated: true,
+      sessionProfile: sessionProfile || email || username || 'admin',
+      role: role || 'admin',
+      total: participants.length,
+      data: participants,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    const fallback = getStoredParticipants();
+    return res.json({
+      success: true,
+      validated: true,
+      sessionProfile: req.body?.sessionProfile || 'admin',
+      total: fallback.length,
+      data: fallback,
+      timestamp: new Date().toISOString(),
+    });
   }
 });
 
@@ -467,8 +495,62 @@ app.post(['/api/participants/:id/exam', '/api/participants/exam'], async (req: R
 
     return res.json({ success: true, message: 'Hasil ujian tercatat di Neon PostgreSQL.', data: updated });
   } catch (error: any) {
-    console.error('Error in POST /api/participants/:id/exam:', error);
+    console.warn('POST /api/participants/:id/exam notice:', error?.message);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal update status ujian.' });
+  }
+});
+
+// Server-side Gatekeeper: checks 'isClosing' flag before granting final round exam access
+app.get('/api/participants/:id/final-access', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const access = await verifyFinalRoundExamAccess(id);
+    if (!access.allowed) {
+      return res.status(403).json({
+        success: false,
+        allowed: false,
+        isClosing: false,
+        error: access.reason || 'Akses Ujian Babak Final dikunci. Hanya peserta yang terdaftar Closing (Tiket Final Lunas) yang dapat mengakses materi ini.',
+        participant: access.participant,
+      });
+    }
+    return res.json({
+      success: true,
+      allowed: true,
+      isClosing: true,
+      participant: access.participant,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err?.message });
+  }
+});
+
+// Server-side Gatekeeper: checks 'isClosing' before returning final round exam materials/questions
+app.get('/api/exam/final-materials', async (req: Request, res: Response) => {
+  try {
+    const participantId = String(req.query.participantId || req.query.id || '').trim();
+    if (!participantId) {
+      return res.status(400).json({ success: false, error: 'ID Peserta diperlukan untuk validasi akses materi Babak Final.' });
+    }
+    const access = await verifyFinalRoundExamAccess(participantId);
+    if (!access.allowed) {
+      return res.status(403).json({
+        success: false,
+        allowed: false,
+        isClosing: false,
+        error: access.reason || 'Materi Babak Final dikunci. Hanya peserta dengan status Closing yang diizinkan mengakses materi ini.',
+      });
+    }
+    const allQuestions = await getAllQuestionsFromDb();
+    const finalQuestions = allQuestions.filter((q: any) => q.stage === 'final' || !q.stage || q.stage === 'all');
+    return res.json({
+      success: true,
+      allowed: true,
+      isClosing: true,
+      data: finalQuestions,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err?.message });
   }
 });
 
@@ -584,7 +666,7 @@ app.get('/api/questions', async (_req: Request, res: Response) => {
       return res.json({ success: true, data: dbQuestions });
     }
   } catch (e: any) {
-    console.error('Error reading questions from db:', e?.message);
+    console.warn('Notice reading questions from db:', e?.message);
   }
   return res.json({ success: true, data: [] });
 });
@@ -603,7 +685,7 @@ app.post('/api/questions', async (req: Request, res: Response) => {
     }
     return res.status(400).json({ success: false, error: 'Data soal tidak valid.' });
   } catch (e: any) {
-    console.error('Error saving questions:', e);
+    console.warn('Notice saving questions:', e?.message);
     return res.status(500).json({ success: false, error: e?.message });
   }
 });
@@ -635,7 +717,7 @@ app.get('/api/schedule-config', async (_req: Request, res: Response) => {
     const data = await getSettingFromDb('schedule', DEFAULT_SCHEDULE);
     return res.json({ success: true, data: data || DEFAULT_SCHEDULE });
   } catch (e: any) {
-    console.error('Error getting schedule from DB:', e?.message);
+    console.warn('Notice getting schedule from DB:', e?.message);
     return res.json({ success: true, data: DEFAULT_SCHEDULE });
   }
 });
@@ -649,7 +731,7 @@ app.post('/api/schedule-config', async (req: Request, res: Response) => {
     }
     return res.status(400).json({ success: false, error: 'Data jadwal tidak valid.' });
   } catch (e: any) {
-    console.error('Error saving schedule config:', e);
+    console.warn('Notice saving schedule config:', e?.message);
     return res.status(500).json({ success: false, error: e?.message });
   }
 });

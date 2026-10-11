@@ -28,6 +28,104 @@ export interface DatabaseEventScheduleSchema {
   updatedAt?: string;
 }
 
+export type SyncLogLevel = 'info' | 'warn' | 'error';
+export type SyncLogCategory = 'PROFILE_SWITCH' | 'RACE_CONDITION' | 'NETWORK_TIMEOUT' | 'CACHE_INVALIDATION' | 'SERVER_SYNC';
+
+export interface SyncAuditLog {
+  id: string;
+  timestamp: string;
+  level: SyncLogLevel;
+  category: SyncLogCategory;
+  profile: string;
+  sessionVersion: number;
+  message: string;
+  details?: any;
+}
+
+// Centralized logging buffer & race condition management
+const MAX_LOGS = 150;
+const syncAuditLogs: SyncAuditLog[] = [];
+const logListeners = new Set<(log: SyncAuditLog) => void>();
+let currentSessionVersion = 0;
+let currentActiveProfile = 'default_admin';
+
+export function getActiveSessionProfile(): string {
+  return currentActiveProfile;
+}
+
+export function getCurrentSessionVersion(): number {
+  return currentSessionVersion;
+}
+
+/**
+ * Safely switch active profile, incrementing session version to invalidate any stale concurrent requests.
+ */
+export function switchActiveSessionProfile(newProfile: string): number {
+  currentSessionVersion++;
+  const prev = currentActiveProfile;
+  currentActiveProfile = newProfile || 'admin';
+  logSyncEvent(
+    'info',
+    'PROFILE_SWITCH',
+    `Active profile switched from [${prev}] to [${currentActiveProfile}]. Session version updated to v${currentSessionVersion}.`,
+    { previousProfile: prev, newProfile: currentActiveProfile, sessionVersion: currentSessionVersion }
+  );
+  return currentSessionVersion;
+}
+
+/**
+ * Centralized logging mechanism for tracking profile switches, race conditions, and network timeouts
+ */
+export function logSyncEvent(
+  level: SyncLogLevel,
+  category: SyncLogCategory,
+  message: string,
+  details?: any,
+  profileOverride?: string
+): SyncAuditLog {
+  const entry: SyncAuditLog = {
+    id: `sync-log-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    timestamp: new Date().toISOString(),
+    level,
+    category,
+    profile: profileOverride || currentActiveProfile,
+    sessionVersion: currentSessionVersion,
+    message,
+    details,
+  };
+  syncAuditLogs.unshift(entry);
+  if (syncAuditLogs.length > MAX_LOGS) syncAuditLogs.pop();
+
+  if (level === 'error') {
+    console.error(`[ServerSyncManager:${category}]`, message, details || '');
+  } else if (level === 'warn') {
+    console.warn(`[ServerSyncManager:${category}]`, message, details || '');
+  }
+
+  logListeners.forEach((fn) => {
+    try {
+      fn(entry);
+    } catch {}
+  });
+
+  return entry;
+}
+
+export function getSyncAuditLogs(): SyncAuditLog[] {
+  return [...syncAuditLogs];
+}
+
+export function clearSyncAuditLogs(): void {
+  syncAuditLogs.length = 0;
+}
+
+export function subscribeSyncAuditLogs(listener: (log: SyncAuditLog) => void): () => void {
+  logListeners.add(listener);
+  return () => {
+    logListeners.delete(listener);
+  };
+}
+
 export interface DatabaseMetaPixelSchema {
   id?: string;
   pixelId: string;
@@ -74,20 +172,42 @@ export interface SyncStatusResult {
 }
 
 /**
- * Universal helper for cache-busted server requests
+ * Universal helper for cache-busted server requests with network timeout handling
+ * and race condition verification across profile sessions
  */
-export async function fetchServerState<T>(endpoint: string, fallback: T): Promise<T> {
+export async function fetchServerState<T>(
+  endpoint: string,
+  fallback: T,
+  timeoutMs: number = 8000
+): Promise<T> {
+  const versionAtStart = currentSessionVersion;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
     const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}_t=${Date.now()}`;
     const res = await fetch(url, {
       method: 'GET',
       cache: 'no-store',
+      signal: controller.signal,
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0',
       },
     });
+    clearTimeout(timer);
+
+    // Detect and resolve race conditions during cross-profile switching
+    if (versionAtStart !== currentSessionVersion) {
+      logSyncEvent(
+        'warn',
+        'RACE_CONDITION',
+        `Race condition resolved: discarded response from ${endpoint} because active profile changed (started v${versionAtStart}, now v${currentSessionVersion})`,
+        { endpoint, startedVersion: versionAtStart, currentVersion: currentSessionVersion, activeProfile: currentActiveProfile }
+      );
+      return fallback;
+    }
 
     if (res.ok) {
       const json = await res.json();
@@ -95,8 +215,18 @@ export async function fetchServerState<T>(endpoint: string, fallback: T): Promis
         return json.data as T;
       }
     }
-  } catch (err) {
-    console.warn(`[ServerSyncManager] Error fetching ${endpoint}:`, err);
+  } catch (err: any) {
+    clearTimeout(timer);
+    if (err?.name === 'AbortError') {
+      logSyncEvent(
+        'warn',
+        'NETWORK_TIMEOUT',
+        `Network timeout (${timeoutMs}ms) fetching ${endpoint}. Recovering database state cleanly.`,
+        { endpoint, timeoutMs, activeProfile: currentActiveProfile }
+      );
+    } else {
+      logSyncEvent('warn', 'SERVER_SYNC', `Network notice for ${endpoint}: ${err?.message}`, { endpoint, error: err?.message });
+    }
   }
   return fallback;
 }
