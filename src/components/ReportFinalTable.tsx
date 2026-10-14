@@ -475,7 +475,7 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                   const hasFinal = !!p.finalExam;
                   const score = p.finalExam?.score ?? 0;
                   const attempts = p.finalAttempts || (hasFinal ? 1 : 0);
-                  const isPaid = p.finalTicketPaymentStatus === 'paid_closing';
+                  const isPaid = Boolean(p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing);
 
                   // Rekomendasi sistem berdasarkan perolehan skor
                   const systemRecommendation = hasFinal
@@ -672,14 +672,31 @@ export const ReportFinalTable: React.FC<ReportFinalTableProps> = ({
                                 onToggleFinalPaymentClosing(p);
                               } else {
                                 const isCurrentlyPaid = Boolean(p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing);
+                                const nextIsClosing = !isCurrentlyPaid;
+                                const nextPaymentStatus = isCurrentlyPaid ? 'unpaid' : 'paid_closing';
+                                const nextPaidAt = isCurrentlyPaid ? undefined : new Date().toISOString();
+                                const nextAmount = isCurrentlyPaid ? 0 : 99000;
+                                const nextCbtStatus = isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing Rp 99.000)';
                                 updateParticipantField(p.id, {
-                                  finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
-                                  isClosing: !isCurrentlyPaid,
-                                  finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
-                                  finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
-                                  cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing Rp 99.000)'
+                                  finalTicketPaymentStatus: nextPaymentStatus,
+                                  isClosing: nextIsClosing,
+                                  finalTicketPaidAt: nextPaidAt,
+                                  finalTicketAmount: nextAmount,
+                                  cbtStatus: nextCbtStatus
                                 });
                                 safeDispatchParticipantsUpdated();
+                                fetch(`/api/participants/${encodeURIComponent(p.id)}`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    id: p.id,
+                                    finalTicketPaymentStatus: nextPaymentStatus,
+                                    isClosing: nextIsClosing,
+                                    finalTicketPaidAt: nextPaidAt,
+                                    finalTicketAmount: nextAmount,
+                                    cbtStatus: nextCbtStatus
+                                  })
+                                }).catch(() => {});
                               }
                             }}
                             className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer whitespace-nowrap shadow-2xs ${

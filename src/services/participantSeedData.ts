@@ -19,7 +19,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -41,7 +41,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -65,7 +65,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -88,7 +88,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -110,7 +110,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -133,7 +133,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -155,7 +155,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -178,7 +178,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -200,7 +200,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -224,7 +224,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -247,7 +247,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -270,7 +270,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -292,7 +292,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -315,7 +315,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -338,7 +338,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -362,7 +362,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -384,7 +384,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -406,7 +406,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -428,7 +428,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -451,7 +451,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -473,7 +473,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -495,7 +495,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -517,7 +517,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -539,7 +539,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -561,7 +561,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -583,7 +583,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -606,7 +606,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -630,7 +630,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -652,7 +652,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -674,7 +674,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -697,7 +697,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -719,7 +719,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -741,7 +741,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -763,7 +763,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -785,7 +785,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -807,7 +807,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -829,7 +829,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -851,7 +851,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -873,7 +873,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -895,7 +895,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -918,7 +918,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -942,7 +942,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -965,7 +965,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -987,7 +987,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1009,7 +1009,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1031,7 +1031,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1053,7 +1053,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1075,7 +1075,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1098,7 +1098,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1120,7 +1120,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1142,7 +1142,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1164,7 +1164,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1188,7 +1188,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1210,7 +1210,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1232,7 +1232,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1256,7 +1256,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1280,7 +1280,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1303,7 +1303,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1325,7 +1325,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1347,7 +1347,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1371,7 +1371,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1393,7 +1393,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1415,7 +1415,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1437,7 +1437,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1461,7 +1461,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1485,7 +1485,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1507,7 +1507,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1529,7 +1529,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1553,7 +1553,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1575,7 +1575,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1597,7 +1597,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1621,7 +1621,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1644,7 +1644,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1668,7 +1668,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1690,7 +1690,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1712,7 +1712,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1734,7 +1734,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1758,7 +1758,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1780,7 +1780,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1803,7 +1803,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1825,7 +1825,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1847,7 +1847,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1869,7 +1869,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1892,7 +1892,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1914,7 +1914,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1937,7 +1937,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1961,7 +1961,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -1983,7 +1983,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2005,7 +2005,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2027,7 +2027,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2050,7 +2050,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2072,7 +2072,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2095,7 +2095,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2118,7 +2118,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   },
@@ -2142,7 +2142,7 @@ export const INITIAL_PARTICIPANTS: ParticipantRecord[] = [
     "simulatedAttempts": 0,
     "penyisihanAttempts": 0,
     "finalAttempts": 0,
-    "qualificationStatus": "lolos",
+    "qualificationStatus": "pending",
     "finalTicketPaymentStatus": "unpaid",
     "isClosing": false
   }

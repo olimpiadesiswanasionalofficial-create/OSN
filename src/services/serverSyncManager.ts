@@ -11,7 +11,7 @@
 import { fetchEventScheduleFromServer, EventScheduleConfig } from './eventScheduleDb.js';
 import { fetchMetaPixelConfigFromServer, MetaPixelConfig } from './metaPixelService.js';
 import { fetchWhatsAppApiSettingsFromServer, WhatsAppApiSettings } from './whatsappApiService.js';
-import { syncParticipantsWithServer, ParticipantRecord } from './participantDb.js';
+import { syncParticipantsWithServer, saveAllParticipants, ParticipantRecord } from './participantDb.js';
 import { syncQuestionsWithServer, QuestionItem } from './cbtQuestionsDb.js';
 
 // PostgreSQL Aligned Schema Definitions
@@ -345,6 +345,30 @@ export async function syncAllWithServer(): Promise<SyncStatusResult> {
     status.participants = results[3].status === 'fulfilled';
     status.questions = results[4].status === 'fulfilled';
     status.migrationAligned = true;
+
+    // Requirement 17: Logika agar status kelulusan final secara otomatis disetel ke 'menunggu' jika peserta belum menempuh ujian babak final
+    if (results[3].status === 'fulfilled') {
+      const participants = results[3].value as ParticipantRecord[];
+      if (Array.isArray(participants) && participants.length > 0) {
+        let changed = false;
+        const normalized = participants.map((p) => {
+          const hasTakenFinal = Boolean(p.finalExam && p.finalExam.completedAt);
+          if (!hasTakenFinal) {
+            if (p.championRank && p.championRank !== 'Belum Dinilai' && p.championRank !== 'Belum Ditetapkan') {
+              changed = true;
+              return {
+                ...p,
+                championRank: 'Belum Ditetapkan' as const
+              };
+            }
+          }
+          return p;
+        });
+        if (changed) {
+          saveAllParticipants(normalized);
+        }
+      }
+    }
   } catch (err) {
     console.warn('[ServerSyncManager] Full sync warning:', err);
   }

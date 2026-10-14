@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Award,
   BookOpen,
@@ -23,6 +23,8 @@ import {
   X,
   ArrowRight,
   ExternalLink,
+  Copy,
+  Search,
   Flame,
   Clock,
   FileCheck,
@@ -164,6 +166,81 @@ export default function App() {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<any>(null);
   const [activeFaq, setActiveFaq] = useState(0);
+  const [faqSearch, setFaqSearch] = useState('');
+  const [copiedRecordId, setCopiedRecordId] = useState<string | null>(null);
+  const [copiedAllRegistration, setCopiedAllRegistration] = useState(false);
+
+  const filteredFaq = useMemo(() => {
+    if (!faqSearch.trim()) return APP_CONFIG.faq;
+    const term = faqSearch.toLowerCase().trim();
+    return APP_CONFIG.faq.filter(
+      (item: any) => item.q.toLowerCase().includes(term) || item.a.toLowerCase().includes(term)
+    );
+  }, [faqSearch]);
+
+  const handleCopySingleRecord = (rec: ParticipantRecord) => {
+    const text = [
+      `🎓 BUKTI PENDAFTARAN RESMI ${APP_CONFIG.brandName}`,
+      `Penyelenggara: ${APP_CONFIG.organizer}`,
+      `--------------------------------------`,
+      `ID Peserta: ${rec.id}`,
+      `Nama Lengkap: ${rec.fullName}`,
+      `Nama Orang Tua/Wali: ${rec.parentName || '-'}`,
+      `Jenjang: ${rec.level}`,
+      `Sekolah: ${rec.schoolName}`,
+      `Kabupaten/Kota: ${rec.cityProvince || 'Indonesia'}`,
+      `No. WhatsApp Login CBT: ${rec.whatsapp}`,
+      `Mata Pelajaran: ${(rec.subjects || ['Matematika']).join(', ')}`,
+      `Biaya Penyisihan: 100% GRATIS`,
+      `--------------------------------------`,
+      `*Gunakan nomor WhatsApp di atas untuk login ke Ruang Ujian Siswa (CBT).`
+    ].join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedRecordId(rec.id);
+      showToast('success', 'Rincian Disalin', `Data ${rec.fullName} berhasil disalin ke clipboard.`);
+      setTimeout(() => setCopiedRecordId(null), 3000);
+    }).catch(() => {
+      showToast('error', 'Gagal Menyalin', 'Tidak dapat menyalin ke clipboard.');
+    });
+  };
+
+  const handleCopyAllRecords = () => {
+    if (!registeredRecords || registeredRecords.length === 0) return;
+    const lines = [
+      `🎓 BUKTI RESMI PENDAFTARAN KOLEKTIF ${APP_CONFIG.brandName}`,
+      `Penyelenggara: ${APP_CONFIG.organizer}`,
+      `Orang Tua / Wali: ${registeredRecords[0]?.parentName || '-'}`,
+      `Total Siswa Terdaftar: ${registeredRecords.length} Anak`,
+      `Waktu Pendaftaran: ${new Date().toLocaleString('id-ID')}`,
+      `======================================`
+    ];
+
+    registeredRecords.forEach((rec, idx) => {
+      lines.push(
+        `\n[Anak Ke-${idx + 1}]`,
+        `ID Peserta: ${rec.id}`,
+        `Nama Siswa: ${rec.fullName}`,
+        `Jenjang: ${rec.level} (${rec.schoolName})`,
+        `Mata Pelajaran: ${(rec.subjects || ['Matematika']).join(', ')}`,
+        `No. WhatsApp CBT: ${rec.whatsapp}`
+      );
+    });
+
+    lines.push(
+      `\n======================================`,
+      `Status: Terverifikasi di Database Pusat`,
+      `Akses CBT Penyisihan: GRATIS`
+    );
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      setCopiedAllRegistration(true);
+      showToast('success', 'Seluruh Data Disalin!', 'Semua rincian pendaftaran berhasil disalin ke clipboard.');
+      setTimeout(() => setCopiedAllRegistration(false), 3000);
+    }).catch(() => {
+      showToast('error', 'Gagal Menyalin', 'Tidak dapat menyalin ke clipboard.');
+    });
+  };
 
   // Auth Modal State (Login User & Admin)
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -1047,7 +1124,7 @@ export default function App() {
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Card 1: Sertifikat Resmi Ber-QR */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] hover:border-[#9E7D15] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#D4AF37] hover:border-[#9E7D15] shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden cursor-pointer">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none transition-all group-hover:scale-110" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -1094,7 +1171,7 @@ export default function App() {
             </div>
 
             {/* Card 2: Jalur Prestasi Nasional / PPDB */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-emerald-500 hover:border-emerald-600 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-emerald-500 hover:border-emerald-600 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden cursor-pointer">
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full pointer-events-none transition-all group-hover:scale-110" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -1135,7 +1212,7 @@ export default function App() {
             </div>
 
             {/* Card 3: Babak Penyisihan 100% Bebas Biaya */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-[#855D05] flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
@@ -1175,7 +1252,7 @@ export default function App() {
             </div>
 
             {/* Card 4: Sistem CBT Anti-Kecurangan Mutakhir */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-[#0B132B] text-white flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
@@ -1215,7 +1292,7 @@ export default function App() {
             </div>
 
             {/* Card 5: Medali Logam Lapis Emas & Piala Kejuaraan */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#855D05] flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
@@ -1255,7 +1332,7 @@ export default function App() {
             </div>
 
             {/* Card 6: Pendampingan & Laporan Hasil Komprehensif */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between group cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
@@ -1353,43 +1430,70 @@ export default function App() {
           </div>
 
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {APP_CONFIG.educationLevels.map((lvl) => (
-              <div
-                key={lvl.id}
-                className="bg-[#FAF8F5] rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:border-[#D4AF37] hover:shadow-lg transition-all space-y-4 flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold px-3 py-1 rounded-full text-white" style={{ backgroundColor: lvl.color }}>
-                      {lvl.categoryName.split(':')[0]}
-                    </span>
-                    <span className="text-xs font-bold text-[#756F68]">{lvl.ageRange}</span>
+            {APP_CONFIG.educationLevels.map((lvl) => {
+              // Unique icon & theme configuration per education level card
+              const isPaud = lvl.id === 'paud-tk';
+              const isSd = lvl.id === 'sd-mi';
+              const LevelIcon = isPaud ? Sparkles : isSd ? GraduationCap : Trophy;
+              const iconBoxClass = isPaud
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs'
+                : isSd
+                ? 'bg-blue-50 text-blue-600 border border-blue-200 shadow-xs'
+                : 'bg-amber-50 text-amber-600 border border-amber-200 shadow-xs';
+              const badgeBorderClass = isPaud
+                ? 'border-emerald-300'
+                : isSd
+                ? 'border-blue-300'
+                : 'border-amber-300';
+
+              return (
+                <div
+                  key={lvl.id}
+                  className={`bg-[#FAF8F5] rounded-3xl p-6 sm:p-7 border border-[#E8E2D9] hover:${badgeBorderClass} hover:shadow-xl transition-all space-y-4 flex flex-col justify-between group`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 ${iconBoxClass}`}>
+                        <LevelIcon className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-bold text-[#756F68] bg-white px-3 py-1 rounded-full border border-[#E8E2D9]">
+                        {lvl.ageRange}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span
+                        className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white inline-block shadow-2xs"
+                        style={{ backgroundColor: lvl.color }}
+                      >
+                        {lvl.categoryName.split(':')[0]}
+                      </span>
+                      <h3 className="text-xl font-extrabold text-[#1A1615]">
+                        {lvl.categoryName.split(':')[1] || lvl.categoryName}
+                      </h3>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-white border border-[#E8E2D9] text-xs font-semibold text-[#0B132B] shadow-2xs">
+                      "{lvl.motto}"
+                    </div>
+
+                    <p className="text-xs text-[#66615B] leading-relaxed">
+                      Terbuka untuk seluruh siswa di jenjang ini. Babak penyisihan dilaksanakan secara online dari rumah dengan sistem CBT interaktif.
+                    </p>
                   </div>
-                  
-                  <h3 className="text-xl font-extrabold text-[#1A1615]">
-                    {lvl.categoryName.split(':')[1] || lvl.categoryName}
-                  </h3>
 
-                  <div className="p-3 rounded-xl bg-white border border-[#E8E2D9] text-xs font-semibold text-[#0B132B]">
-                    "{lvl.motto}"
+                  <div className="pt-4 border-t border-[#E8E2D9]">
+                    <button
+                      onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      <span>Daftar Jenjang Ini (Gratis)</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-
-                  <p className="text-xs text-[#66615B] leading-relaxed">
-                    Terbuka untuk seluruh siswa di jenjang ini. Babak penyisihan dilaksanakan secara online dari rumah dengan sistem CBT interaktif.
-                  </p>
                 </div>
-
-                <div className="pt-4 border-t border-[#E8E2D9]">
-                  <button
-                    onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Daftar Jenjang Ini (Gratis)</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
         </div>
@@ -1812,37 +1916,86 @@ export default function App() {
             </p>
           </div>
 
-          <div className="mt-12 space-y-3">
-            {APP_CONFIG.faq.map((item, idx) => {
-              const isOpen = activeFaq === idx;
-              return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-[#E8E2D9] overflow-hidden bg-[#FAF8F5] transition-all"
+          {/* Search Bar FAQ */}
+          <div className="mt-8 max-w-lg mx-auto">
+            <div className="relative">
+              <Search className="w-4 h-4 text-[#756F68] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={faqSearch}
+                onChange={(e) => {
+                  setFaqSearch(e.target.value);
+                  setActiveFaq(0);
+                }}
+                placeholder="Cari FAQ (misal: gratis, sertifikat, jadwal, biaya, medali)..."
+                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-[#FAF8F5] border-2 border-[#E8E2D9] focus:border-[#D4AF37] focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1A1615] placeholder:text-[#9E978E] shadow-xs transition-all"
+              />
+              {faqSearch && (
+                <button
+                  type="button"
+                  onClick={() => setFaqSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                  title="Hapus pencarian"
                 >
-                  <button
-                    onClick={() => setActiveFaq(isOpen ? -1 : idx)}
-                    className="w-full p-5 text-left flex items-center justify-between gap-4 focus:outline-none"
-                  >
-                    <span className="text-xs sm:text-sm font-bold text-[#1A1615]">
-                      {item.q}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-[#D4AF37] transition-transform duration-300 shrink-0 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-5 text-xs sm:text-sm text-[#554E46] leading-relaxed border-t border-[#E8E2D9]/60 pt-4 bg-white">
-                      {item.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            {faqSearch && (
+              <p className="text-[11px] text-center text-[#756F68] mt-2">
+                Menampilkan <strong>{filteredFaq.length}</strong> hasil untuk "{faqSearch}"
+              </p>
+            )}
           </div>
+
+          {filteredFaq.length === 0 ? (
+            <div className="mt-8 p-8 text-center bg-[#FAF8F5] rounded-3xl border border-[#E8E2D9] space-y-3">
+              <HelpCircle className="w-8 h-8 text-[#D4AF37] mx-auto opacity-70" />
+              <h4 className="text-sm font-bold text-[#1A1615]">Pertanyaan Tidak Ditemukan</h4>
+              <p className="text-xs text-[#756F68] max-w-md mx-auto">
+                Tidak ada pertanyaan yang sesuai dengan "{faqSearch}". Silakan tanyakan langsung ke Panitia via WhatsApp.
+              </p>
+              <button
+                type="button"
+                onClick={() => setFaqSearch('')}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-colors cursor-pointer"
+              >
+                Tampilkan Semua Pertanyaan
+              </button>
+            </div>
+          ) : (
+            <div className="mt-8 space-y-3">
+              {filteredFaq.map((item: any, idx: number) => {
+                const isOpen = activeFaq === idx;
+                return (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-[#E8E2D9] overflow-hidden bg-[#FAF8F5] transition-all"
+                  >
+                    <button
+                      onClick={() => setActiveFaq(isOpen ? -1 : idx)}
+                      className="w-full p-5 text-left flex items-center justify-between gap-4 focus:outline-none cursor-pointer"
+                    >
+                      <span className="text-xs sm:text-sm font-bold text-[#1A1615]">
+                        {item.q}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-[#D4AF37] transition-transform duration-300 shrink-0 ${
+                          isOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+
+                    {isOpen && (
+                      <div className="px-5 pb-5 text-xs sm:text-sm text-[#554E46] leading-relaxed border-t border-[#E8E2D9]/60 pt-4 bg-white">
+                        {item.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
         </div>
       </section>
@@ -2374,6 +2527,35 @@ export default function App() {
                     </p>
                   </div>
 
+                  {/* Copy All Registration Button Banner */}
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-left">
+                    <div>
+                      <span className="text-xs font-bold text-amber-950 block">
+                        Simpan Bukti & Akun Login Ujian
+                      </span>
+                      <span className="text-[11px] text-amber-800">
+                        Salin ringkasan data pendaftaran untuk disimpan ke catatan atau chat keluarga.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyAllRecords}
+                      className="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+                    >
+                      {copiedAllRegistration ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Tersalin ke Clipboard!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Salin Seluruh Rincian Siswa</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
                   {/* List of Registered Children Credentials */}
                   <div className="space-y-3">
                     {registeredRecords.map((rec, rIdx) => (
@@ -2386,9 +2568,23 @@ export default function App() {
                             <User className="w-3.5 h-3.5 text-[#D4AF37]" />
                             Data Terdaftar (Anak Ke-{rIdx + 1}): {rec.fullName}
                           </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
-                            {rec.id}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                              {rec.id}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopySingleRecord(rec)}
+                              className="p-1 rounded-md text-[#756F68] hover:text-[#1A1615] hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                              title="Salin data siswa ini"
+                            >
+                              {copiedRecordId === rec.id ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5 text-[#756F68]" />
+                              )}
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
@@ -2419,15 +2615,34 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-[#E8E2D9] flex items-center justify-between text-[11px]">
-                          <button
-                            type="button"
-                            onClick={() => openLoginWithRegisteredData(rec.fullName, rec.whatsapp)}
-                            className="text-xs font-bold text-[#9E7D15] hover:text-[#7A6110] underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <LogIn className="w-3 h-3" />
-                            <span>Buka CBT Untuk Siswa Ini &rarr;</span>
-                          </button>
+                        <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => openLoginWithRegisteredData(rec.fullName, rec.whatsapp)}
+                              className="text-xs font-bold text-[#9E7D15] hover:text-[#7A6110] underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <LogIn className="w-3 h-3" />
+                              <span>Buka CBT Untuk Siswa Ini &rarr;</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopySingleRecord(rec)}
+                              className="text-xs font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 cursor-pointer bg-white px-2 py-0.5 rounded-lg border border-neutral-300 hover:border-neutral-400 transition-colors"
+                            >
+                              {copiedRecordId === rec.id ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <span className="text-emerald-700 font-bold">Tersalin</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 text-neutral-500" />
+                                  <span>Salin</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                           <span className="text-emerald-700 font-bold">Penyisihan 100% GRATIS</span>
                         </div>
                       </div>

@@ -196,7 +196,7 @@ export function mapRowsToParticipants(rows: Record<string, any>[]): { participan
       subjects: subjects,
       registeredAt: new Date().toISOString(),
       cbtStatus: statusVal || 'Aktif & Siap Ujian (Tercatat di Database)',
-      qualificationStatus: (qualVal.toLowerCase().includes('lolos') || (scorePenyisihanVal && Number(scorePenyisihanVal) >= 60))
+      qualificationStatus: qualVal.toLowerCase().includes('lolos')
         ? 'lolos'
         : (qualVal.toLowerCase().includes('tidak') ? 'tidak_lolos' : 'pending'),
       finalTicketPaymentStatus: paymentVal.toLowerCase().includes('lunas') || paymentVal.toLowerCase().includes('closing')
@@ -214,7 +214,7 @@ export function mapRowsToParticipants(rows: Record<string, any>[]): { participan
         score: sc,
         totalQuestions: 20,
         completedAt: new Date().toISOString(),
-        status: sc >= 60 ? 'Selesai Simulasi (Lulus)' : 'Selesai Simulasi'
+        status: 'Selesai Simulasi'
       };
     }
 
@@ -225,9 +225,9 @@ export function mapRowsToParticipants(rows: Record<string, any>[]): { participan
         score: sc,
         totalQuestions: 20,
         completedAt: new Date().toISOString(),
-        status: sc >= 60 ? 'Selesai Babak Penyisihan (Lolos ke Final)' : 'Selesai Babak Penyisihan'
+        status: 'Selesai Babak Penyisihan (Menunggu Penetapan Panitia)'
       };
-      if (sc >= 60) {
+      if (qualVal.toLowerCase().includes('lolos')) {
         participant.qualificationStatus = 'lolos';
         participant.qualificationNote = 'Dinyatakan Lolos ke Babak Final';
       }

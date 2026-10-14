@@ -59,9 +59,9 @@ export async function exportLolosPenyisihanReportPdf(participants: ParticipantRe
   doc.setTextColor(212, 175, 55);
   doc.text(`Penyelenggara: ${APP_CONFIG.organizer} · Tanggal Terbit: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 25, { align: 'center' });
 
-  // Filter only qualified or high-scoring participants
+  // Filter only officially qualified participants (strictly qualificationStatus === 'lolos')
   const lolosList = participants.filter(
-    p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60) || (!p.qualificationStatus && (p.simulatedExam?.score || 0) >= 70)
+    p => p.qualificationStatus === 'lolos'
   );
   const displayList = lolosList.length > 0 ? lolosList : participants.slice(0, 50);
 
@@ -524,5 +524,200 @@ export async function exportSimulasiReportPdf(participants: ParticipantRecord[])
   doc.text('Direktur LKP Prestasi Nusantara', signX, currentY + 27, { align: 'center' });
 
   const filename = `Laporan_Simulasi_CBT_OSN_2026_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(filename);
+}
+
+/**
+ * 4. LAPORAN REKAPITULASI PESERTA PER JENJANG PENDIDIKAN (PAUD/TK, SD/MI, SMP/MTs)
+ * Fitur Admin Panitia untuk Mencetak Laporan Rekapitulasi Peserta Resmi Format PDF
+ */
+export async function exportRekapitulasiPerJenjangReportPdf(
+  participants: ParticipantRecord[],
+  filterLevel: string = 'Semua'
+): Promise<void> {
+  const logos = await getOfficialLogosForPdf();
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const pageWidth = 297;
+  const pageHeight = 210;
+
+  // Header Banner
+  doc.setFillColor(26, 22, 21);
+  doc.rect(0, 0, pageWidth, 30, 'F');
+
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(1.2);
+  doc.line(0, 30, pageWidth, 30);
+
+  // Logo 1: Logo OSN
+  if (logos.logoOsn) {
+    try {
+      doc.addImage(logos.logoOsn, 'PNG', 12, 4, 22, 22);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo OSN:', e);
+    }
+  }
+
+  // Logo 2: Logo LKP
+  if (logos.logoLkp) {
+    try {
+      doc.addImage(logos.logoLkp, 'PNG', pageWidth - 32, 4, 20, 22);
+    } catch (e) {
+      console.warn('Gagal menambahkan logo LKP:', e);
+    }
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(255, 242, 178);
+  doc.text('LAPORAN REKAPITULASI RESMI PESERTA PER JENJANG PENDIDIKAN', pageWidth / 2, 11, { align: 'center' });
+
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  const subtitleLevel = filterLevel !== 'Semua' ? `JENJANG: ${filterLevel.toUpperCase()}` : 'SELURUH JENJANG PENDIDIKAN (PAUD/TK, SD/MI, SMP/MTs)';
+  doc.text(`OLIMPIADE SISWA NASIONAL (OSN 2026) · ${subtitleLevel}`, pageWidth / 2, 18, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(212, 175, 55);
+  doc.text(`Penyelenggara: ${APP_CONFIG.organizer} · Tanggal Rekapitulasi: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, pageWidth / 2, 25, { align: 'center' });
+
+  // Filter participants by level
+  const filtered = participants.filter(p => {
+    if (filterLevel === 'Semua') return true;
+    return (p.level || '').toLowerCase().includes(filterLevel.toLowerCase());
+  });
+
+  // Calculate statistics per level
+  const totalPaud = participants.filter(p => (p.level || '').toLowerCase().includes('paud') || (p.level || '').toLowerCase().includes('tk')).length;
+  const totalSd = participants.filter(p => (p.level || '').toLowerCase().includes('sd') || (p.level || '').toLowerCase().includes('mi')).length;
+  const totalSmp = participants.filter(p => (p.level || '').toLowerCase().includes('smp') || (p.level || '').toLowerCase().includes('mts')).length;
+
+  let currentY = 36;
+
+  // Summary Stat Bar
+  doc.setFillColor(254, 243, 199);
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(12, currentY, pageWidth - 24, 10, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text(`Total Terdata: ${filtered.length} Peserta`, 16, currentY + 6.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`|  PAUD/TK (Kat. A): ${totalPaud}  |  SD/MI (Kat. B): ${totalSd}  |  SMP/MTs (Kat. C): ${totalSmp}  |  Lolos Final: ${filtered.filter(p => p.qualificationStatus === 'lolos').length}  |  Closing: ${filtered.filter(p => p.isClosing || p.finalTicketPaymentStatus === 'paid_closing').length}`, 65, currentY + 6.5);
+
+  currentY += 14;
+
+  const renderTableHeader = (y: number) => {
+    doc.setFillColor(245, 243, 238);
+    doc.rect(12, y, pageWidth - 24, 8, 'F');
+    doc.setDrawColor(212, 175, 55);
+    doc.setLineWidth(0.4);
+    doc.rect(12, y, pageWidth - 24, 8, 'D');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(26, 22, 21);
+
+    doc.text('No', 15, y + 5.5);
+    doc.text('ID Peserta', 25, y + 5.5);
+    doc.text('Nama Lengkap Siswa', 65, y + 5.5);
+    doc.text('Jenjang', 125, y + 5.5);
+    doc.text('Asal Sekolah', 155, y + 5.5);
+    doc.text('Kota/Provinsi', 205, y + 5.5);
+    doc.text('Mapel Diikuti', 245, y + 5.5);
+    doc.text('Status Kelulusan', 272, y + 5.5);
+  };
+
+  renderTableHeader(currentY);
+  currentY += 9;
+
+  const displayList = filtered.slice(0, 100);
+
+  displayList.forEach((p, idx) => {
+    if (currentY > pageHeight - 32) {
+      doc.addPage();
+      currentY = 15;
+      renderTableHeader(currentY);
+      currentY += 9;
+    }
+
+    if (idx % 2 === 0) {
+      doc.setFillColor(255, 255, 255);
+    } else {
+      doc.setFillColor(250, 249, 246);
+    }
+    doc.rect(12, currentY, pageWidth - 24, 7.5, 'F');
+    doc.setDrawColor(230, 225, 215);
+    doc.line(12, currentY + 7.5, pageWidth - 12, currentY + 7.5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(40, 40, 40);
+
+    doc.text(String(idx + 1), 15, currentY + 5);
+    doc.setFont('courier', 'bold');
+    doc.text(p.id, 25, currentY + 5);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(doc.splitTextToSize(p.fullName, 55)[0], 65, currentY + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text((p.level || '-').slice(0, 16), 125, currentY + 5);
+    doc.text(doc.splitTextToSize(p.schoolName || '-', 45)[0], 155, currentY + 5);
+    doc.text(doc.splitTextToSize(p.cityProvince || '-', 35)[0], 205, currentY + 5);
+    doc.text((p.subjects || ['Matematika']).join(', ').slice(0, 18), 245, currentY + 5);
+
+    const isLolos = p.qualificationStatus === 'lolos';
+    const qualText = isLolos ? 'LOLOS FINAL' : (p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'MENUNGGU');
+    doc.setTextColor(isLolos ? 5 : 120, isLolos ? 150 : 80, isLolos ? 105 : 30);
+    doc.setFont('helvetica', 'bold');
+    doc.text(qualText, 272, currentY + 5);
+
+    currentY += 8;
+  });
+
+  // Bagian Pengesahan & Tanda Tangan pada Halaman Terakhir
+  if (currentY > pageHeight - 45) {
+    doc.addPage();
+    currentY = 25;
+  } else {
+    currentY += 6;
+  }
+
+  const signX = pageWidth - 65;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(50, 50, 50);
+  doc.text('Mengetahui & Mengesahkan,', signX, currentY, { align: 'center' });
+  doc.text('Panitia Pelaksana OSN 2026', signX, currentY + 5, { align: 'center' });
+
+  // Logo 3: Stempel Resmi LKP
+  if (logos.stempelLkp) {
+    try {
+      doc.addImage(logos.stempelLkp, 'PNG', signX - 12, currentY + 6, 24, 24);
+    } catch (e) {
+      console.warn('Gagal menambahkan stempel LKP:', e);
+    }
+  }
+
+  doc.setDrawColor(180, 180, 180);
+  doc.setLineWidth(0.4);
+  doc.line(signX - 30, currentY + 23, signX + 30, currentY + 23);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(26, 22, 21);
+  doc.text('Direktur LKP Prestasi Nusantara', signX, currentY + 27, { align: 'center' });
+
+  const safeLevelName = filterLevel.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `Rekapitulasi_Peserta_${safeLevelName}_OSN_2026_${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
 }

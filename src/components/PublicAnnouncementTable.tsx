@@ -17,11 +17,13 @@ import { ParticipantRecord } from '../services/participantDb';
 
 interface PublicAnnouncementTableProps {
   participants: ParticipantRecord[];
+  isLoading?: boolean;
   onOpenLogin?: () => void;
 }
 
 export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = ({
   participants,
+  isLoading = false,
   onOpenLogin
 }) => {
   const [activeTab, setActiveTab] = useState<'penyisihan' | 'final'>('penyisihan');
@@ -36,7 +38,7 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
     return participants.filter(p => {
       // Tab 1: Babak Penyisihan (Only qualified or completed penyisihan)
       if (activeTab === 'penyisihan') {
-        const isQualified = p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60);
+        const isQualified = p.qualificationStatus === 'lolos';
         if (!isQualified && !p.penyisihanExam) return false;
       } else {
         // Tab 2: Babak Final (Only those with finalExam or championRank)
@@ -87,7 +89,7 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
   }, [filteredList, currentPage]);
 
   const totalQualifiedPenyisihan = useMemo(() => {
-    return participants.filter(p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60)).length;
+    return participants.filter(p => p.qualificationStatus === 'lolos').length;
   }, [participants]);
 
   const totalFinalists = useMemo(() => {
@@ -241,6 +243,22 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
           </div>
         </div>
 
+        {/* Animated Progress Bar when loading data from server (Requirement 20) */}
+        {isLoading && (
+          <div className="mb-4 space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-amber-800 font-bold px-1">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping" />
+                <span>Menyinkronkan data pengumuman resmi dengan database hosting...</span>
+              </span>
+              <span className="text-[11px] text-[#756F68] font-normal">Memuat data terbaru...</span>
+            </div>
+            <div className="w-full bg-amber-100/70 h-2.5 overflow-hidden rounded-full shadow-inner relative">
+              <div className="h-full bg-gradient-to-r from-amber-600 via-[#D4AF37] to-amber-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite] transition-all duration-700 w-full" />
+            </div>
+          </div>
+        )}
+
         {/* Data Table */}
         <div className="bg-white rounded-3xl border border-[#E8E2D9] overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
@@ -269,7 +287,7 @@ export const PublicAnnouncementTable: React.FC<PublicAnnouncementTableProps> = (
                     const rowNumber = (currentPage - 1) * itemsPerPage + idx + 1;
                     const exam = activeTab === 'penyisihan' ? p.penyisihanExam : p.finalExam;
                     const score = exam ? exam.score : (p.simulatedExam ? p.simulatedExam.score : 0);
-                    const isQualified = p.qualificationStatus === 'lolos' || score >= 60;
+                    const isQualified = p.qualificationStatus === 'lolos';
 
                     return (
                       <tr

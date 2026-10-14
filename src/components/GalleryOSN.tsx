@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Trophy, 
   Award, 
@@ -42,6 +42,123 @@ interface GalleryOSNProps {
   onOpenRegistration?: (product?: any) => void;
   onOpenLogin?: (role: 'user' | 'admin') => void;
 }
+
+// Subcomponent with IntersectionObserver for lazy loading images (Requirement 7)
+interface GalleryCardWithObserverProps {
+  item: GalleryItem;
+  currentImage: string;
+  onClick: () => void;
+}
+
+const GalleryCardWithObserver: React.FC<GalleryCardWithObserverProps> = ({ item, currentImage, onClick }) => {
+  const [isInView, setIsInView] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    if (!('IntersectionObserver' in window)) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '200px 0px',
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={onClick}
+      className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer bg-[#0B132B] border border-[#E8E2D9] shadow-sm hover:shadow-2xl hover:border-[#D4AF37]/80 transition-all duration-300 flex flex-col justify-end"
+    >
+      {/* Lazy Loaded Image Background */}
+      {isInView ? (
+        <img
+          src={currentImage}
+          alt={item.title}
+          referrerPolicy="no-referrer"
+          loading="lazy"
+          className="w-full h-full object-cover absolute inset-0 group-hover:scale-108 transition-transform duration-700 brightness-95 group-hover:brightness-105"
+          onError={(e) => {
+            const target = e.currentTarget;
+            target.onerror = null;
+            target.src = item.id === 'gal-abizar' ? '/abizar_radinka_annail.svg' : 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop';
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
+          <Trophy className="w-8 h-8 text-[#D4AF37]/30 animate-pulse" />
+        </div>
+      )}
+
+      {/* Dark Luxury Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0B132B] via-[#0B132B]/60 to-transparent opacity-95 group-hover:opacity-90 transition-opacity" />
+
+      {/* Top Floating Badge */}
+      <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
+        <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-[#D4AF37] text-[#1A1615] uppercase tracking-wider shadow-md inline-flex items-center gap-1">
+          <Trophy className="w-3 h-3 text-[#1A1615]" />
+          {item.badge || 'Juara Nasional'}
+        </span>
+        
+        <span className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-[#D4AF37] group-hover:text-[#1A1615] transition-colors shadow-sm">
+          <Eye className="w-3.5 h-3.5" />
+        </span>
+      </div>
+
+      {/* Content Overlay at Bottom */}
+      <div className="relative p-5 text-white space-y-2 z-10">
+        <div className="flex items-center gap-1.5 text-[11px] text-[#D4AF37] font-semibold">
+          <GraduationCap className="w-3.5 h-3.5" />
+          <span>{item.level || item.category || 'Jenjang Siswa'}</span>
+        </div>
+
+        <h3 className="text-sm sm:text-base font-extrabold text-white leading-snug group-hover:text-[#D4AF37] transition-colors">
+          {item.title}
+        </h3>
+
+        {item.trophy && (
+          <div className="flex items-center gap-1.5 text-[11px] text-amber-200/90 font-medium">
+            <Medal className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+            <span className="truncate">{item.trophy}</span>
+          </div>
+        )}
+
+        <p className="text-[11px] text-neutral-300 line-clamp-2 leading-relaxed">
+          {item.subtitle}
+        </p>
+
+        <div className="pt-1 flex items-center justify-between text-[11px] text-[#D4AF37] font-bold border-t border-white/10 mt-2">
+          <span className="flex items-center gap-1 text-emerald-400">
+            <CheckCircle2 className="w-3 h-3" />
+            Terverifikasi LKP
+          </span>
+          <span className="group-hover:translate-x-1 transition-transform inline-flex items-center gap-0.5">
+            Lihat Piagam & Trofi
+            <ChevronRight className="w-3 h-3" />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOpenLogin }) => {
   const [activeCategory, setActiveCategory] = useState<'all' | 'paud' | 'sd' | 'smp' | 'umum'>('all');
@@ -112,25 +229,54 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
 
     const reader = new FileReader();
     reader.onload = (uploadEvent) => {
-      const result = uploadEvent.target?.result as string;
-      if (result) {
-        setCustomImages((prev) => {
-          const updated = { ...prev, [itemId]: result };
-          try {
-            localStorage.setItem('osn_gallery_custom_images', JSON.stringify(updated));
-          } catch (err) {
-            console.warn('Could not persist image to localStorage', err);
+      const rawDataUrl = uploadEvent.target?.result as string;
+      if (!rawDataUrl) return;
+
+      // Compress image using canvas before storing & sending to prevent PayloadTooLargeError
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 1200;
+        const maxHeight = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
           }
-          // Sync to Neon DB server
-          fetch('/api/gallery', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ images: updated })
-          }).catch(() => {});
-          return updated;
-        });
-        showToast('success', 'Foto Tersimpan & Tersinkron', 'Foto galeri juara berhasil diunggah dan disinkronkan ke server database.');
-      }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          setCustomImages((prev) => {
+            const updated = { ...prev, [itemId]: compressedDataUrl };
+            try {
+              localStorage.setItem('osn_gallery_custom_images', JSON.stringify(updated));
+            } catch (err) {
+              console.warn('Could not persist image to localStorage', err);
+            }
+            // Sync to Neon DB server
+            fetch('/api/gallery', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ images: updated })
+            }).catch(() => {});
+            return updated;
+          });
+          showToast('success', 'Foto Tersimpan & Tersinkron', 'Foto galeri juara berhasil dioptimalkan dan disinkronkan ke database server.');
+        }
+      };
+      img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   };
@@ -342,80 +488,12 @@ export const GalleryOSN: React.FC<GalleryOSNProps> = ({ onOpenRegistration, onOp
             {filteredGallery.map((item) => {
               const currentImage = customImages[item.id] || item.image;
               return (
-              <div
-                key={item.id}
-                onClick={() => setSelectedItem(item)}
-                className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer bg-[#0B132B] border border-[#E8E2D9] shadow-sm hover:shadow-2xl hover:border-[#D4AF37]/80 transition-all duration-300 flex flex-col justify-end"
-              >
-                {/* Image Background */}
-                <img
-                  src={currentImage}
-                  alt={item.title}
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                  className="w-full h-full object-cover absolute inset-0 group-hover:scale-108 transition-transform duration-700 brightness-95 group-hover:brightness-105"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.onerror = null;
-                    target.src = item.id === 'gal-abizar' ? '/abizar_radinka_annail.svg' : 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop';
-                  }}
+                <GalleryCardWithObserver
+                  key={item.id}
+                  item={item}
+                  currentImage={currentImage}
+                  onClick={() => setSelectedItem(item)}
                 />
-
-                {/* Dark Luxury Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B132B] via-[#0B132B]/60 to-transparent opacity-95 group-hover:opacity-90 transition-opacity" />
-
-                {/* Top Floating Badge */}
-                <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-[#D4AF37] text-[#1A1615] uppercase tracking-wider shadow-md inline-flex items-center gap-1">
-                    <Trophy className="w-3 h-3 text-[#1A1615]" />
-                    {item.badge || 'Juara Nasional'}
-                  </span>
-                  
-                  <span className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-[#D4AF37] group-hover:text-[#1A1615] transition-colors shadow-sm">
-                    <Eye className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-
-                {/* Content Overlay at Bottom */}
-                <div className="relative p-5 text-white space-y-2 z-10">
-                  {/* Category Pill */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#D4AF37] font-semibold">
-                    <GraduationCap className="w-3.5 h-3.5" />
-                    <span>{item.level || item.category || 'Jenjang Siswa'}</span>
-                  </div>
-
-                  {/* Student Title */}
-                  <h3 className="text-sm sm:text-base font-extrabold text-white leading-snug group-hover:text-[#D4AF37] transition-colors">
-                    {item.title}
-                  </h3>
-
-                  {/* Trophy / Award Info */}
-                  {item.trophy && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-amber-200/90 font-medium">
-                      <Medal className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                      <span className="truncate">{item.trophy}</span>
-                    </div>
-                  )}
-
-                  {/* Subtitle */}
-                  <p className="text-[11px] text-neutral-300 line-clamp-2 leading-relaxed">
-                    {item.subtitle}
-                  </p>
-
-                  {/* Click to inspect action */}
-                  <div className="pt-1 flex items-center justify-between text-[11px] text-[#D4AF37] font-bold border-t border-white/10 mt-2">
-                    <span className="flex items-center gap-1 text-emerald-400">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Terverifikasi LKP
-                    </span>
-                    <span className="group-hover:translate-x-1 transition-transform inline-flex items-center gap-0.5">
-                      Lihat Piagam & Trofi
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
-
-              </div>
               );
             })}
           </div>

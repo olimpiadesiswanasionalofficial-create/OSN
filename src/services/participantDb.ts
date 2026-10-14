@@ -79,7 +79,7 @@ function normalizeName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
-export const CURRENT_DATASET_VERSION = 'osn_2026_dataset_v5_clean_spreadsheet_synced';
+export const CURRENT_DATASET_VERSION = 'osn_2026_dataset_v6_pending_qualification';
 
 export function getAllParticipants(): ParticipantRecord[] {
   try {
@@ -363,12 +363,23 @@ export async function syncParticipantsWithServer(): Promise<ParticipantRecord[]>
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         const serverData: ParticipantRecord[] = json.data;
+        const local = getAllParticipants();
+        const serverIds = new Set(serverData.map(p => p.id));
+        const localOnly = local.filter(p => !serverIds.has(p.id));
+        for (const unposted of localOnly) {
+          fetch('/api/participants', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(unposted)
+          }).catch(() => {});
+        }
+        const mergedData: ParticipantRecord[] = [...localOnly, ...serverData];
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedData));
           localStorage.setItem('osn_dataset_sync_version', CURRENT_DATASET_VERSION);
         } catch {}
         safeDispatchParticipantsUpdated();
-        return serverData;
+        return mergedData;
       }
     }
   } catch (err) {
@@ -669,7 +680,7 @@ export function updateParticipantExamResult(
     p.finalAttempts = currentAttempts;
     p.cbtStatus = result.violationReason
       ? `Pelanggaran CBT Final: ${result.violationReason}`
-      : `Selesai Ujian Final (${result.score}/100)`;
+      : 'Selesai Babak Final (Menunggu Pengumuman Juara)';
     
     // PERMINTAAN USER: Juara dan pemenang maupun medali jangan ditentukan otomatis oleh sistem.
     // Ditentukan oleh admin (sistem hanya memberikan rekomendasi siapa juara dan pemenang maupun medali).
@@ -687,25 +698,18 @@ export function updateParticipantExamResult(
     p.penyisihanAttempts = currentAttempts;
     p.cbtStatus = result.violationReason
       ? `Pelanggaran CBT Penyisihan: ${result.violationReason}`
-      : `Selesai Babak Penyisihan (${result.score}/100)`;
-    if (result.score >= 70) {
-      p.qualificationStatus = 'lolos';
-      p.qualificationNote = 'Lolos Otomatis Berdasarkan Nilai Babak Penyisihan (≥70)';
-    } else {
-      p.qualificationStatus = 'tidak_lolos';
-      p.qualificationNote = 'Belum Memenuhi Passing Grade Babak Penyisihan (≥70)';
-    }
+      : 'Selesai Babak Penyisihan (Menunggu Penetapan Panitia)';
+    // PERMINTAAN USER: Status kelulusan TIDAK boleh otomatis lolos berdasarkan skor.
+    // Status kelulusan hanya ditentukan secara resmi oleh panitia di dashboard admin / database PostgreSQL.
+    p.qualificationStatus = p.qualificationStatus || 'pending';
+    p.qualificationNote = p.qualificationNote || 'Menunggu Evaluasi & Penetapan Dewan Juri';
   } else {
     // simulasi
     p.simulatedExam = examInfo;
     p.simulatedAttempts = currentAttempts;
     p.cbtStatus = result.violationReason
       ? `Pelanggaran CBT Simulasi: ${result.violationReason}`
-      : `Selesai Simulasi CBT (${result.score}/100)`;
-    if (!p.penyisihanExam && result.score >= 70) {
-      p.qualificationStatus = 'lolos';
-      p.qualificationNote = 'Lolos Evaluasi CBT (≥70)';
-    }
+      : 'Selesai Simulasi CBT';
   }
 
   if (result.violationReason) {
@@ -721,10 +725,11 @@ export function updateParticipantExamResult(
 
   // Sync to server in background
   try {
-    fetch(`/api/participants/${participantId}/exam`, {
+    fetch(`/api/participants/${encodeURIComponent(participantId)}/exam`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        id: participantId,
         examType,
         subject: result.subject,
         score: result.score,
@@ -736,7 +741,8 @@ export function updateParticipantExamResult(
         fullName: meta?.fullName || p.fullName,
         whatsapp: meta?.whatsapp || p.whatsapp,
         level: meta?.level || p.level,
-        schoolName: meta?.schoolName || p.schoolName
+        schoolName: meta?.schoolName || p.schoolName,
+        examResult: examInfo
       })
     }).catch(() => {});
   } catch {}
@@ -807,7 +813,10 @@ export function updateParticipantField(
     fetch(`/api/participants/${encodeURIComponent(participantId)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields)
+      body: JSON.stringify({
+        id: participantId,
+        ...fields
+      })
     }).catch(() => {});
   } catch {}
 

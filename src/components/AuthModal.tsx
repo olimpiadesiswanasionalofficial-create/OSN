@@ -134,7 +134,8 @@ import {
 import {
   exportLolosPenyisihanReportPdf,
   exportLolosFinalDanJuaraReportPdf,
-  exportSimulasiReportPdf
+  exportSimulasiReportPdf,
+  exportRekapitulasiPerJenjangReportPdf
 } from '../services/officialReportsGenerator';
 import { showToast } from './NotificationToast';
 import {
@@ -184,6 +185,20 @@ interface AuthModalProps {
     autoLogin?: boolean;
   } | null;
   onOpenRegistration?: () => void;
+}
+
+/**
+ * REQUIREMENT 18: Fungsi validasi yang memverifikasi apakah peserta sudah
+ * benar-benar menyelesaikan babak penyisihan sebelum menampilkan akses ke materi babak final,
+ * guna mencegah akses ilegal.
+ */
+export function verifyParticipantCompletedPenyisihan(participant: ParticipantRecord | null | undefined): boolean {
+  if (!participant) return false;
+  // Memverifikasi bahwa peserta benar-benar memiliki riwayat ujian penyisihan yang sah & selesai
+  const penyisihan = participant.penyisihanExam;
+  if (!penyisihan) return false;
+  if (!penyisihan.completedAt) return false;
+  return true;
 }
 
 export const AuthModal = ({
@@ -248,6 +263,7 @@ export const AuthModal = ({
   >('participants');
   const [adminSearch, setAdminSearch] = useState('');
   const [adminFilterCategory, setAdminFilterCategory] = useState('Semua');
+  const [adminFilterSubject, setAdminFilterSubject] = useState('Semua');
   const [adminFilterExamStatus, setAdminFilterExamStatus] = useState('Semua');
   const [adminFilterWinner, setAdminFilterWinner] = useState('Semua');
   const [adminStartDate, setAdminStartDate] = useState('');
@@ -346,6 +362,54 @@ export const AuthModal = ({
     return findParticipantsByPhone(activeStudent.whatsapp);
   }, [activeStudent, participantsList]);
 
+  // REQUIREMENT 14: Personalized color theme for student dashboard based on category (Gold for PAUD, Emerald for SD, Deep Blue for SMP)
+  const studentTheme = useMemo(() => {
+    const lvl = (activeStudent?.level || '').toUpperCase();
+    if (lvl.includes('PAUD') || lvl.includes('TK') || lvl.includes('KATEGORI A')) {
+      return {
+        key: 'paud',
+        name: 'Kategori A • PAUD/TK',
+        bannerBg: 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white',
+        border: 'border-2 border-[#D4AF37]',
+        badgeBg: 'bg-amber-100',
+        badgeText: 'text-amber-900',
+        badgeBorder: 'border-amber-300',
+        accentIconBg: 'bg-amber-100 text-[#D4AF37]',
+        chipBg: 'bg-[#D4AF37] text-neutral-950 font-black',
+        cardBorder: 'border-[#D4AF37]',
+        iconColor: 'text-[#D4AF37]',
+      };
+    } else if (lvl.includes('SD') || lvl.includes('MI') || lvl.includes('KATEGORI B')) {
+      return {
+        key: 'sd',
+        name: 'Kategori B • SD/MI',
+        bannerBg: 'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-white',
+        border: 'border-2 border-emerald-500',
+        badgeBg: 'bg-emerald-100',
+        badgeText: 'text-emerald-900',
+        badgeBorder: 'border-emerald-300',
+        accentIconBg: 'bg-emerald-100 text-emerald-700',
+        chipBg: 'bg-emerald-600 text-white font-black',
+        cardBorder: 'border-emerald-500',
+        iconColor: 'text-emerald-600',
+      };
+    } else {
+      return {
+        key: 'smp',
+        name: 'Kategori C • SMP/MTs',
+        bannerBg: 'bg-gradient-to-r from-blue-600/10 via-blue-600/5 to-white',
+        border: 'border-2 border-blue-600',
+        badgeBg: 'bg-blue-100',
+        badgeText: 'text-blue-900',
+        badgeBorder: 'border-blue-300',
+        accentIconBg: 'bg-blue-100 text-blue-700',
+        chipBg: 'bg-blue-700 text-white font-black',
+        cardBorder: 'border-blue-600',
+        iconColor: 'text-blue-600',
+      };
+    }
+  }, [activeStudent?.level]);
+
   // Participant Action Modals
   const [contactActionParticipant, setContactActionParticipant] = useState<ParticipantRecord | null>(null);
   const [resetQuotaParticipant, setResetQuotaParticipant] = useState<ParticipantRecord | null>(null);
@@ -395,7 +459,18 @@ export const AuthModal = ({
   // Realtime participant updates listener & background sync
   useEffect(() => {
     const handleUpdate = () => {
-      setParticipantsList(getAllParticipants());
+      const all = getAllParticipants();
+      setParticipantsList(all);
+      setActiveStudent(prev => {
+        if (!prev) return null;
+        const fresh = all.find(p => p.id === prev.id);
+        if (!fresh) return prev;
+        return {
+          ...prev,
+          ...fresh,
+          isClosing: Boolean(fresh.isClosing || fresh.finalTicketPaymentStatus === 'paid_closing')
+        };
+      });
     };
     window.addEventListener('osn_participants_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
@@ -403,7 +478,19 @@ export const AuthModal = ({
     // Periodic sync with server to ensure new submissions immediately appear on admin dashboard
     const interval = setInterval(() => {
       syncParticipantsWithServer().then(synced => {
-        if (synced && synced.length > 0) setParticipantsList(synced);
+        if (synced && synced.length > 0) {
+          setParticipantsList(synced);
+          setActiveStudent(prev => {
+            if (!prev) return null;
+            const fresh = synced.find(p => p.id === prev.id);
+            if (!fresh) return prev;
+            return {
+              ...prev,
+              ...fresh,
+              isClosing: Boolean(fresh.isClosing || fresh.finalTicketPaymentStatus === 'paid_closing')
+            };
+          });
+        }
       }).catch(() => {});
     }, 4000);
 
@@ -413,6 +500,33 @@ export const AuthModal = ({
       clearInterval(interval);
     };
   }, []);
+
+  // Synchronize activeStudent directly with authoritative PostgreSQL server on login / profile change
+  useEffect(() => {
+    if (!activeStudent?.id) return;
+    let isMounted = true;
+    fetch(`/api/participants/${encodeURIComponent(activeStudent.id)}`)
+      .then(res => res.json())
+      .then(json => {
+        if (isMounted && json && json.success && json.data) {
+          const freshData = json.data;
+          setActiveStudent(prev => {
+            if (!prev || prev.id !== freshData.id) return prev;
+            return {
+              ...prev,
+              ...freshData,
+              isClosing: Boolean(freshData.isClosing || freshData.finalTicketPaymentStatus === 'paid_closing'),
+              qualificationStatus: freshData.qualificationStatus || prev.qualificationStatus,
+              championRank: freshData.championRank || prev.championRank,
+            };
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [activeStudent?.id]);
 
   // Sync state on load
   useEffect(() => {
@@ -707,17 +821,15 @@ export const AuthModal = ({
       // Cari semua anak/siswa yang terdaftar dengan nomor WhatsApp ini
       let matching = findParticipantsByPhone(cleanWa);
 
-      // Jika belum ditemukan di cache lokal, sync langsung dengan server database terkini
-      if (matching.length === 0) {
-        try {
-          const fresh = await syncParticipantsWithServer();
-          if (fresh && fresh.length > 0) {
-            setParticipantsList(fresh);
-            matching = findParticipantsByPhone(cleanWa);
-          }
-        } catch {
-          // ignore
+      // Selalu pastikan sinkron dengan database server terkini agar status closing, ujian, dan kelulusan 100% akurat lintas device
+      try {
+        const fresh = await syncParticipantsWithServer();
+        if (fresh && fresh.length > 0) {
+          setParticipantsList(fresh);
+          matching = findParticipantsByPhone(cleanWa);
         }
+      } catch {
+        // fallback to local cache
       }
 
       if (matching.length === 1) {
@@ -847,16 +959,27 @@ export const AuthModal = ({
   };
 
   const startSimulation = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final.
-    // Peserta yang belum ditandai closing maka akses Babak Final masih di kunci.
-    const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
-    if (mode === 'final' && !isClosed) {
-      showToast(
-        'error',
-        'Akses Babak Final Terkunci',
-        'Akses ujian Babak Final masih dikunci karena status Anda belum ditandai Closing oleh panitia. Silakan lakukan konfirmasi pembayaran tiket promo Rp 99.000 ke rekening BCA panitia.'
-      );
-      return;
+    // ATURAN RESMI: Verifikasi Babak Penyisihan terlebih dahulu sebelum Babak Final
+    if (mode === 'final') {
+      if (!verifyParticipantCompletedPenyisihan(activeStudent)) {
+        showToast(
+          'error',
+          'Akses Babak Final Ditolak',
+          'Peserta belum menyelesaikan ujian Babak Penyisihan. Anda wajib menyelesaikan Babak Penyisihan terlebih dahulu sebelum dapat mengakses materi Babak Final.'
+        );
+        return;
+      }
+
+      // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final.
+      const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
+      if (!isClosed) {
+        showToast(
+          'error',
+          'Akses Babak Final Terkunci',
+          'Akses ujian Babak Final masih dikunci karena status Anda belum ditandai Closing oleh panitia. Silakan lakukan konfirmasi pembayaran tiket promo Rp 99.000 ke rekening BCA panitia.'
+        );
+        return;
+      }
     }
 
     setExamTypeMode(mode);
@@ -870,15 +993,26 @@ export const AuthModal = ({
   };
 
   const handlePromptStartExam = (subject: string, mode: 'simulasi' | 'penyisihan' | 'final' = 'simulasi') => {
-    // ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan Babak Final
-    const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
-    if (mode === 'final' && !isClosed) {
-      showToast(
-        'error',
-        'Akses Babak Final Terkunci',
-        'Akses ujian Babak Final masih dikunci. Akses hanya dibuka untuk peserta yang telah ditandai Closing oleh panitia.'
-      );
-      return;
+    // ATURAN RESMI: Verifikasi Penyisihan & Closing sebelum memulai Babak Final
+    if (mode === 'final') {
+      if (!verifyParticipantCompletedPenyisihan(activeStudent)) {
+        showToast(
+          'error',
+          'Akses Babak Final Ditolak',
+          'Peserta belum menyelesaikan Babak Penyisihan. Akses ke Babak Final hanya dibuka untuk peserta yang telah menyelesaikan Babak Penyisihan.'
+        );
+        return;
+      }
+
+      const isClosed = Boolean(activeStudent?.isClosing || activeStudent?.finalTicketPaymentStatus === 'paid_closing');
+      if (!isClosed) {
+        showToast(
+          'error',
+          'Akses Babak Final Terkunci',
+          'Akses ujian Babak Final masih dikunci. Akses hanya dibuka untuk peserta yang telah ditandai Closing oleh panitia.'
+        );
+        return;
+      }
     }
 
     setExamTypeMode(mode);
@@ -1028,8 +1162,8 @@ export const AuthModal = ({
           '20 Menit'
         ).catch(err => console.warn('WA Notification auto-send error:', err));
 
-        // Jika ujian Babak Penyisihan atau Final dan status dinyatakan lolos, kirim notifikasi rilis kelulusan
-        if (updated?.qualificationStatus === 'lolos' || calculatedScore >= 70) {
+        // Hanya kirim notifikasi rilis kelulusan jika status dinyatakan lolos secara resmi oleh panitia
+        if (updated?.qualificationStatus === 'lolos') {
           triggerQualificationReleasedNotification(updated || activeStudent, 'lolos')
             .catch(err => console.warn('WA Qualification notification auto-send error:', err));
         }
@@ -1103,6 +1237,10 @@ export const AuthModal = ({
     const matchesCategory =
       adminFilterCategory === 'Semua' || p.level.includes(adminFilterCategory);
 
+    const matchesSubject =
+      adminFilterSubject === 'Semua' ||
+      (Array.isArray(p.subjects) && p.subjects.some(s => s.toLowerCase().includes(adminFilterSubject.toLowerCase())));
+
     let matchesStatus = true;
     if (adminFilterExamStatus === 'Simulasi') {
       matchesStatus = !!p.simulatedExam;
@@ -1144,7 +1282,7 @@ export const AuthModal = ({
       }
     }
 
-    return matchesSearch && matchesCategory && matchesStatus && matchesWinner && matchesDate;
+    return matchesSearch && matchesCategory && matchesSubject && matchesStatus && matchesWinner && matchesDate;
   });
 
   // Diurutkan mulai dari yang terbaru (newest registeredAt first) sesuai permintaan
@@ -1178,7 +1316,7 @@ export const AuthModal = ({
   useEffect(() => {
     setAdminParticipantsPage(1);
     setAdminAnnouncePage(1);
-  }, [adminSearch, adminFilterCategory, adminFilterExamStatus, adminFilterWinner, adminStartDate, adminEndDate]);
+  }, [adminSearch, adminFilterCategory, adminFilterSubject, adminFilterExamStatus, adminFilterWinner, adminStartDate, adminEndDate]);
 
   // Calculate statistics based on current date filter or total
   const dateFilteredParticipants = participantsList.filter(p => {
@@ -1309,9 +1447,9 @@ export const AuthModal = ({
         if (reportPenyisihanStatus === 'Sudah') {
           matchesStatus = !!p.penyisihanExam;
         } else if (reportPenyisihanStatus === 'Lolos') {
-          matchesStatus = p.qualificationStatus === 'lolos' || (!!p.penyisihanExam && p.penyisihanExam.score >= 70);
+          matchesStatus = p.qualificationStatus === 'lolos';
         } else if (reportPenyisihanStatus === 'TidakLolos') {
-          matchesStatus = p.qualificationStatus === 'tidak_lolos' || (!!p.penyisihanExam && p.penyisihanExam.score < 70);
+          matchesStatus = p.qualificationStatus === 'tidak_lolos';
         } else if (reportPenyisihanStatus === 'Belum') {
           matchesStatus = !p.penyisihanExam;
         }
@@ -1687,6 +1825,9 @@ export const AuthModal = ({
   const handleExportPdf = () => {
     try {
       let filterDesc = `Status: ${adminFilterExamStatus}, Jenjang: ${adminFilterCategory}`;
+      if (adminFilterSubject !== 'Semua') {
+        filterDesc += `, Mapel: ${adminFilterSubject}`;
+      }
       if (adminFilterWinner !== 'Semua') {
         filterDesc += `, Filter: ${adminFilterWinner}`;
       }
@@ -2027,21 +2168,38 @@ export const AuthModal = ({
     setDeleteConfirmParticipant(null);
   };
 
-  const handleToggleQualification = (participant: ParticipantRecord, status: 'lolos' | 'tidak_lolos' | 'pending') => {
+  const handleToggleQualification = async (participant: ParticipantRecord, status: 'lolos' | 'tidak_lolos' | 'pending') => {
     try {
+      const note = status === 'lolos' ? 'Dinyatakan Lolos ke Babak Final' : status === 'tidak_lolos' ? 'Belum Memenuhi Passing Grade' : 'Menunggu Penilaian';
       const updated = updateParticipantField(participant.id, {
         qualificationStatus: status,
-        qualificationNote: status === 'lolos' ? 'Dinyatakan Lolos ke Babak Final' : status === 'tidak_lolos' ? 'Belum Memenuhi Passing Grade' : 'Menunggu Penilaian'
+        qualificationNote: note
       });
       if (updated) {
         const all = getAllParticipants();
         setParticipantsList(all);
         if (activeStudent?.id === participant.id) {
-          setActiveStudent(updated);
+          setActiveStudent({ ...updated, qualificationStatus: status, qualificationNote: note });
         }
-        setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah: ${status.toUpperCase()}`);
-        showToast('success', 'Status Kelulusan Diperbarui', `Status ${participant.fullName} berhasil diubah menjadi: ${status.toUpperCase()}.`);
+        const statusText = status.toUpperCase();
+        setAdminNotification(`Status kelulusan penyisihan ${participant.fullName} diubah: ${statusText}`);
+        showToast('success', 'Status Kelulusan Diperbarui', `Status ${participant.fullName} berhasil diubah menjadi: ${statusText}.`);
         setTimeout(() => setAdminNotification(''), 3000);
+
+        // Langsung kirim PATCH ke server PostgreSQL agar sinkron permanen
+        try {
+          await fetch(`/api/participants/${encodeURIComponent(participant.id)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: participant.id,
+              qualificationStatus: status,
+              qualificationNote: note
+            })
+          });
+        } catch (serverErr) {
+          console.warn('Server qualification patch notice:', serverErr);
+        }
 
         // Otomatis kirim notifikasi WhatsApp API saat status kelulusan dirilis
         if (status === 'lolos') {
@@ -2063,7 +2221,7 @@ export const AuthModal = ({
   };
 
   const handleBroadcastQualificationAnnouncements = async () => {
-    const qualified = participantsList.filter(p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60));
+    const qualified = participantsList.filter(p => p.qualificationStatus === 'lolos');
     if (qualified.length === 0) {
       showToast('error', 'Broadcast Dibatalkan', 'Tidak ada peserta yang berstatus lolos ke babak final.');
       return;
@@ -2085,21 +2243,52 @@ export const AuthModal = ({
     setTimeout(() => setAdminNotification(''), 4500);
   };
 
-  const handleToggleFinalPaymentClosing = (participant: ParticipantRecord) => {
+  const handleToggleFinalPaymentClosing = async (participant: ParticipantRecord) => {
     try {
       const isCurrentlyPaid = Boolean(participant.finalTicketPaymentStatus === 'paid_closing' || participant.isClosing);
+      const nextIsClosing = !isCurrentlyPaid;
+      const nextPaymentStatus = isCurrentlyPaid ? 'unpaid' : 'paid_closing';
+      const nextPaidAt = isCurrentlyPaid ? undefined : new Date().toISOString();
+      const nextAmount = isCurrentlyPaid ? 0 : 99000;
+      const nextCbtStatus = isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing BCA Rp 99.000)';
+
       const updated = updateParticipantField(participant.id, {
-        finalTicketPaymentStatus: isCurrentlyPaid ? 'unpaid' : 'paid_closing',
-        isClosing: !isCurrentlyPaid,
-        finalTicketPaidAt: isCurrentlyPaid ? undefined : new Date().toISOString(),
-        finalTicketAmount: isCurrentlyPaid ? 0 : 99000,
-        cbtStatus: isCurrentlyPaid ? 'Tercatat di Database' : 'Tiket Final Lunas (Closing BCA Rp 99.000)'
+        finalTicketPaymentStatus: nextPaymentStatus,
+        isClosing: nextIsClosing,
+        finalTicketPaidAt: nextPaidAt,
+        finalTicketAmount: nextAmount,
+        cbtStatus: nextCbtStatus
       });
+
+      // Synchronize directly with server PATCH endpoint to ensure Neon PostgreSQL is updated immediately
+      try {
+        const patchRes = await fetch(`/api/participants/${encodeURIComponent(participant.id)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: participant.id,
+            finalTicketPaymentStatus: nextPaymentStatus,
+            isClosing: nextIsClosing,
+            finalTicketPaidAt: nextPaidAt,
+            finalTicketAmount: nextAmount,
+            cbtStatus: nextCbtStatus
+          })
+        });
+        if (patchRes.ok) {
+          const resJson = await patchRes.json();
+          if (resJson?.data) {
+            updateParticipantField(participant.id, resJson.data);
+          }
+        }
+      } catch (err) {
+        console.warn('Direct server closing patch notice:', err);
+      }
+
       if (updated) {
         const all = getAllParticipants();
         setParticipantsList(all);
         if (activeStudent?.id === participant.id) {
-          setActiveStudent(updated);
+          setActiveStudent({ ...updated, isClosing: nextIsClosing, finalTicketPaymentStatus: nextPaymentStatus, cbtStatus: nextCbtStatus });
         }
         const statusText = isCurrentlyPaid ? 'BATAL CLOSING (Belum Bayar)' : 'CLOSING BERHASIL (LUNAS RP 99.000)';
         setAdminNotification(`Status pembayaran tiket final ${participant.fullName}: ${statusText}`);
@@ -2341,7 +2530,7 @@ export const AuthModal = ({
                                 <span className="font-mono text-neutral-400">ID: {child.id}</span>
                                 {child.simulatedExam ? (
                                   <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
-                                    Simulasi: {child.simulatedExam.score}/100
+                                    Simulasi Selesai
                                   </span>
                                 ) : (
                                   <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
@@ -2539,23 +2728,26 @@ export const AuthModal = ({
             /* =================== VIEW: USER / SISWA PORTAL =================== */
             <div className="space-y-6">
               
-              {/* Top Banner Status */}
-              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#E8E2D9] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+              {/* Top Banner Status - Themed by Student Category (Requirement 14) */}
+              <div className={`rounded-3xl p-5 sm:p-6 ${studentTheme.bannerBg} ${studentTheme.border} flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm transition-colors`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#D4AF37] flex items-center justify-center font-black text-xl shrink-0">
-                    <User className="w-6 h-6 text-[#9E7D15]" />
+                  <div className={`w-12 h-12 rounded-2xl ${studentTheme.accentIconBg} flex items-center justify-center font-black text-xl shrink-0 shadow-xs`}>
+                    <User className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-extrabold text-[#1A1615]">
                         Selamat Datang, {activeStudent?.fullName || 'Peserta'}!
                       </h3>
+                      <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-black ${studentTheme.chipBg}`}>
+                        {studentTheme.name}
+                      </span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">
                         Tercatat di Database
                       </span>
                     </div>
                     <p className="text-xs text-[#756F68] mt-0.5">
-                      No. Peserta: <strong className="text-[#1A1615] font-mono">{activeStudent?.id || 'OSN-2026-B-001'}</strong> · No. WA: {activeStudent?.whatsapp || '-'}
+                      No. Peserta: <strong className="text-[#1A1615] font-mono">{activeStudent?.id || 'OSN-2026-B-001'}</strong> · No. WA: {activeStudent?.whatsapp || '-'} · Jenjang: <strong>{activeStudent?.level || 'SD/MI'}</strong>
                     </p>
 
                     {/* Sibling Switcher if multiple children are registered with this number */}
@@ -2638,7 +2830,7 @@ export const AuthModal = ({
                   </button>
 
                   {/* ATURAN RESMI: Peserta yang sudah ditandai closing baru muncul akses pengerjaan babak final nya, peserta yang belum ditandai closing maka akses babak final masih di kunci */}
-                  {activeStudent?.qualificationStatus === 'lolos' && (
+                  {activeStudent?.qualificationStatus === 'lolos' && verifyParticipantCompletedPenyisihan(activeStudent) && (
                     (activeStudent.isClosing || activeStudent.finalTicketPaymentStatus === 'paid_closing') ? (
                       <button
                         onClick={() => {
@@ -3276,9 +3468,15 @@ export const AuthModal = ({
                               <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded ${
                                 activeStudent.qualificationStatus === 'lolos'
                                   ? 'bg-emerald-100 text-emerald-800'
-                                  : 'bg-rose-100 text-rose-700'
+                                  : activeStudent.qualificationStatus === 'tidak_lolos'
+                                  ? 'bg-rose-100 text-rose-700'
+                                  : 'bg-amber-100 text-amber-800'
                               }`}>
-                                {activeStudent.qualificationStatus === 'lolos' ? '✓ Lolos Final' : 'Belum Lolos'}
+                                {activeStudent.qualificationStatus === 'lolos'
+                                  ? '✓ Lolos Final'
+                                  : activeStudent.qualificationStatus === 'tidak_lolos'
+                                  ? 'Belum Lolos'
+                                  : 'Menunggu Pengumuman'}
                               </span>
                               <span className="text-[10px] text-[#756F68]">
                                 Percobaan: {activeStudent.penyisihanAttempts || 1}/2
@@ -3398,7 +3596,7 @@ export const AuthModal = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {activeStudent.qualificationStatus === 'lolos' ? (
+                      {activeStudent.qualificationStatus === 'lolos' && verifyParticipantCompletedPenyisihan(activeStudent) ? (
                         <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
                           <CheckCircle className="w-4 h-4 text-emerald-600" />
                           SELAMAT! LOLOS KE BABAK FINAL
@@ -3415,8 +3613,8 @@ export const AuthModal = ({
                     </div>
                   </div>
 
-                  {/* Jika Siswa Dinyatakan Lolos: Tampilkan Pembelian Tiket Final Mandiri */}
-                  {activeStudent.qualificationStatus === 'lolos' ? (
+                  {/* Jika Siswa Dinyatakan Lolos & Terverifikasi Menyelesaikan Penyisihan: Tampilkan Pembelian Tiket Final Mandiri */}
+                  {activeStudent.qualificationStatus === 'lolos' && verifyParticipantCompletedPenyisihan(activeStudent) ? (
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                       <div className="md:col-span-7 space-y-3">
                         <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
@@ -4021,6 +4219,23 @@ export const AuthModal = ({
                           </select>
                         </div>
 
+                        {/* Filter Mata Pelajaran (Mapel) */}
+                        <div className="flex items-center gap-1.5 text-xs text-[#756F68]">
+                          <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                          <span className="font-bold">Mapel:</span>
+                          <select
+                            value={adminFilterSubject}
+                            onChange={(e) => setAdminFilterSubject(e.target.value)}
+                            className="px-2.5 py-1.5 rounded-xl text-xs border border-[#E8E2D9] bg-[#FAF8F5] focus:outline-none font-medium text-[#1A1615]"
+                          >
+                            <option value="Semua">Semua Mapel</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Sains">Sains / IPA</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                          </select>
+                        </div>
+
                         <div className="flex items-center gap-1.5 text-xs text-[#756F68]">
                           <span className="font-bold">Status Ujian:</span>
                           <select
@@ -4388,7 +4603,7 @@ export const AuthModal = ({
                             </tr>
                           ) : (
                             displayedParticipants.map((p) => {
-                            const isPaidClosing = p.finalTicketPaymentStatus === 'paid_closing';
+                            const isPaidClosing = Boolean(p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing);
                             const isLolos = p.qualificationStatus === 'lolos';
                             const isSelected = selectedParticipantIds.includes(p.id);
 
@@ -5823,6 +6038,25 @@ export const AuthModal = ({
                         >
                           <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
                           <span>2. Cetak Laporan Pemenang Juara (PDF)</span>
+                        </button>
+
+                        {/* Dokumen 3: Laporan Rekapitulasi Peserta per Jenjang (PAUD, SD, SMP) PDF */}
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              showToast('info', 'Menyiapkan Rekapitulasi', 'Sedang memproses Laporan Rekapitulasi Peserta per Jenjang (PDF)...');
+                              await exportRekapitulasiPerJenjangReportPdf(participantsList, 'Semua');
+                              showToast('success', 'Rekapitulasi Berhasil Dicetak', 'Laporan Rekapitulasi Peserta per Jenjang (PDF) berhasil diunduh.');
+                            } catch (e: any) {
+                              showToast('error', 'Gagal Mencetak Rekapitulasi', e?.message || 'Terjadi kesalahan saat memproses rekapitulasi.');
+                            }
+                          }}
+                          className="px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
+                          title="Download Dokumen Resmi 3: Laporan Rekapitulasi Peserta per Jenjang (PAUD/TK, SD/MI, SMP/MTs) PDF"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>3. Cetak Rekapitulasi per Jenjang (PDF)</span>
                         </button>
                       </div>
                     </div>

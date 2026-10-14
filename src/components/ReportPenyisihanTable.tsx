@@ -236,7 +236,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
   // Broadcast WhatsApp API untuk Seluruh Peserta Lolos
   const handleBroadcastAllQualified = async () => {
     const qualified = participantsList.filter(
-      p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 60)
+      p => p.qualificationStatus === 'lolos'
     );
 
     if (qualified.length === 0) {
@@ -285,8 +285,8 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
   // Stats calculation
   const completedList = participantsList.filter(p => !!p.penyisihanExam);
   const totalCompleted = completedList.length;
-  const totalFinalists = participantsList.filter(p => p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 70)).length;
-  const totalClosing = participantsList.filter(p => p.finalTicketPaymentStatus === 'paid_closing').length;
+  const totalFinalists = participantsList.filter(p => p.qualificationStatus === 'lolos').length;
+  const totalClosing = participantsList.filter(p => p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing).length;
   const avgScore = totalCompleted > 0
     ? Math.round(completedList.reduce((sum, p) => sum + (p.penyisihanExam?.score || 0), 0) / totalCompleted)
     : 0;
@@ -312,11 +312,11 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
           (p.subjects && p.subjects.includes(filterSubject));
 
         let matchesQualification = true;
-        const isLolos = p.qualificationStatus === 'lolos' || (!!p.penyisihanExam && p.penyisihanExam.score >= 70);
+        const isLolos = p.qualificationStatus === 'lolos';
         if (filterQualification === 'Lolos') {
           matchesQualification = isLolos;
         } else if (filterQualification === 'TidakLolos') {
-          matchesQualification = p.qualificationStatus === 'tidak_lolos' || (!!p.penyisihanExam && p.penyisihanExam.score < 70);
+          matchesQualification = p.qualificationStatus === 'tidak_lolos';
         } else if (filterQualification === 'SudahUjian') {
           matchesQualification = !!p.penyisihanExam;
         } else if (filterQualification === 'BelumUjian') {
@@ -399,8 +399,8 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
       p.penyisihanExam?.subject || p.subjects?.[0] || 'Matematika',
       p.penyisihanExam ? p.penyisihanExam.score : 'Belum Ujian',
       '70',
-      p.qualificationStatus === 'lolos' || (p.penyisihanExam && p.penyisihanExam.score >= 70) ? 'LOLOS KE BABAK FINAL' : 'TIDAK LOLOS',
-      p.finalTicketPaymentStatus === 'paid_closing' ? 'LUNAS CLOSING RP 99.000' : 'BELUM CLOSING',
+      p.qualificationStatus === 'lolos' ? 'LOLOS KE BABAK FINAL' : (p.qualificationStatus === 'tidak_lolos' ? 'TIDAK LOLOS' : 'MENUNGGU PENETAPAN'),
+      p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing ? 'LUNAS CLOSING RP 99.000' : 'BELUM CLOSING',
       `${p.penyisihanAttempts || 0}/2`,
       p.penyisihanExam?.durationText || '18 Menit 24 Detik',
       p.penyisihanExam?.completedAt ? new Date(p.penyisihanExam.completedAt).toLocaleString('id-ID') : '-'
@@ -684,8 +684,8 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                   const globalIdx = (validPage - 1) * PAGE_SIZE + idx + 1;
                   const hasExam = !!p.penyisihanExam;
                   const score = p.penyisihanExam?.score ?? 0;
-                  const isLolos = p.qualificationStatus === 'lolos' || (hasExam && score >= 70);
-                  const isPaidClosing = p.finalTicketPaymentStatus === 'paid_closing';
+                  const isLolos = p.qualificationStatus === 'lolos';
+                  const isPaidClosing = p.finalTicketPaymentStatus === 'paid_closing' || p.isClosing;
                   const attempts = p.penyisihanAttempts || (hasExam ? 1 : 0);
 
                   return (
@@ -888,7 +888,7 @@ export const ReportPenyisihanTable: React.FC<ReportPenyisihanTableProps> = ({
                             <MessageCircle className="w-3.5 h-3.5" />
                           </a>
 
-                          {(isLolos || (p.penyisihanExam && p.penyisihanExam.score >= 60)) && (
+                          {isLolos && (
                             <button
                               type="button"
                               onClick={async () => {

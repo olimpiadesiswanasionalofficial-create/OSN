@@ -285,6 +285,35 @@ export async function getAllParticipantsFromDb(): Promise<any[]> {
 }
 
 /**
+ * Read a single participant by ID from Neon PostgreSQL (with fallback to local JSON)
+ */
+export async function getParticipantByIdFromDb(participantId: string): Promise<any | null> {
+  const cleanId = String(participantId || '').trim();
+  if (!cleanId) return null;
+
+  if (!isNeonQuotaExceeded) {
+    try {
+      await ensureDbSchema();
+      if (!isNeonQuotaExceeded) {
+        const p = getDbPool();
+        const res = await p.query(`SELECT * FROM participants WHERE id = $1`, [cleanId]);
+        if (res.rows && res.rows.length > 0) {
+          return rowToParticipant(res.rows[0]);
+        }
+      }
+    } catch (err: any) {
+      if (isQuotaError(err)) {
+        isNeonQuotaExceeded = true;
+      }
+    }
+  }
+
+  const localList = readLocalJsonParticipants();
+  const found = localList.find((p: any) => p.id === cleanId);
+  return found || null;
+}
+
+/**
  * Save / Upsert a single participant record in Neon PostgreSQL & local JSON
  */
 export async function saveParticipantToDb(record: any): Promise<any> {
@@ -318,7 +347,26 @@ export async function saveParticipantToDb(record: any): Promise<any> {
   const sessionQuestionIds = record.sessionQuestionIds ? JSON.stringify(record.sessionQuestionIds) : null;
   const violationReason = record.violationReason || null;
 
-  const fullRecord = { ...record, id, fullName, whatsapp, registeredAt, isClosing };
+  const fullRecord = {
+    ...record,
+    id,
+    fullName,
+    level,
+    schoolName,
+    cityProvince,
+    whatsapp,
+    email,
+    parentName,
+    fullAddress,
+    registeredAt,
+    cbtStatus,
+    qualificationStatus,
+    qualificationNote,
+    finalTicketPaymentStatus,
+    isClosing,
+    championRank,
+    recommendedChampionRank,
+  };
 
   // Guaranteed immediate local save for real-time synchronization across all profiles
   saveLocalJsonParticipant(fullRecord);
@@ -367,10 +415,10 @@ export async function saveParticipantToDb(record: any): Promise<any> {
             final_attempts = COALESCE(EXCLUDED.final_attempts, participants.final_attempts, 0),
             qualification_status = COALESCE(EXCLUDED.qualification_status, participants.qualification_status),
             qualification_note = COALESCE(EXCLUDED.qualification_note, participants.qualification_note),
-            final_ticket_payment_status = COALESCE(EXCLUDED.final_ticket_payment_status, participants.final_ticket_payment_status),
-            is_closing = COALESCE(EXCLUDED.is_closing, participants.is_closing, FALSE),
+            final_ticket_payment_status = EXCLUDED.final_ticket_payment_status,
+            is_closing = EXCLUDED.is_closing,
             final_ticket_paid_at = EXCLUDED.final_ticket_paid_at,
-            final_ticket_amount = COALESCE(EXCLUDED.final_ticket_amount, participants.final_ticket_amount),
+            final_ticket_amount = EXCLUDED.final_ticket_amount,
             champion_rank = COALESCE(EXCLUDED.champion_rank, participants.champion_rank),
             recommended_champion_rank = EXCLUDED.recommended_champion_rank,
             certificate_issued_date = COALESCE(EXCLUDED.certificate_issued_date, participants.certificate_issued_date),
@@ -712,19 +760,14 @@ export async function recordExamInDb(
   if (examType === 'simulasi') {
     newCbtStatus = 'Selesai Simulasi (Siap Babak Penyisihan)';
   } else if (examType === 'penyisihan') {
-    if (examResult.score >= 60) {
-      newCbtStatus = 'Selesai Babak Penyisihan (Lolos ke Babak Final)';
-      newQualStatus = 'lolos';
-      newQualNote = 'Dinyatakan Lolos ke Babak Final';
-    } else {
-      newCbtStatus = 'Selesai Babak Penyisihan';
-    }
+    newCbtStatus = 'Selesai Babak Penyisihan (Menunggu Penetapan Panitia)';
+    // Do NOT automatically set 'lolos'! Qualification is strictly determined by admin in database.
+    newQualStatus = existingRow.qualification_status || 'pending';
+    newQualNote = existingRow.qualification_note || 'Menunggu Evaluasi & Penetapan Dewan Juri';
   } else if (examType === 'final') {
     newCbtStatus = 'Selesai Babak Final (Menunggu Pengumuman Juara)';
-    if (examResult.score >= 95) newRank = 'Juara 1';
-    else if (examResult.score >= 90) newRank = 'Juara 2';
-    else if (examResult.score >= 80) newRank = 'Juara 3';
-    else newRank = 'Peserta Final';
+    // Juara dan pemenang maupun medali ditentukan oleh admin, status awal adalah Belum Ditetapkan / Menunggu
+    newRank = existingRow.champion_rank || 'Belum Ditetapkan';
   }
 
   if (additionalUpdates?.cbtStatus) newCbtStatus = additionalUpdates.cbtStatus;
@@ -1107,7 +1150,12 @@ function readLocalJsonParticipants(): any[] {
     if (fs.existsSync(participantsFile)) {
       const data = JSON.parse(fs.readFileSync(participantsFile, 'utf-8'));
       if (Array.isArray(data) && data.length > 0) {
-        return data;
+        return data.map(p => ({
+          ...p,
+          qualificationStatus: p.qualificationStatus || 'pending',
+          finalTicketPaymentStatus: p.finalTicketPaymentStatus || 'unpaid',
+          isClosing: Boolean(p.isClosing || p.finalTicketPaymentStatus === 'paid_closing'),
+        }));
       }
     }
 
@@ -1119,8 +1167,14 @@ function readLocalJsonParticipants(): any[] {
         const csvContent = fs.readFileSync(csvFile, 'utf-8');
         const restored = parseCSV(csvContent);
         if (Array.isArray(restored) && restored.length > 0) {
-          fs.writeFileSync(participantsFile, JSON.stringify(restored, null, 2), 'utf-8');
-          return restored;
+          const normalized = restored.map((p: any) => ({
+            ...p,
+            qualificationStatus: p.qualificationStatus || 'pending',
+            finalTicketPaymentStatus: p.finalTicketPaymentStatus || 'unpaid',
+            isClosing: Boolean(p.isClosing || p.finalTicketPaymentStatus === 'paid_closing'),
+          }));
+          fs.writeFileSync(participantsFile, JSON.stringify(normalized, null, 2), 'utf-8');
+          return normalized;
         }
       } catch {}
     }

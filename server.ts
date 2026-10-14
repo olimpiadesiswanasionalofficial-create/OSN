@@ -21,7 +21,10 @@ import {
   getAllQuestionsFromDb,
   saveQuestionToDb,
   deleteQuestionFromDb,
-  verifyFinalRoundExamAccess
+  verifyFinalRoundExamAccess,
+  patchParticipantInDb,
+  resetParticipantInDb,
+  getParticipantByIdFromDb
 } from './src/server/db.js';
 import { runDbMigration } from './src/server/dbMigration.js';
 
@@ -33,16 +36,18 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(express.text({ limit: '100mb' }));
+app.use(express.raw({ limit: '100mb' }));
 
 // Middleware to gracefully handle any payload too large or body parser errors
 app.use((err: any, _req: Request, res: Response, next: any) => {
-  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.name === 'PayloadTooLargeError')) {
+  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.statusCode === 413 || err.name === 'PayloadTooLargeError')) {
     console.warn('[Server] PayloadTooLarge caught and handled:', err.message);
     return res.status(413).json({
       success: false,
-      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 50MB).',
+      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 100MB).',
       details: err.message
     });
   }
@@ -136,15 +141,28 @@ Mohon berikan rekomendasi terbaik, motivasi berprestasi, dan panduan langkah sel
       });
     }
 
-    // Call Gemini 3.8 Flash model
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-      },
-    });
+    // Call Gemini Pro model (gemini-2.5-pro) for maximum analytical quality and professional consultation
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-pro',
+        contents: userPrompt,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    } catch (e: any) {
+      console.warn('[Gemini Pro] Fallback to gemini-2.5-flash:', e?.message);
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: userPrompt,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    }
 
     const replyText = response.text || 'Terima kasih atas antusiasme Anda. Silakan hubungi panitia melalui WhatsApp untuk panduan pendaftaran.';
 
@@ -201,7 +219,16 @@ function getStoredParticipants(): any[] {
       return initialData;
     }
     const raw = fs.readFileSync(participantsFile, 'utf-8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.map((p: any) => ({
+        ...p,
+        qualificationStatus: p.qualificationStatus || 'pending',
+        finalTicketPaymentStatus: p.finalTicketPaymentStatus || 'unpaid',
+        isClosing: Boolean(p.isClosing || p.finalTicketPaymentStatus === 'paid_closing'),
+      }));
+    }
+    return [];
   } catch (err) {
     console.error('Error reading participants database:', err);
     return [];
@@ -232,6 +259,27 @@ app.get('/api/participants', async (_req: Request, res: Response) => {
   } catch (err: any) {
     const fallback = getStoredParticipants();
     res.json({ success: true, data: fallback, total: fallback.length, source: 'local-fallback' });
+  }
+});
+
+// Endpoint to get a single participant by ID (for student dashboard & cross-device verification)
+app.get('/api/participants/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const participant = await getParticipantByIdFromDb(id);
+    if (!participant) {
+      // Check stored participants fallback
+      const list = getStoredParticipants();
+      const local = list.find((p: any) => p.id === id);
+      if (local) {
+        return res.json({ success: true, data: local, source: 'local-fallback' });
+      }
+      return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
+    }
+    return res.json({ success: true, data: participant, source: 'Neon PostgreSQL Hosting Database' });
+  } catch (err: any) {
+    console.error('Error in GET /api/participants/:id:', err);
+    return res.status(500).json({ success: false, error: err?.message || 'Gagal mengambil data peserta.' });
   }
 });
 
@@ -457,7 +505,7 @@ app.get('/api/webhook', async (_req: Request, res: Response) => {
 app.post(['/api/participants/:id/exam', '/api/participants/exam'], async (req: Request, res: Response) => {
   try {
     const participantId = req.params?.id || req.body?.id;
-    const { examType, subject, score, totalQuestions, completedAt, violationReason, whatsapp, fullName, level, schoolName, examResult } = req.body;
+    const { examType, subject, score, totalQuestions, completedAt, durationText, durationSeconds, violationReason, whatsapp, fullName, level, schoolName, examResult } = req.body;
     
     const numericScore = typeof score === 'number' ? score : (examResult?.score ?? parseInt(score, 10) ?? 0);
     const resolvedExamType: 'simulasi' | 'penyisihan' | 'final' = examType || examResult?.examType || 'simulasi';
@@ -467,6 +515,8 @@ app.post(['/api/participants/:id/exam', '/api/participants/exam'], async (req: R
       score: numericScore,
       totalQuestions: totalQuestions || 20,
       completedAt: completedAt || new Date().toISOString(),
+      durationText: durationText || undefined,
+      durationSeconds: durationSeconds || undefined,
       status: violationReason
         ? `Pelanggaran: ${violationReason}`
         : resolvedExamType === 'final'
@@ -569,18 +619,27 @@ app.get('/api/exam/final-materials', async (req: Request, res: Response) => {
 });
 
 // Reset participant attempts / quota
-app.post('/api/participants/:id/reset', (req: Request, res: Response) => {
+app.post('/api/participants/:id/reset', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { examType, clearHistory, extraAttempt } = req.body;
+
+    // Persist to Neon PostgreSQL
+    let updatedDb;
+    try {
+      updatedDb = await resetParticipantInDb(id, examType || 'all', Boolean(clearHistory));
+    } catch (e: any) {
+      console.warn('PostgreSQL reset notice:', e?.message);
+    }
+
     const currentList = getStoredParticipants();
     const idx = currentList.findIndex((p: any) => p.id === id);
 
-    if (idx === -1) {
+    if (idx === -1 && !updatedDb) {
       return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
     }
 
-    const p = currentList[idx];
+    let p = idx >= 0 ? currentList[idx] : updatedDb;
     delete p.violationReason;
 
     if (extraAttempt) {
@@ -626,29 +685,47 @@ app.post('/api/participants/:id/reset', (req: Request, res: Response) => {
       }
     }
 
-    currentList[idx] = p;
+    if (idx >= 0) {
+      currentList[idx] = updatedDb || p;
+    } else {
+      currentList.unshift(updatedDb || p);
+    }
     saveStoredParticipants(currentList);
-    return res.json({ success: true, message: 'Kuota berhasil di-reset.', data: p });
+    return res.json({ success: true, message: 'Kuota berhasil di-reset.', data: updatedDb || p });
   } catch (error: any) {
     console.error('Error in POST /api/participants/:id/reset:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal reset kuota peserta.' });
   }
 });
 
-// Update specific fields of participant
-app.patch('/api/participants/:id', (req: Request, res: Response) => {
+// Update specific fields of participant (closing status, qualification, notes)
+app.patch('/api/participants/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // Authoritative update in Neon PostgreSQL
+    let updated;
+    try {
+      updated = await patchParticipantInDb(id, req.body);
+    } catch (e: any) {
+      console.warn('PostgreSQL patch notice:', e?.message);
+    }
+
     const currentList = getStoredParticipants();
     const idx = currentList.findIndex((p: any) => p.id === id);
 
-    if (idx === -1) {
+    if (idx === -1 && !updated) {
       return res.status(404).json({ success: false, error: 'Peserta tidak ditemukan.' });
     }
 
-    currentList[idx] = { ...currentList[idx], ...req.body };
+    const finalRecord = updated || { ...(currentList[idx] || {}), ...req.body, id };
+    if (idx >= 0) {
+      currentList[idx] = finalRecord;
+    } else {
+      currentList.unshift(finalRecord);
+    }
     saveStoredParticipants(currentList);
-    return res.json({ success: true, data: currentList[idx] });
+    return res.json({ success: true, data: finalRecord });
   } catch (error: any) {
     console.error('Error in PATCH /api/participants/:id:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal memperbarui data peserta.' });

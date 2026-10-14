@@ -25,16 +25,18 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(express.text({ limit: '100mb' }));
+app.use(express.raw({ limit: '100mb' }));
 
 // Middleware to gracefully handle payload too large
 app.use((err, _req, res, next) => {
-  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.name === 'PayloadTooLargeError')) {
+  if (err && (err.type === 'entity.too.large' || err.status === 413 || err.statusCode === 413 || err.name === 'PayloadTooLargeError')) {
     console.warn('[Server] PayloadTooLarge caught and handled:', err.message);
     return res.status(413).json({
       success: false,
-      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 50MB).',
+      error: 'Ukuran payload data melebihi batas yang diizinkan (maksimal 100MB).',
       details: err.message
     });
   }
@@ -116,15 +118,28 @@ Mohon berikan rekomendasi terbaik, motivasi berprestasi, dan panduan langkah sel
       });
     }
 
-    // Panggil model Gemini 3.8 Flash
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-      },
-    });
+    // Panggil model Gemini Pro (gemini-2.5-pro) untuk analisis akademis maksimal & profesional
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-pro',
+        contents: userPrompt,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    } catch (e) {
+      console.warn('[Gemini Pro] Fallback to gemini-2.5-flash:', e?.message);
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: userPrompt,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    }
 
     const replyText = response.text || 'Terima kasih atas pertanyaan Anda. Silakan hubungi WhatsApp panitia di ' + APP_CONFIG.contact.displayPhone + ' untuk panduan lebih lanjut.';
 
