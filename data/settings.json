@@ -23,5 +23,28 @@
     "customScript": "",
     "isEnabled": false
   },
-  "gallery": {}
+  "gallery": {},
+  "google_sync_config": {
+    "isEnabled": true,
+    "autoSyncOnRegistration": true,
+    "autoSyncGoogleForm": true,
+    "autoSyncSpreadsheet": true,
+    "googleFormUrl": "https://docs.google.com/forms/d/e/1FAIpQLSc_OSN2026_Nasional_Pendaftaran_Resmi/formResponse",
+    "googleFormViewUrl": "https://docs.google.com/forms/d/e/1FAIpQLSc_OSN2026_Nasional_Pendaftaran_Resmi/viewform",
+    "googleSpreadsheetId": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+    "googleSpreadsheetUrl": "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?usp=sharing",
+    "googleAppsScriptUrl": "https://script.google.com/macros/s/AKfycbx_OSN2026_LiveSync_Webhook/exec",
+    "fieldMappings": {
+      "fullName": "entry.2005620554",
+      "whatsapp": "entry.1045781291",
+      "level": "entry.1065046570",
+      "schoolName": "entry.839337160",
+      "cityProvince": "entry.1166974658",
+      "subjects": "entry.1846923549",
+      "parentName": "entry.1982736451",
+      "email": "entry.1045781292"
+    },
+    "lastSyncedAt": "2026-10-20T07:24:44.914Z",
+    "totalSynced": 9
+  }
 }

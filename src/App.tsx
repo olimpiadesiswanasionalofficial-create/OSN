@@ -284,17 +284,23 @@ export default function App() {
   const [publicParticipants, setPublicParticipants] = useState<ParticipantRecord[]>(() => getAllParticipants());
 
   useEffect(() => {
-    // Secret URL parameter ?admin=true or ?panel=admin
+    // Direct URL parameter ?admin=true or ?panel=admin or #admin-panitia or ?login=true or ?daftar=true
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('admin') === 'true' || urlParams.get('panel') === 'admin' || window.location.hash === '#admin-panitia') {
-      openLogin('admin');
+    if (
+      urlParams.get('admin') === 'true' ||
+      urlParams.get('panel') === 'admin' ||
+      window.location.hash === '#admin-panitia' ||
+      urlParams.get('login') === 'true' ||
+      urlParams.get('daftar') === 'true'
+    ) {
+      window.location.href = 'https://ujiancbt.ai.studio/';
     }
 
-    // Secret Keyboard Shortcut: Ctrl + Shift + A to open Admin Login safely
+    // Keyboard Shortcut: Ctrl + Shift + A redirects to CBT portal
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
-        openLogin('admin');
+        window.location.href = 'https://ujiancbt.ai.studio/';
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -356,22 +362,15 @@ export default function App() {
   }, [aiMessages, aiLoading]);
 
 
-  const openLogin = (role: 'user' | 'admin') => {
-    setAuthModalDefaultRole(role);
-    setAuthStudentInitialData(null);
-    setAuthModalOpen(true);
+  const CBT_PORTAL_URL = 'https://ujiancbt.ai.studio/';
+
+  const openLogin = (_role?: 'user' | 'admin') => {
     setMobileMenuOpen(false);
+    window.location.href = CBT_PORTAL_URL;
   };
 
-  const openLoginWithRegisteredData = (fullName: string, whatsapp: string) => {
-    setAuthStudentInitialData({
-      fullName,
-      whatsapp,
-      autoLogin: true
-    });
-    setAuthModalDefaultRole('user');
-    setAuthModalOpen(true);
-    setRegistrationModalOpen(false);
+  const openLoginWithRegisteredData = (_fullName?: string, _whatsapp?: string) => {
+    window.location.href = CBT_PORTAL_URL;
   };
 
   // Filter products based on category tab
@@ -379,44 +378,9 @@ export default function App() {
     ? APP_CONFIG.products
     : APP_CONFIG.products.filter(p => p.category.toLowerCase().includes(selectedCategory.toLowerCase()) || p.name.toLowerCase().includes(selectedCategory.toLowerCase()));
 
-  const handleOpenRegistration = (product?: any) => {
-    const p = product || APP_CONFIG.products[0];
-    setSelectedProductForModal(p);
-    
-    // Auto-detect matching subject from clicked product card
-    let matchedSubject = 'Matematika';
-    if (p) {
-      const pName = (p.name || p.category || '').toLowerCase();
-      if (pName.includes('indonesia')) matchedSubject = 'Bahasa Indonesia';
-      else if (pName.includes('sains') || pName.includes('ipa')) matchedSubject = 'IPA / Sains';
-      else if (pName.includes('inggris')) matchedSubject = 'Bahasa Inggris';
-      else if (pName.includes('matematika')) matchedSubject = 'Matematika';
-    }
-
-    setChildrenForms(prev => {
-      const first = prev[0] || {
-        fullName: '',
-        level: 'SD / MI (Kategori B: Usia 7-12 Tahun)',
-        schoolName: '',
-        cityProvince: '',
-        whatsapp: '',
-        email: '',
-        parentName: '',
-        fullAddress: '',
-        subjects: [matchedSubject]
-      };
-      const currentSubjects = first.subjects.includes(matchedSubject)
-        ? first.subjects
-        : [...first.subjects, matchedSubject];
-      return [{
-        ...first,
-        subjects: currentSubjects.length > 0 ? currentSubjects : [matchedSubject]
-      }];
-    });
-    setChildCount(1);
-    setSubjectErrors({});
-    setRegistrationSuccess(false);
-    setRegistrationModalOpen(true);
+  const handleOpenRegistration = (_product?: any) => {
+    setMobileMenuOpen(false);
+    window.location.href = CBT_PORTAL_URL;
   };
 
   // Change number of children (1, 2, 3, or more)
@@ -735,33 +699,36 @@ export default function App() {
           <div className="hidden sm:flex items-center gap-2">
             
             {/* Tombol Akses Login User */}
-            <button
-              onClick={() => openLogin('user')}
+            <a
+              href="https://ujiancbt.ai.studio/"
+              onClick={(e) => { e.preventDefault(); openLogin('user'); }}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all shadow-xs cursor-pointer"
               title="Akses Ujian CBT & Kartu Peserta"
             >
               <User className="w-3.5 h-3.5 text-[#9E7D15]" />
               <span>Login Peserta</span>
-            </button>
+            </a>
 
             {/* Tombol Akses Login Admin Panitia */}
-            <button
-              onClick={() => openLogin('admin')}
+            <a
+              href="https://ujiancbt.ai.studio/"
+              onClick={(e) => { e.preventDefault(); openLogin('admin'); }}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/60 hover:bg-[#2A2321] transition-all shadow-xs cursor-pointer"
               title="Akses Dashboard Admin & Panitia Pusat"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Login Admin</span>
-            </button>
+            </a>
 
             {/* Tombol Daftar Sekarang */}
-            <button
-              onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+            <a
+              href="https://ujiancbt.ai.studio/"
+              onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white transition-all shadow-sm cursor-pointer"
             >
               <span>Daftar Gratis</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            </a>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -780,20 +747,22 @@ export default function App() {
             
             {/* Mobile Login Access Direct Row */}
             <div className="pb-2 border-b border-[#E8E2D9] space-y-2">
-              <button
-                onClick={() => openLogin('user')}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] shadow-sm"
+              <a
+                href="https://ujiancbt.ai.studio/"
+                onClick={(e) => { e.preventDefault(); openLogin('user'); }}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] shadow-sm cursor-pointer"
               >
                 <User className="w-4 h-4 text-[#9E7D15]" />
                 <span>Masuk Ruang Ujian CBT Peserta</span>
-              </button>
-              <button
-                onClick={() => openLogin('admin')}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm"
+              </a>
+              <a
+                href="https://ujiancbt.ai.studio/"
+                onClick={(e) => { e.preventDefault(); openLogin('admin'); }}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 shadow-sm cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
                 <span>Masuk Dashboard Admin Panitia</span>
-              </button>
+              </a>
             </div>
 
             <a
@@ -847,15 +816,17 @@ export default function App() {
             </a>
 
             <div className="pt-2 flex flex-col gap-2">
-              <button
-                onClick={() => {
+              <a
+                href="https://ujiancbt.ai.studio/"
+                onClick={(e) => {
+                  e.preventDefault();
                   setMobileMenuOpen(false);
                   handleOpenRegistration(APP_CONFIG.products[0]);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-[#1A1615] text-[#D4AF37] shadow-md border border-[#D4AF37]/50"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-[#1A1615] text-[#D4AF37] shadow-md border border-[#D4AF37]/50 cursor-pointer"
               >
                 Daftar Kompetisi (Penyisihan Gratis)
-              </button>
+              </a>
               <a
                 href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi`}
                 target="_blank"
@@ -934,22 +905,24 @@ export default function App() {
 
               {/* Main Action Buttons */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
-                <button
-                  onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+                <a
+                  href="https://ujiancbt.ai.studio/"
+                  onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
                   className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-xs sm:text-sm font-extrabold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all shadow-[0_10px_25px_rgba(26,22,21,0.25)] flex items-center justify-center gap-2.5 group border border-[#D4AF37]/50 cursor-pointer animate-subtle-pulse ring-2 ring-[#D4AF37]/40 hover:ring-[#D4AF37]"
                 >
                   <Award className="w-4 h-4 text-[#D4AF37] group-hover:rotate-12 transition-transform" />
                   <span>Daftar Sekarang (Penyisihan Gratis)</span>
                   <ChevronRight className="w-4 h-4 text-[#D4AF37]" />
-                </button>
+                </a>
 
-                <button
-                  onClick={() => openLogin('user')}
-                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs sm:text-sm font-bold bg-white border border-[#D4AF37] text-[#1A1615] hover:bg-amber-50/60 transition-all flex items-center justify-center gap-2 shadow-sm"
+                <a
+                  href="https://ujiancbt.ai.studio/"
+                  onClick={(e) => { e.preventDefault(); openLogin('user'); }}
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs sm:text-sm font-bold bg-white border border-[#D4AF37] text-[#1A1615] hover:bg-amber-50/60 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
                   <User className="w-4 h-4 text-[#9E7D15]" />
                   <span>Akses Login Peserta</span>
-                </button>
+                </a>
 
                 <a
                   href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi%20pendaftaran`}
@@ -1076,12 +1049,13 @@ export default function App() {
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Pendaftaran 2026 Aktif</span>
                   </div>
-                  <button
-                    onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#D4AF37] text-[#1A1615] hover:bg-[#FFF2B2] transition-colors"
+                  <a
+                    href="https://ujiancbt.ai.studio/"
+                    onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
+                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#D4AF37] text-[#1A1615] hover:bg-[#FFF2B2] transition-colors cursor-pointer"
                   >
                     Daftar Sekarang
-                  </button>
+                  </a>
                 </div>
 
               </div>
@@ -1389,14 +1363,14 @@ export default function App() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+              <a
+                href="https://ujiancbt.ai.studio/"
+                onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs font-black bg-[#D4AF37] hover:bg-[#FFF2B2] text-[#1A1615] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-[#FFF2B2]"
               >
                 <span>Daftar Gratis Sekarang</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
               <a
                 href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20konsultasi%20tentang%20keunggulan%20kompetisi`}
                 target="_blank"
@@ -1483,13 +1457,14 @@ export default function App() {
                   </div>
 
                   <div className="pt-4 border-t border-[#E8E2D9]">
-                    <button
-                      onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
+                    <a
+                      href="https://ujiancbt.ai.studio/"
+                      onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
                       className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                     >
                       <span>Daftar Jenjang Ini (Gratis)</span>
                       <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                    </a>
                   </div>
                 </div>
               );
@@ -1602,13 +1577,14 @@ export default function App() {
 
                 {/* Card Actions */}
                 <div className="p-6 pt-0 space-y-2">
-                  <button
-                    onClick={() => handleOpenRegistration(prod)}
-                    className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 hover:bg-[#2A2321] transition-all flex items-center justify-center gap-2 shadow-sm"
+                  <a
+                    href="https://ujiancbt.ai.studio/"
+                    onClick={(e) => { e.preventDefault(); handleOpenRegistration(prod); }}
+                    className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] border border-[#D4AF37]/50 hover:bg-[#2A2321] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
                     <span>Daftar Mapel Ini (Gratis)</span>
                     <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  </a>
 
                   <a
                     href={`https://wa.me/${APP_CONFIG.contact.whatsapp}?text=Halo%20Panitia%20OSN,%20saya%20ingin%20tanya%20silabus%20${encodeURIComponent(prod.name)}`}
@@ -1740,20 +1716,22 @@ export default function App() {
           </div>
 
           <div className="mt-10 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => handleOpenRegistration(APP_CONFIG.products[0])}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 shadow-md"
+            <a
+              href="https://ujiancbt.ai.studio/"
+              onClick={(e) => { e.preventDefault(); handleOpenRegistration(APP_CONFIG.products[0]); }}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 shadow-md cursor-pointer"
             >
               <span>Daftar Sekarang Sebelum Pendaftaran Ditutup</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => openLogin('user')}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all inline-flex items-center justify-center gap-2 shadow-sm"
+            </a>
+            <a
+              href="https://ujiancbt.ai.studio/"
+              onClick={(e) => { e.preventDefault(); openLogin('user'); }}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs font-bold bg-white text-[#1A1615] border border-[#D4AF37] hover:bg-amber-50/70 transition-all inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer"
             >
               <User className="w-3.5 h-3.5 text-[#9E7D15]" />
               <span>Sudah Daftar? Login Peserta CBT</span>
-            </button>
+            </a>
           </div>
 
         </div>
@@ -2140,577 +2118,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* 16. REGISTRATION MODAL (TANPA HARGA - PENYISIHAN GRATIS) */}
-      {registrationModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="relative bg-white w-full max-w-xl rounded-3xl border border-[#D4AF37]/50 shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
-            
-            {/* Modal Header */}
-            <div className="p-6 bg-[#0B132B] text-white border-b border-[#D4AF37]/30 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <LogoOSN className="w-10 h-10" />
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-[#D4AF37]">
-                    Penyelenggara: {APP_CONFIG.organizer}
-                  </span>
-                  <h3 className="text-base font-extrabold text-white mt-0.5">
-                    Formulir Registrasi Olimpiade 2026
-                  </h3>
-                </div>
-              </div>
-              <button
-                onClick={() => setRegistrationModalOpen(false)}
-                className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 sm:p-8 max-h-[85vh] overflow-y-auto">
-              {!registrationSuccess ? (
-                <form onSubmit={handleRegSubmit} className="space-y-6">
-                  
-                  {/* SELEKSI JUMLAH ANAK YANG DIDAFTARKAN (1, 2, 3, ATAU LEBIH) */}
-                  <div className="p-4 rounded-2xl bg-[#1A1615] text-white border-2 border-[#D4AF37]/60 shadow-md">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div>
-                        <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider block">
-                          Formulir Pendaftaran Keluarga
-                        </span>
-                        <h4 className="text-sm font-black text-white flex items-center gap-1.5 mt-0.5">
-                          <Users className="w-4 h-4 text-[#D4AF37]" />
-                          Berapa Jumlah Anak yang Ingin Didaftarkan? *
-                        </h4>
-                        <p className="text-[11px] text-neutral-300 mt-0.5">
-                          Pilih 1, 2, 3, atau lebih. Formulir data siswa akan otomatis terisi dan disesuaikan.
-                        </p>
-                      </div>
-
-                      {/* Buttons 1, 2, 3, 4+ */}
-                      <div className="flex items-center gap-1.5 self-end sm:self-auto bg-neutral-900/90 p-1 rounded-xl border border-neutral-700">
-                        {[1, 2, 3, 4].map(num => (
-                          <button
-                            key={num}
-                            type="button"
-                            onClick={() => handleChangeChildCount(num)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                              childCount === num
-                                ? 'bg-[#D4AF37] text-[#1A1615] shadow-md scale-105'
-                                : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
-                            }`}
-                          >
-                            {num === 4 ? '4+ Anak' : `${num} Anak`}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {childCount > 1 && (
-                      <div className="mt-3 pt-3 border-t border-neutral-700/80 flex items-center justify-between text-xs text-amber-300">
-                        <span className="flex items-center gap-1.5 font-bold">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          Mendaftarkan {childCount} Siswa Sekaligus
-                        </span>
-                        <span className="text-[11px] text-neutral-300">
-                          Babak Penyisihan Seluruh Anak Bebas Biaya (100% GRATIS)
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* DATA ORANG TUA / WALI & ALAMAT DOMISILI (BERLAKU UNTUK KELUARGA / SELURUH ANAK) */}
-                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] space-y-3">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-[#E8E2D9]">
-                      <h5 className="text-xs font-black text-[#1A1615] uppercase tracking-wider flex items-center gap-1.5">
-                        <User className="w-4 h-4 text-[#D4AF37]" />
-                        <span>Data Orang Tua / Wali & Domisili Keluarga</span>
-                      </h5>
-                      <span className="text-[10px] font-bold text-[#756F68] bg-white px-2 py-0.5 rounded-md border border-[#E8E2D9]">
-                        Wajib Diisi
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                          NAMA ORANGTUA / WALI *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="Nama lengkap Ayah / Ibu / Wali Siswa"
-                          value={childrenForms[0]?.parentName || ''}
-                          onChange={(e) => updateChildField(0, 'parentName', e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-white font-medium"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                          Kota / Kabupaten & Provinsi Domisili *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="Contoh: Surabaya, Jawa Timur"
-                          value={childrenForms[0]?.cityProvince || ''}
-                          onChange={(e) => updateChildField(0, 'cityProvince', e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-white font-medium"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                        ALAMAT LENGKAP / DOMISILI *
-                      </label>
-                      <textarea
-                        rows={2}
-                        required
-                        placeholder="Contoh: Jl. Rungkut Asri No. 12, Kel. Kali Rungkut, Kec. Rungkut, Kota Surabaya (Untuk pengiriman piagam/sertifikat resmi)"
-                        value={childrenForms[0]?.fullAddress || ''}
-                        onChange={(e) => updateChildField(0, 'fullAddress', e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-white font-medium resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* LOOP FORMULIR SETIAP ANAK / SISWA */}
-                  <div className="space-y-6">
-                    {childrenForms.map((child, idx) => (
-                      <div
-                        key={idx}
-                        className="p-5 rounded-2xl bg-white border-2 border-[#D4AF37]/40 shadow-xs space-y-4 relative"
-                      >
-                        {/* Header Box Anak ke-N */}
-                        <div className="flex items-center justify-between pb-2 border-b border-[#E8E2D9]">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-[#1A1615] text-[#D4AF37] font-black text-xs flex items-center justify-center shadow-xs">
-                              {idx + 1}
-                            </span>
-                            <h4 className="text-xs sm:text-sm font-extrabold text-[#1A1615]">
-                              Data Siswa - Anak Ke-{idx + 1}
-                              {child.fullName ? ` (${child.fullName})` : ''}
-                            </h4>
-                          </div>
-                          {childrenForms.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (childrenForms.length > 1) {
-                                  handleChangeChildCount(childrenForms.length - 1);
-                                }
-                              }}
-                              className="text-[11px] font-bold text-rose-600 hover:text-rose-800 transition-colors cursor-pointer"
-                              title="Hapus form anak ini"
-                            >
-                              Hapus
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Input 1: Nama Lengkap Siswa */}
-                        <div>
-                          <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                            Nama Lengkap Siswa (Anak Ke-{idx + 1}) *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="Contoh: Dzaliqa Assyafa N"
-                            value={child.fullName}
-                            onChange={(e) => updateChildField(idx, 'fullName', e.target.value)}
-                            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5] font-semibold"
-                          />
-                        </div>
-
-                        {/* Input 2 & 3: Kategori Jenjang & Asal Sekolah */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                              Kategori Jenjang (Anak Ke-{idx + 1}) *
-                            </label>
-                            <select
-                              value={child.level}
-                              onChange={(e) => updateChildField(idx, 'level', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5] font-medium"
-                            >
-                              <option value="PAUD/TK (Kategori A: Usia 4-6 Tahun)">PAUD / TK (Kategori A: 4-6 Tahun)</option>
-                              <option value="SD/MI (Kategori B: Usia 7-12 Tahun)">SD / MI (Kategori B: 7-12 Tahun)</option>
-                              <option value="SMP/MTs (Kategori C: Usia 13-15 Tahun)">SMP / MTs (Kategori C: 13-15 Tahun)</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                              Asal Sekolah (Anak Ke-{idx + 1}) *
-                            </label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="Contoh: SDN Teladan Bangsa"
-                              value={child.schoolName}
-                              onChange={(e) => updateChildField(idx, 'schoolName', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Input 4 & 5: No WhatsApp & Alamat Email */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <label className="block text-xs font-bold text-[#1A1615]">
-                                No. WhatsApp Aktif (Anak Ke-{idx + 1}) *
-                              </label>
-                              {idx > 0 && child.whatsapp === childrenForms[0]?.whatsapp && child.whatsapp && (
-                                <span className="text-[9px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
-                                  ✓ Sama dg Anak Ke-1
-                                </span>
-                              )}
-                            </div>
-                            <input
-                              type="tel"
-                              required
-                              placeholder="Contoh: 081234567890"
-                              value={child.whatsapp}
-                              onChange={(e) => updateChildField(idx, 'whatsapp', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5] font-mono font-bold"
-                            />
-                            <p className="text-[10px] text-[#756F68] mt-0.5">
-                              {idx === 0 
-                                ? 'Nomor ini digunakan untuk mendaftarkan semua anak & akses login CBT'
-                                : '1 nomor WhatsApp dapat menaungi seluruh anak sekaligus'}
-                            </p>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold text-[#1A1615] mb-1">
-                              Alamat Email Aktif (Anak Ke-{idx + 1}) *
-                            </label>
-                            <input
-                              type="email"
-                              required
-                              placeholder="Untuk jadwal CBT & sertifikat"
-                              value={child.email}
-                              onChange={(e) => updateChildField(idx, 'email', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E8E2D9] focus:outline-none focus:border-[#D4AF37] bg-[#FAF8F5]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Multi-Select Mata Pelajaran per Siswa */}
-                        <div className="space-y-2 bg-[#FAF8F5] p-3.5 rounded-xl border border-[#E8E2D9]">
-                          <div className="flex items-center justify-between gap-2 flex-wrap">
-                            <div>
-                              <label className="block text-xs font-black text-[#1A1615]">
-                                Mata Pelajaran yang Diikuti (Anak Ke-{idx + 1}) *
-                              </label>
-                              <span className="text-[10px] text-[#756F68]">
-                                Bisa memilih lebih dari 1 mata pelajaran
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                {child.subjects.length} Mapel Terpilih
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleSelectAllSubjectsForChild(idx)}
-                                className="text-[11px] font-bold text-[#9E7D15] hover:text-[#7A6110] underline cursor-pointer"
-                              >
-                                {child.subjects.length === SUBJECT_OPTIONS.length ? 'Pilih Ulang' : 'Pilih Semua (4 Mapel)'}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                            {SUBJECT_OPTIONS.map((sub) => {
-                              const isSelected = child.subjects.includes(sub.name);
-                              const IconComp = sub.icon;
-                              return (
-                                <button
-                                  key={sub.id}
-                                  type="button"
-                                  onClick={() => toggleSubjectForChild(idx, sub.name)}
-                                  className={`text-left p-2.5 rounded-xl border transition-all flex items-start gap-2 cursor-pointer select-none ${
-                                    isSelected
-                                      ? 'bg-white border-[#D4AF37] ring-2 ring-[#D4AF37]/40 shadow-xs'
-                                      : 'bg-white/80 border-[#E8E2D9] hover:border-[#D4AF37]/50 hover:bg-white'
-                                  }`}
-                                >
-                                  <div className="mt-0.5 shrink-0">
-                                    {isSelected ? (
-                                      <div className="w-4 h-4 rounded bg-[#1A1615] text-[#D4AF37] flex items-center justify-center shadow-xs">
-                                        <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
-                                      </div>
-                                    ) : (
-                                      <div className="w-4 h-4 rounded border border-neutral-400 bg-white" />
-                                    )}
-                                  </div>
-
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between gap-1">
-                                      <div className="flex items-center gap-1.5 min-w-0">
-                                        <IconComp className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-[#D4AF37]' : 'text-neutral-400'}`} />
-                                        <span className={`text-xs font-bold truncate ${isSelected ? 'text-[#1A1615]' : 'text-neutral-700'}`}>
-                                          {sub.name}
-                                        </span>
-                                      </div>
-                                      <span className="text-[8.5px] font-bold px-1 rounded bg-amber-100/80 text-amber-900 shrink-0">
-                                        {sub.badge}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {subjectErrors[idx] && (
-                            <p className="text-[11px] font-semibold text-rose-600 flex items-center gap-1 pt-1">
-                              <X className="w-3.5 h-3.5 shrink-0" />
-                              {subjectErrors[idx]}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Tombol Tambah Anak Tambahan */}
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => handleChangeChildCount(childrenForms.length + 1)}
-                      className="px-4 py-2 rounded-xl text-xs font-bold border-2 border-dashed border-[#D4AF37] text-[#1A1615] hover:bg-amber-50/50 flex items-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <PlusCircle className="w-4 h-4 text-[#D4AF37]" />
-                      <span>+ Tambah Formulir Anak Lainnya</span>
-                    </button>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      className="w-full py-3.5 rounded-xl text-xs sm:text-sm font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all border border-[#D4AF37]/50 shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
-                      <span>
-                        Kirim Pendaftaran ({childrenForms.length} Anak - Babak Penyisihan Bebas Biaya)
-                      </span>
-                    </button>
-                    <p className="text-[11px] text-center text-[#756F68] mt-2">
-                      Penyelenggara: {APP_CONFIG.organizer} • Call Center: {APP_CONFIG.contact.displayPhone}
-                    </p>
-                  </div>
-                </form>
-              ) : (
-                /* Registration Success State (Supports 1 or Multi-Child) */
-                <div className="text-center py-4 space-y-4">
-                  <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto border-2 border-emerald-400">
-                    <CheckCircle2 className="w-7 h-7" />
-                  </div>
-
-                  <div>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 border border-emerald-300">
-                      <Database className="w-3.5 h-3.5 text-emerald-600" />
-                      Pendaftaran {registeredRecords.length} Peserta Otomatis Tersimpan di Database
-                    </span>
-                    <h3 className="text-lg font-extrabold text-[#1A1615] mt-2">
-                      Pendaftaran Berhasil Terverifikasi!
-                    </h3>
-                    <p className="text-xs text-[#66615B] max-w-md mx-auto mt-1 leading-relaxed">
-                      Orang Tua/Wali: <strong>{childrenForms[0]?.parentName || '-'}</strong>. Data seluruh siswa telah aktif di database CBT pusat OSN 2026.
-                    </p>
-                  </div>
-
-                  {/* Copy All Registration Button Banner */}
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-left">
-                    <div>
-                      <span className="text-xs font-bold text-amber-950 block">
-                        Simpan Bukti & Akun Login Ujian
-                      </span>
-                      <span className="text-[11px] text-amber-800">
-                        Salin ringkasan data pendaftaran untuk disimpan ke catatan atau chat keluarga.
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleCopyAllRecords}
-                      className="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
-                    >
-                      {copiedAllRegistration ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Tersalin ke Clipboard!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          <span>Salin Seluruh Rincian Siswa</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* List of Registered Children Credentials */}
-                  <div className="space-y-3">
-                    {registeredRecords.map((rec, rIdx) => (
-                      <div
-                        key={rec.id || rIdx}
-                        className="p-4 rounded-2xl bg-[#FAF8F5] border-2 border-[#D4AF37]/50 text-left text-xs space-y-2 shadow-xs"
-                      >
-                        <div className="flex items-center justify-between pb-1.5 border-b border-[#E8E2D9]">
-                          <span className="text-[11px] font-bold text-[#1A1615] flex items-center gap-1.5">
-                            <User className="w-3.5 h-3.5 text-[#D4AF37]" />
-                            Data Terdaftar (Anak Ke-{rIdx + 1}): {rec.fullName}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
-                              {rec.id}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleCopySingleRecord(rec)}
-                              className="p-1 rounded-md text-[#756F68] hover:text-[#1A1615] hover:bg-neutral-200/60 transition-colors cursor-pointer"
-                              title="Salin data siswa ini"
-                            >
-                              {copiedRecordId === rec.id ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5 text-[#756F68]" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                          <div>
-                            <span className="text-[#756F68] block">Nama Lengkap Siswa:</span>
-                            <strong className="text-[#1A1615] text-xs">{rec.fullName}</strong>
-                          </div>
-                          <div>
-                            <span className="text-[#756F68] block">No. WhatsApp Akses Login:</span>
-                            <strong className="text-[#1A1615] text-xs font-mono">{rec.whatsapp}</strong>
-                            <span className="text-[9.5px] text-amber-800 font-semibold block mt-0.5">
-                              (Cukup masukkan nomor ini saat login, tanpa perlu mengetik nama)
-                            </span>
-                          </div>
-                        </div>
-
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-[#756F68] block">
-                            Mata Pelajaran yang Diikuti:
-                          </span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {Array.from(new Set(rec.subjects || ['Matematika'])).map((s, idx) => (
-                              <span key={`${s}-${idx}`} className="px-2 py-0.5 rounded-lg bg-[#1A1615] text-[#D4AF37] font-bold text-[11px] inline-flex items-center gap-1 shadow-xs">
-                                <CheckCircle2 className="w-3 h-3 text-[#D4AF37]" />
-                                {s}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => openLoginWithRegisteredData(rec.fullName, rec.whatsapp)}
-                              className="text-xs font-bold text-[#9E7D15] hover:text-[#7A6110] underline flex items-center gap-1 cursor-pointer"
-                            >
-                              <LogIn className="w-3 h-3" />
-                              <span>Buka CBT Untuk Siswa Ini &rarr;</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleCopySingleRecord(rec)}
-                              className="text-xs font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 cursor-pointer bg-white px-2 py-0.5 rounded-lg border border-neutral-300 hover:border-neutral-400 transition-colors"
-                            >
-                              {copiedRecordId === rec.id ? (
-                                <>
-                                  <Check className="w-3 h-3 text-emerald-600" />
-                                  <span className="text-emerald-700 font-bold">Tersalin</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="w-3 h-3 text-neutral-500" />
-                                  <span>Salin</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                          <span className="text-emerald-700 font-bold">Penyisihan 100% GRATIS</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Wajib Konfirmasi WhatsApp & Follow Sosmed Banner */}
-                  <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-left space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-600 text-white font-bold text-xs flex items-center justify-center">!</span>
-                      <h4 className="text-xs font-bold text-amber-900">Alur Wajib Setelah Mendaftar:</h4>
-                    </div>
-                    <ol className="text-xs text-amber-950 space-y-1 pl-4 list-decimal">
-                      <li><strong>Klik tombol WhatsApp di bawah</strong> untuk konfirmasi data ke panitia.</li>
-                      <li><strong>Wajib Follow Akun Instagram/TikTok resmi OSN</strong> untuk membuka akses pengerjaan simulasi ujian.</li>
-                      <li>Setelah follow, masuk ke <strong>Ruang Ujian Siswa</strong> untuk mengerjakan simulasi dan unduh kartu ujian.</li>
-                    </ol>
-                  </div>
-
-                  {/* Actions: WhatsApp Notification & Direct CBT Portal Login */}
-                  <div className="space-y-2 pt-2">
-                    <a
-                      href={generateWhatsAppUrlMulti(childrenForms)}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => {
-                        trackPixelEvent('Contact', {
-                          content_name: 'Konfirmasi Pendaftaran ke WhatsApp Admin',
-                          students_count: childrenForms.length
-                        });
-                        showToast('success', 'Konfirmasi Pendaftaran', 'Membuka WhatsApp Admin untuk konfirmasi pendaftaran & link sosmed...');
-                      }}
-                      className="w-full py-3.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>1. Konfirmasi Sekarang ke WhatsApp Admin & Ambil Link Sosmed</span>
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const first = registeredRecords[0];
-                        if (first) {
-                          openLoginWithRegisteredData(first.fullName, first.whatsapp);
-                        } else {
-                          openLogin('user');
-                        }
-                      }}
-                      className="w-full py-3 rounded-xl text-xs font-bold bg-[#1A1615] text-[#D4AF37] hover:bg-[#2A2321] transition-all flex items-center justify-center gap-2 shadow-md border border-[#D4AF37]/60 cursor-pointer"
-                    >
-                      <LogIn className="w-4 h-4 text-[#D4AF37]" />
-                      <span>2. Masuk ke Ruang Ujian CBT Siswa (Simulasi & Kartu)</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => setRegistrationModalOpen(false)}
-                      className="w-full py-2 rounded-xl text-xs font-semibold text-[#66615B] hover:text-[#1A1615] cursor-pointer"
-                    >
-                      Tutup
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
+      {/* 16. REGISTRATION PORTAL REDIRECT (https://ujiancbt.ai.studio/) */}
 
       {/* 17. AI CONSULTANT DRAWER */}
       {aiDrawerOpen && (

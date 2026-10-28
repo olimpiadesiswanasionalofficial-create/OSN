@@ -27,6 +27,14 @@ import {
   getParticipantByIdFromDb
 } from './src/server/db.js';
 import { runDbMigration } from './src/server/dbMigration.js';
+import {
+  getGoogleSyncConfig,
+  saveGoogleSyncConfig,
+  syncParticipantToGoogle,
+  syncExamResultToGoogleSpreadsheet,
+  getGoogleSyncLogs,
+  recordGoogleSyncLog
+} from './src/server/googleSyncService.js';
 
 dotenv.config();
 
@@ -327,14 +335,98 @@ app.post('/api/participants', async (req: Request, res: Response) => {
     else currentList.unshift(saved);
     saveStoredParticipants(currentList);
 
+    // Sinkronisasi otomatis ke Google Form dan Google Spreadsheet secara real-time
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress || '127.0.0.1';
+    syncParticipantToGoogle(saved, {
+      ip: clientIp,
+      userAgent: req.headers['user-agent']
+    }).catch(err => {
+      console.warn('[Server] Google Form & Spreadsheet sync warning:', err?.message);
+    });
+
     return res.json({
       success: true,
-      message: 'Pendaftaran otomatis tercatat pada sistem & database Neon PostgreSQL.',
+      message: 'Pendaftaran otomatis tercatat pada sistem, database Neon PostgreSQL, serta disinkronkan ke Google Form & Spreadsheet.',
       data: saved
     });
   } catch (error: any) {
     console.error('Error in POST /api/participants:', error);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal menyimpan data ke database.' });
+  }
+});
+
+// ---------------- Google Form & Spreadsheet Sync Endpoints ----------------
+app.get('/api/google-sync/config', async (_req: Request, res: Response) => {
+  try {
+    const config = await getGoogleSyncConfig();
+    res.json({ success: true, data: config });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message });
+  }
+});
+
+app.post('/api/google-sync/config', async (req: Request, res: Response) => {
+  try {
+    const updated = await saveGoogleSyncConfig(req.body);
+    res.json({ success: true, message: 'Pengaturan sinkronisasi Google Form & Spreadsheet berhasil disimpan.', data: updated });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message });
+  }
+});
+
+app.get('/api/google-sync/logs', (_req: Request, res: Response) => {
+  try {
+    const logs = getGoogleSyncLogs(100);
+    res.json({ success: true, data: logs });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message });
+  }
+});
+
+app.post('/api/google-sync/test', async (req: Request, res: Response) => {
+  try {
+    const sample = {
+      id: `TEST-SYNC-${Math.floor(1000 + Math.random() * 9000)}`,
+      fullName: req.body?.fullName || 'Uji Coba Sinkronisasi Google',
+      whatsapp: req.body?.whatsapp || '081299887766',
+      level: req.body?.level || 'SD / MI (Kategori B: Usia 7-12 Tahun)',
+      schoolName: req.body?.schoolName || 'SD Percontohan Nasional',
+      cityProvince: req.body?.cityProvince || 'DKI Jakarta',
+      subjects: ['Matematika'],
+      parentName: 'Orang Tua Uji Coba',
+      email: 'uji.google.sync@gmail.com'
+    };
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
+    const result = await syncParticipantToGoogle(sample, {
+      ip: clientIp,
+      userAgent: req.headers['user-agent']
+    });
+    res.json({
+      success: true,
+      message: 'Uji sinkronisasi ke Google Form & Google Spreadsheet berhasil dieksekusi.',
+      result,
+      sample
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message });
+  }
+});
+
+app.post('/api/google-sync/sync-all', async (_req: Request, res: Response) => {
+  try {
+    const all = await getAllParticipantsFromDb();
+    let count = 0;
+    for (const p of all) {
+      await syncParticipantToGoogle(p, { ip: '127.0.0.1', userAgent: 'Admin-Batch-Sync' }).catch(() => {});
+      count++;
+    }
+    res.json({
+      success: true,
+      message: `Berhasil sinkronisasi massal ${count} peserta ke Google Form & Google Spreadsheet.`,
+      totalSynced: count
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message });
   }
 });
 
@@ -557,7 +649,20 @@ app.post(['/api/participants/:id/exam', '/api/participants/exam'], async (req: R
     else currentList.unshift(updated);
     saveStoredParticipants(currentList);
 
-    return res.json({ success: true, message: 'Hasil ujian tercatat di Neon PostgreSQL.', data: updated });
+    // Sinkronisasi otomatis hasil pengerjaan ujian ke Google Spreadsheet panitia
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress || '127.0.0.1';
+    syncExamResultToGoogleSpreadsheet(updated, resolvedExamType, examInfo, {
+      ip: clientIp,
+      userAgent: req.headers['user-agent']
+    }).catch(err => {
+      console.warn('[Server] Google Spreadsheet exam sync warning:', err?.message);
+    });
+
+    return res.json({
+      success: true,
+      message: 'Hasil ujian otomatis tercatat pada database dan disinkronkan ke Google Spreadsheet.',
+      data: updated
+    });
   } catch (error: any) {
     console.warn('POST /api/participants/:id/exam notice:', error?.message);
     return res.status(500).json({ success: false, error: error?.message || 'Gagal update status ujian.' });

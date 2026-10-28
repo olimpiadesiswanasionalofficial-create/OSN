@@ -460,3 +460,110 @@ export function exportParticipantsToGoogleSheetsCsv(
   URL.revokeObjectURL(url);
 }
 
+// ---------------- Google Form & Spreadsheet Live Sync API ----------------
+export interface GoogleSyncConfig {
+  isEnabled: boolean;
+  autoSyncOnRegistration: boolean;
+  autoSyncGoogleForm: boolean;
+  autoSyncSpreadsheet: boolean;
+  googleFormUrl: string;
+  googleFormViewUrl: string;
+  googleSpreadsheetId: string;
+  googleSpreadsheetUrl: string;
+  googleAppsScriptUrl?: string;
+  fieldMappings: {
+    fullName: string;
+    whatsapp: string;
+    level: string;
+    schoolName: string;
+    cityProvince: string;
+    subjects: string;
+    parentName: string;
+    email: string;
+  };
+  lastSyncedAt?: string | null;
+  totalSynced: number;
+}
+
+export interface GoogleSyncLog {
+  id: string;
+  timestamp: string;
+  participantId: string;
+  participantName: string;
+  whatsapp: string;
+  target: 'google_form' | 'google_spreadsheet' | 'both';
+  status: 'success' | 'warning' | 'error';
+  details: string;
+  sourceIp?: string;
+  device?: string;
+}
+
+export async function fetchGoogleSyncConfig(): Promise<GoogleSyncConfig | null> {
+  try {
+    const res = await fetch(`/api/google-sync/config?_t=${Date.now()}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.success) return json.data;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch Google sync config:', err);
+  }
+  return null;
+}
+
+export async function saveGoogleSyncConfigToServer(config: Partial<GoogleSyncConfig>): Promise<GoogleSyncConfig | null> {
+  try {
+    const res = await fetch('/api/google-sync/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.success) return json.data;
+    }
+  } catch (err) {
+    console.warn('Failed to save Google sync config:', err);
+  }
+  return null;
+}
+
+export async function fetchGoogleSyncLogs(): Promise<GoogleSyncLog[]> {
+  try {
+    const res = await fetch(`/api/google-sync/logs?_t=${Date.now()}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.success) return json.data;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch Google sync logs:', err);
+  }
+  return [];
+}
+
+export async function triggerGoogleSyncTest(sampleData?: any): Promise<{ success: boolean; message: string; result?: any }> {
+  try {
+    const res = await fetch('/api/google-sync/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sampleData || {})
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Gagal menghubungi server sync.' };
+  }
+}
+
+export async function triggerGoogleSyncAll(): Promise<{ success: boolean; message: string; totalSynced?: number }> {
+  try {
+    const res = await fetch('/api/google-sync/sync-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Gagal sinkronisasi massal.' };
+  }
+}
+
+
